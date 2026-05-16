@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local runtime artifacts
+*.log
+*.tmp
+
+# Data/output artifacts that should be intentionally versioned only when needed
+data/raw/
+data/interim/
+data/clean/
+data/observables/
+data/model_input/
+outputs/
+!outputs/schema/
+
+# Dynare/MATLAB generated artifacts
+*.asv
+*.m~
+*_dynamic.m
+*_static.m
+*_set_auxiliary_variables.m
+*_results.mat
+*_mode.mat
+
