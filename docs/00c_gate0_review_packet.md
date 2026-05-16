@@ -13,7 +13,7 @@
 - O Gate 0 está aprovado? **Não.**
 - Decisões que bloqueiam avanço: `SAMPLE-001`, `TREND-001`, `MON-001`, `TARGET-001`, `EXT-001`, `FISC-001`, `ADMIN-001`, `OBS-001`.
 - Motivo formal: todas as decisões permanecem com `decision_status: proposed`, `approved_by` vazio e `approval_date` vazio.
-- Motivo de schema: nenhuma decisão contém o campo `blocking_status`, exigido pelo prompt de revisão atual.
+- Schema: corrigido; todas as decisões existentes agora contêm `blocking_status: blocking_for_mvp`.
 - Próximo passo recomendado: revisão humana de `docs/00b_modeling_decisions.md`, aplicação dos ajustes sugeridos abaixo e nova execução com `HUMAN_APPROVALS` preenchido para Modo B.
 
 Nenhum config, dado, `.mod`, pipeline, teste, equation registry ou data dictionary deve ser criado antes da aprovação humana explícita do Gate 0.
@@ -67,36 +67,36 @@ blocking_status
 
 | decision_id | decision_id | decision_title | decision_status | proposed_by | approved_by | approval_date | alternatives_rejected | rationale | downstream_files | blocking_status |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `SAMPLE-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `TREND-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `MON-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `TARGET-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `EXT-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `FISC-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `ADMIN-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
-| `OBS-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | **Não** |
+| `SAMPLE-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `TREND-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `MON-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `TARGET-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `EXT-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `FISC-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `ADMIN-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
+| `OBS-001` | Sim | Sim | Sim | Sim | Sim, vazio | Sim, vazio | Sim | Sim | Sim | Sim, `blocking_for_mvp` |
 
 Conclusão do schema check:
 
 ```text
-Schema quase completo, mas falta `blocking_status` em todas as decisões.
-Gate 0 não pode passar enquanto `decision_status` permanecer proposed e os campos de aprovação humana estiverem vazios.
+Schema corrigido para as decisões existentes: todas contêm `blocking_status`.
+Gate 0 continua bloqueado porque `decision_status` permanece proposed e os campos de aprovação humana estão vazios.
 ```
 
 ---
 
 ## 4. Decisões encontradas
 
-| decision_id | decision_title | status | approved_by | approval_date | bloqueante? | pode avançar? | observação |
-|---|---|---|---|---|---:|---:|---|
-| `SAMPLE-001` | Amostra, COVID e política de revisão de dados | proposed | vazio | vazio | Sim | Não | Formalmente bloqueada por falta de aprovação; conteúdo é majoritariamente alinhado ao SPEC. |
-| `TREND-001` | Tratamento de tendência para SAMBA clássico | proposed | vazio | vazio | Sim | Não | Alinhada ao SPEC, mas ainda precisa fixar onde transformações serão decididas por série. |
-| `MON-001` | Regra de Taylor forward-looking com meta explícita | proposed | vazio | vazio | Sim | Não | Regra está especificada, mas `y_gap_t` ainda está ambíguo como variável/model measure vs proxy observável. |
-| `TARGET-001` | Tratamento de `pi_target_t` no MVP clássico | proposed | vazio | vazio | Sim | Não | Deixa aberta escolha entre série exógena e `varexo_det`, listada como pendência bloqueante no plano. |
-| `EXT-001` | UIP com fechamento NFA/debt-elastic e prêmio de risco | proposed | vazio | vazio | Sim | Não | Forma de UIP está bem especificada; proxy/fonte do risco pode ficar para Gate 1b/estimação. |
-| `FISC-001` | Regra fiscal com `sp_target` e feedback sobre dívida/PIB | proposed | vazio | vazio | Sim | Não | Alinhada ao SPEC; precisa explicitar status de bloqueio. |
-| `ADMIN-001` | Processo para inflação de preços administrados | proposed | vazio | vazio | Sim | Não | Fórmula inclui canais, mas critério ainda pede confirmar quais entram no MVP. |
-| `OBS-001` | Conjunto inicial de observáveis do MVP e primeira estimação | proposed | vazio | vazio | Sim | Não | Lista de observáveis está alinhada; falta lista explícita de variáveis estruturais mínimas do Gate 0. |
+| decision_id | decision_title | decision_status | blocking_status | approved_by | approval_date | pode avançar? | observação |
+|---|---|---|---|---|---|---:|---|
+| `SAMPLE-001` | Amostra, COVID e política de revisão de dados | proposed | blocking_for_mvp | vazio | vazio | Não | Formalmente bloqueada por falta de aprovação; conteúdo é majoritariamente alinhado ao SPEC. |
+| `TREND-001` | Tratamento de tendência para SAMBA clássico | proposed | blocking_for_mvp | vazio | vazio | Não | Alinhada ao SPEC, mas ainda precisa fixar onde transformações serão decididas por série. |
+| `MON-001` | Regra de Taylor forward-looking com meta explícita | proposed | blocking_for_mvp | vazio | vazio | Não | Regra está especificada, mas `y_gap_t` ainda está ambíguo como variável/model measure vs proxy observável. |
+| `TARGET-001` | Tratamento de `pi_target_t` no MVP clássico | proposed | blocking_for_mvp | vazio | vazio | Não | Deixa aberta escolha entre série exógena e `varexo_det`, listada como pendência bloqueante no plano. |
+| `EXT-001` | UIP com fechamento NFA/debt-elastic e prêmio de risco | proposed | blocking_for_mvp | vazio | vazio | Não | Forma de UIP está bem especificada; proxy/fonte do risco pode ficar para Gate 1b/estimação. |
+| `FISC-001` | Regra fiscal com `sp_target` e feedback sobre dívida/PIB | proposed | blocking_for_mvp | vazio | vazio | Não | Alinhada ao SPEC; o status de bloqueio agora está explícito. |
+| `ADMIN-001` | Processo para inflação de preços administrados | proposed | blocking_for_mvp | vazio | vazio | Não | Fórmula inclui canais, mas critério ainda pede confirmar quais entram no MVP. |
+| `OBS-001` | Conjunto inicial de observáveis do MVP e primeira estimação | proposed | blocking_for_mvp | vazio | vazio | Não | Lista de observáveis está alinhada; falta lista explícita de variáveis estruturais mínimas do Gate 0. |
 
 ---
 
@@ -104,9 +104,9 @@ Gate 0 não pode passar enquanto `decision_status` permanecer proposed e os camp
 
 ### 5.1 Amostra
 
-Problema: a proposta está alinhada ao SPEC, mas ainda não tem `blocking_status` nem aprovação humana.  
+Problema: a proposta está alinhada ao SPEC e agora tem `blocking_status`, mas ainda não tem aprovação humana.  
 Por que importa: amostra define todos os datasets, calibração, estimação futura e comparabilidade.  
-Correção proposta: adicionar `blocking_status: blocking_for_gate0` e manter `classic_mvp` em 2003Q1-2019Q4, com Redux explicitamente fora do MVP.  
+Correção proposta: manter `blocking_status: blocking_for_mvp` e `classic_mvp` em 2003Q1-2019Q4, com Redux explicitamente fora do MVP.  
 Severidade: Alta.  
 Bloqueia Gate 0? Sim.
 
@@ -132,7 +132,7 @@ Problema: a decisão confirma log-linear/steady state determinístico, mas não 
 Por que importa: crescimento, log-desvio, deflação, sazonalidade e medidas de hiato precisam ser compatíveis com equações de medida.  
 Correção proposta: manter a decisão macro no Gate 0 e exigir que `docs/02_data_dictionary.md` detalhe transformação por série antes de Gate 1b.  
 Severidade: Média.  
-Bloqueia Gate 0? Sim, por falta de aprovação e `blocking_status`; o detalhamento por série pode ficar para Gate 1a/1b.
+Bloqueia Gate 0? Sim, por falta de aprovação; o detalhamento por série pode ficar para Gate 1a/1b.
 
 ### 5.5 Regra de Taylor
 
@@ -204,12 +204,12 @@ Bloqueia Gate 0? Não, se a exclusão for mantida nas decisões existentes; reco
 
 | decision_id | recomendação | motivo | alteração necessária antes de aprovação |
 |---|---|---|---|
-| `SAMPLE-001` | approve_after_human_review | Conteúdo alinhado ao SPEC para amostra, COVID e final-revised. | Adicionar `blocking_status`; humano preencher `approved_by` e `approval_date` se concordar. |
-| `TREND-001` | approve_after_human_review | Alinhado ao SPEC; detalhamento por série pode ficar no data dictionary. | Adicionar `blocking_status`; explicitar que transformações por observable entram em Gate 1a/1b. |
+| `SAMPLE-001` | approve_after_human_review | Conteúdo alinhado ao SPEC para amostra, COVID e final-revised. | Humano preencher `approved_by` e `approval_date` se concordar. |
+| `TREND-001` | approve_after_human_review | Alinhado ao SPEC; detalhamento por série pode ficar no data dictionary. | Explicitar que transformações por observable entram em Gate 1a/1b. |
 | `MON-001` | revise_before_approval | `y_gap_t` ainda está operacionalmente ambíguo. | Fixar status de `y_gap_t` para MVP ou marcar como bloqueante para Gate 2b antes de `.mod`. |
 | `TARGET-001` | revise_before_approval | Escolha entre série exógena e `varexo_det` ainda está aberta. | Escolher tratamento do MVP ou marcar decisão como deferred bloqueante para `.mod`. |
-| `EXT-001` | approve_after_human_review | Forma estrutural está bem definida e preserva alternativa AR(1). | Adicionar `blocking_status`; remover exigência de proxy/fonte do Gate 0 e empurrar para Gate 1b/estimação. |
-| `FISC-001` | approve_after_human_review | Regra fiscal mínima está alinhada ao SPEC. | Adicionar `blocking_status`; explicitar que identidade completa de dívida entra no equation registry. |
+| `EXT-001` | approve_after_human_review | Forma estrutural está bem definida e preserva alternativa AR(1). | Remover exigência de proxy/fonte do Gate 0 e empurrar para Gate 1b/estimação. |
+| `FISC-001` | approve_after_human_review | Regra fiscal mínima está alinhada ao SPEC. | Explicitar que identidade completa de dívida entra no equation registry. |
 | `ADMIN-001` | revise_before_approval | Canais do processo ainda precisam ser fixados. | Declarar se MVP usa meta + câmbio + importados, ou subconjunto específico. |
 | `OBS-001` | revise_before_approval | Observáveis estão bons, mas faltam variáveis estruturais mínimas. | Adicionar lista estrutural mínima ou nova decisão `STRUCT-001`. |
 
@@ -228,19 +228,23 @@ Não aplicado automaticamente.
 
 ### 7.1 Campo `blocking_status`
 
-Adicionar a todas as decisões:
+Já aplicado às decisões existentes:
 
 ```yaml
-blocking_status: blocking_for_gate0
+blocking_status: blocking_for_mvp
 ```
 
-Para decisões que o humano optar por diferir sem bloquear Gate 0, usar explicitamente:
+Categorias permitidas para decisões futuras:
 
-```yaml
-blocking_status: deferred_non_blocking_for_gate0
-defer_until: Gate 1b | Gate 2b | Phase 3
-defer_reason:
+```text
+blocking_for_mvp
+blocking_for_estimation
+blocking_for_redux
+blocking_for_sovereign
+non_blocking
 ```
+
+Se o humano optar por diferir uma decisão, manter `blocking_status` conforme o impacto real e registrar o diferimento em campo separado, sem transformar a decisão em aprovada.
 
 ### 7.2 Revisão sugerida para `MON-001`
 
@@ -295,7 +299,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
-blocking_status: blocking_for_gate0
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Permitir que variáveis estruturais sejam descobertas apenas durante a escrita do .mod."
   - "Omitir variáveis incorporadas pelo SPEC, como mc, q_k, wn, lambda, y_gap, y_pot, nfa, m_int e pi_target."
@@ -335,7 +339,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
-blocking_status: blocking_for_gate0
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Incluir Redux no MVP."
   - "Incluir extensão soberana no MVP."
@@ -426,3 +430,21 @@ notes:
 | Eu mantive Redux e soberano fora do MVP? | Sim. |
 | O próximo passo está claramente bloqueado ou desbloqueado? | Bloqueado até revisão humana e `HUMAN_APPROVALS` explícito. |
 
+---
+
+## Human approval block template
+
+Para aprovar o Gate 0, preencher explicitamente:
+
+```text
+HUMAN_APPROVALS:
+
+approver:
+approval_date:
+approved_decision_ids:
+rejected_decision_ids:
+deferred_decision_ids:
+notes:
+```
+
+Gate 0 só pode avançar se todas as decisões com `blocking_status: blocking_for_mvp` estiverem aprovadas ou explicitamente diferidas com justificativa compatível com o MVP.

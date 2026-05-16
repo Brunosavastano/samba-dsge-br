@@ -30,6 +30,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status:
 alternatives_rejected:
 rationale:
 downstream_files:
@@ -65,6 +66,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Incluir COVID no baseline linear-Gaussiano inicial."
   - "Usar real-time vintages no MVP acadêmico."
@@ -123,6 +125,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Usar HP filter bilateral na estimação."
   - "Escolher transformações dos observáveis depois do .mod."
@@ -165,6 +168,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Regra de Taylor ambígua entre inflação corrente e esperada."
   - "Absorver mudanças de meta no choque monetário."
@@ -210,6 +214,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Omitir inflação-meta do modelo clássico."
   - "Tratar mudanças de meta como choque monetário puro."
@@ -251,6 +256,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Deixar UIP como 'modificada' sem equação."
   - "Usar prêmio de risco AR(1) puro como única forma sem registrar alternativa."
@@ -306,6 +312,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Usar bloco fiscal sem regra explícita."
   - "Tratar resultado primário realizado e meta fiscal como a mesma variável."
@@ -354,6 +361,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Tratar preços administrados como choque genérico sem processo próprio."
   - "Omitir pass-through cambial/importado do processo testável."
@@ -394,6 +402,7 @@ decision_status: proposed
 proposed_by: Codex
 approved_by:
 approval_date:
+blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Começar a baixar dados antes do data dictionary."
   - "Começar a estimação com o dataset total."
@@ -487,4 +496,3 @@ created_by: Codex
 approved_by:
 approval_date:
 ```
-
