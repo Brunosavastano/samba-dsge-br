@@ -8,13 +8,25 @@
 
 ---
 
+## Gate 0 simplified check — 2026-05-16
+
+Resultado: Gate 0 nao aprovado.
+
+Falha objetiva: `EXT-001` especifica UIP/premio de risco e `risk_t`, mas nao declara uma convencao clara de sinal para `q`/cambio real.
+
+Proximo passo: explicitar em `docs/00b_modeling_decisions.md` se aumento de `q` representa depreciacao ou apreciacao real, e como isso entra na UIP e nas IRFs.
+
+Nenhuma decisao foi aprovada nesta revisao. Nenhum config, dado, pipeline, teste ou `.mod` foi criado.
+
+---
+
 ## 1. Executive summary
 
 - O Gate 0 está aprovado? **Não.**
 - Decisões que bloqueiam avanço: `SAMPLE-001`, `TREND-001`, `MON-001`, `TARGET-001`, `EXT-001`, `FISC-001`, `ADMIN-001`, `OBS-001`.
 - Motivo formal: todas as decisões permanecem com `decision_status: proposed`, `approved_by` vazio e `approval_date` vazio.
 - Schema: corrigido; todas as decisões existentes agora contêm `blocking_status: blocking_for_mvp`.
-- Próximo passo recomendado: revisão humana de `docs/00b_modeling_decisions.md`, aplicação dos ajustes sugeridos abaixo e nova execução com `HUMAN_APPROVALS` preenchido para Modo B.
+- Próximo passo recomendado: revisão humana de `docs/00b_modeling_decisions.md`, aplicação dos ajustes sugeridos abaixo e nova execução com autorização explícita preenchida para Modo B.
 
 Nenhum config, dado, `.mod`, pipeline, teste, equation registry ou data dictionary deve ser criado antes da aprovação humana explícita do Gate 0.
 
@@ -364,9 +376,9 @@ Gate 0 passa somente se todos os itens forem verdadeiros:
 3. Nenhuma decisão bloqueante permanece com `approved_by` vazio.
 4. Nenhuma decisão bloqueante permanece com `approval_date` vazio.
 5. Todas as decisões têm `blocking_status`.
-6. O revisor humano consta em `HUMAN_APPROVALS.approver`.
-7. `HUMAN_APPROVALS.approval_date` está preenchido.
-8. `HUMAN_APPROVALS.approved_decision_ids` cobre as decisões bloqueantes ou registra diferimentos explícitos.
+6. O revisor humano consta no campo `approver` do bloco de aprovação.
+7. O campo `approval_date` do bloco de aprovação está preenchido.
+8. O campo `approved_decision_ids` do bloco de aprovação cobre as decisões bloqueantes ou registra diferimentos explícitos.
 9. `TARGET-001` não deixa ambíguo o tratamento de `pi_target_t` sem marcar bloqueio posterior.
 10. `MON-001` não deixa ambíguo o status operacional de `y_gap_t` sem marcar bloqueio posterior.
 11. `ADMIN-001` define quais canais entram no MVP ou marca indisponibilidade condicionada a Gate 1b.
@@ -385,7 +397,7 @@ Como Gate 0 ainda não está aprovado:
 3. Preencher explicitamente:
 
 ```text
-HUMAN_APPROVALS:
+APROVACAO_GATE0:
 
 approver: <nome humano>
 approval_date: <YYYY-MM-DD>
@@ -428,16 +440,16 @@ notes:
 | Eu criei `.mod`, dados, pipeline ou testes indevidamente? | Não. |
 | Eu inventei alguma fonte ou versão de software? | Não. |
 | Eu mantive Redux e soberano fora do MVP? | Sim. |
-| O próximo passo está claramente bloqueado ou desbloqueado? | Bloqueado até revisão humana e `HUMAN_APPROVALS` explícito. |
+| O próximo passo está claramente bloqueado ou desbloqueado? | Bloqueado até revisão humana explícita. |
 
 ---
 
-## Human approval block template
+## Bloco de aprovação humana — template
 
 Para aprovar o Gate 0, preencher explicitamente:
 
 ```text
-HUMAN_APPROVALS:
+APROVACAO_GATE0:
 
 approver:
 approval_date:
