@@ -1,0 +1,17 @@
+sample:
+  classic_mvp:
+    start: "2003Q1"
+    end: "2019Q4"
+    frequency: quarterly
+    covid_treatment: excluded
+    data_revision: final_revised
+  redux_replication:
+    start: "2001Q4"
+    end: "2019Q4"
+    status: deferred
+    scope: out_of_mvp
+  future_operational:
+    period: current/future
+    data_revision: real_time_vintage
+    scope: out_of_mvp
+

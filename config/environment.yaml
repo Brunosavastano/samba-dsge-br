@@ -1,0 +1,12 @@
+python_version: to_pin
+dynare_version: to_pin
+matlab_version: to_pin_if_used
+octave_version: to_pin_if_used
+seeds:
+  stoch_simul: 12345
+  mh: 12345
+  bootstrap: 12345
+  smc: 12345
+no_source_id_invention: true
+final_revised_and_realtime_must_not_mix: true
+

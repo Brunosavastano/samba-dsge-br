@@ -1,82 +1,67 @@
-# Modeling Decisions — samba-dsge-br
+# Modeling Decisions - samba-dsge-br
 
-**Documento:** `docs/00b_modeling_decisions.md`  
-**Status geral:** proposed-only; aguardando aprovação humana para Gate 0  
-**Fonte canônica:** `samba_dsge_br_spec_standalone_consolidado.md`  
-**Plano operacional:** `docs/08_implementation_plan.md`  
-**Criado por:** Codex  
-**Data:** 2026-05-16
+**Documento:** `docs/00b_modeling_decisions.md`
+**Status geral:** Gate 0 approved
+**Fonte canonica:** `samba_dsge_br_spec_standalone_consolidado.md`
+**Plano operacional:** `docs/08_implementation_plan.md`
+**Criado por:** Codex
+**Aprovado por:** Bruno
+**Data de aprovacao:** 2026-05-19
 
 ---
 
-## 0. Regra de governança
+## 0. Regra de governanca
 
-Este documento contém propostas para o Gate 0. Codex não aprova decisões macroeconométricas.
-
-Regra operacional:
+Bruno autorizou a aprovacao do Gate 0 em 2026-05-19, limitada ao MVP, desde que as correcoes tecnicas objetivas fossem aplicadas neste documento.
 
 ```text
-Codex pode criar ou revisar decisões com decision_status: proposed.
-Codex não pode preencher approved_by nem approval_date.
-Gate 0 só passa quando um revisor humano alterar explicitamente as decisões bloqueantes para approved.
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 ```
 
-Campos obrigatórios por decisão:
-
-```yaml
-decision_id:
-decision_title:
-decision_status: proposed
-proposed_by: Codex
-approved_by:
-approval_date:
-blocking_status:
-alternatives_rejected:
-rationale:
-downstream_files:
-```
+Esta aprovacao nao aprova `source_id`, dados, priors, Dynare/MATLAB/Octave, Redux ou extensao soberana.
 
 ---
 
 ## 1. Checklist Gate 0
 
-| Decisão | ID | Status |
+| Decisao | ID | Status |
 |---|---|---|
-| Amostra, COVID e revisão de dados | SAMPLE-001 | proposed |
-| Tratamento de tendência | TREND-001 | proposed |
-| Regra de política monetária | MON-001 | proposed |
-| Inflação-meta | TARGET-001 | proposed |
-| UIP e prêmio de risco | EXT-001 | proposed |
-| Regra fiscal | FISC-001 | proposed |
-| Preços administrados | ADMIN-001 | proposed |
-| Observáveis iniciais | OBS-001 | proposed |
+| Amostra, COVID e revisao de dados | SAMPLE-001 | approved |
+| Tratamento de tendencia | TREND-001 | approved |
+| Regra de politica monetaria | MON-001 | approved |
+| Inflacao-meta | TARGET-001 | approved |
+| UIP e premio de risco | EXT-001 | approved |
+| Regra fiscal | FISC-001 | approved |
+| Precos administrados | ADMIN-001 | approved |
+| Observaveis iniciais | OBS-001 | approved |
+| Variaveis estruturais minimas | STRUCT-001 | approved |
+| Escopo do MVP | SCOPE-001 | approved |
 
-Gate 0 ainda não está aprovado.
+Gate 0 esta aprovado para o MVP.
 
 ---
 
-## 2. Decisões propostas
+## 2. Decisoes aprovadas
 
-### SAMPLE-001 — Amostra, COVID e revisão de dados
+### SAMPLE-001 - Amostra, COVID e revisao de dados
 
 ```yaml
 decision_id: SAMPLE-001
-decision_title: Amostra, COVID e política de revisão de dados
-decision_status: proposed
+decision_title: Amostra, COVID e politica de revisao de dados
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
   - "Incluir COVID no baseline linear-Gaussiano inicial."
-  - "Usar real-time vintages no MVP acadêmico."
+  - "Usar real-time vintages no MVP academico."
   - "Misturar dados final-revised e real-time no mesmo experimento."
-  - "Usar a amostra Redux 2001Q4-2019Q4 como baseline do SAMBA clássico MVP."
+  - "Usar a amostra Redux 2001Q4-2019Q4 como baseline do SAMBA classico MVP."
 rationale: >
-  O SPEC consolidado define o MVP clássico como amostra pós-crise de 2002,
-  sob regime de metas e sem choque pandêmico. O baseline acadêmico deve usar
-  dados final-revised para reduzir complexidade operacional e evitar contaminar
-  o filtro/estimação inicial com real-time vintages ou COVID.
+  O MVP classico usa amostra pos-crise de 2002, sob regime de metas,
+  sem choque pandemico e com dados final-revised.
 downstream_files:
   - config/sample.yaml
   - docs/02_data_dictionary.md
@@ -84,56 +69,46 @@ downstream_files:
   - model/samba_classic/observables.inc
 ```
 
-Proposta:
+Decisao aprovada:
 
 ```yaml
 sample:
   classic_mvp:
     start: "2003Q1"
     end: "2019Q4"
-    covid_treatment: "exclude"
+    frequency: "quarterly"
+    covid_treatment: "excluded"
     data_revision: "final_revised"
-    rationale: "Amostra pós-crise de 2002, sob regime de metas, sem choque pandêmico."
   redux_replication:
     start: "2001Q4"
     end: "2019Q4"
-    kalman_initialization_observations: 8
-    covid_treatment: "exclude"
-    data_revision: "final_revised"
-    status: "out_of_mvp"
+    status: "deferred"
+    scope: "out_of_mvp"
   future_operational:
-    start: "2003Q1"
-    end: "current"
-    covid_treatment: "to_be_defined"
+    period: "current/future"
     data_revision: "real_time_vintage"
-    status: "out_of_mvp"
+    scope: "out_of_mvp"
 ```
 
-Critério para aprovação humana:
-
-- Confirmar que `classic_mvp` deve ser 2003Q1-2019Q4.
-- Confirmar que COVID fica excluído do baseline.
-- Confirmar que real-time vintages ficam fora do MVP.
-- Confirmar que Redux não altera a amostra do MVP clássico.
-
-### TREND-001 — Tratamento de tendência
+### TREND-001 - Tratamento de tendencia
 
 ```yaml
 decision_id: TREND-001
-decision_title: Tratamento de tendência para SAMBA clássico
-decision_status: proposed
+decision_title: Tratamento de tendencia para SAMBA classico
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Usar HP filter bilateral na estimação."
-  - "Escolher transformações dos observáveis depois do .mod."
-  - "Tratar produto potencial/hiato apenas como texto sem variável ou medida."
+  - "Usar HP filter bilateral na estimacao."
+  - "Escolher transformacoes dos observaveis depois do .mod."
+  - "Tratar produto potencial/hiato apenas como texto sem variavel ou medida."
 rationale: >
-  O SPEC propõe SAMBA clássico log-linear em torno de steady state determinístico.
-  A transformação dos observáveis precisa ser compatível com as equações de medida
-  e não pode introduzir look-ahead bias via filtro bilateral.
+  O MVP classico e log-linear em torno de steady state deterministico.
+  Transformacoes por serie serao detalhadas depois no data dictionary e nas
+  measurement equations.
 downstream_files:
   - docs/01_equation_registry.md
   - docs/02_data_dictionary.md
@@ -142,41 +117,34 @@ downstream_files:
   - model/samba_classic/observables.inc
 ```
 
-Proposta:
+Decisao aprovada:
 
 ```text
-SAMBA clássico:
-- modelo log-linear em torno de steady state determinístico;
-- observáveis reais em crescimento ou log-desvio conforme equação de medida;
-- inflação e juros em desvios de steady state/meta quando aplicável;
-- nenhum HP filter bilateral na estimação;
-- `y_gap` deve ser variável/model measure explícita, não rótulo informal.
+SAMBA classico:
+- modelo log-linear em torno de steady state deterministico;
+- observaveis reais em crescimento ou log-desvio conforme equation registry/data dictionary;
+- inflacao e juros em desvios de steady state/meta quando aplicavel;
+- nenhum HP filter bilateral na estimacao;
+- `y_gap` e variavel estrutural do MVP.
 ```
 
-Critério para aprovação humana:
-
-- Confirmar que o MVP clássico permanece log-linear e de primeira ordem.
-- Confirmar política de transformação antes do data dictionary final.
-- Confirmar que HP bilateral está proibido na estimação.
-
-### MON-001 — Regra de política monetária
+### MON-001 - Regra de politica monetaria
 
 ```yaml
 decision_id: MON-001
-decision_title: Regra de Taylor forward-looking com meta explícita
-decision_status: proposed
+decision_title: Regra de Taylor forward-looking com meta explicita
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Regra de Taylor ambígua entre inflação corrente e esperada."
-  - "Absorver mudanças de meta no choque monetário."
-  - "Omitir `y_gap_t` da regra ou deixá-lo sem definição operacional."
+  - "Regra de Taylor ambigua entre inflacao corrente e esperada."
+  - "Absorver mudancas de meta no choque monetario."
+  - "Omitir `y_gap_t` da regra ou deixa-lo sem definicao operacional."
 rationale: >
-  A regra monetária precisa estar definida antes do equation registry e do .mod.
-  A formulação forward-looking com meta explícita reduz ambiguidade entre inflação
-  corrente, esperada e desvios em relação à meta.
+  A regra monetaria usa inflacao esperada, hiato estrutural e meta explicita.
 downstream_files:
   - docs/01_equation_registry.md
   - docs/02_data_dictionary.md
@@ -185,7 +153,7 @@ downstream_files:
   - tests/test_irf_restrictions.py
 ```
 
-Proposta:
+Decisao aprovada:
 
 ```text
 r_t = rho_r * r_{t-1}
@@ -193,36 +161,32 @@ r_t = rho_r * r_{t-1}
       + eps_monetary_t
 ```
 
-Requisitos associados:
+Requisitos aprovados:
 
+```text
 - `pi_target_t` entra explicitamente.
-- `y_gap_t` deve existir como variável ou proxy observável documentada.
-- A IRF de choque monetário deve exigir sinal, timing, magnitude e benchmark.
+- `y_gap_t` e variavel estrutural do MVP.
+- A measurement equation de `y_gap_t` sera definida depois no data dictionary/equation registry.
+- A IRF de choque monetario deve exigir sinal, timing, magnitude e benchmark.
+```
 
-Critério para aprovação humana:
-
-- Confirmar uso de inflação esperada.
-- Confirmar definição operacional de `y_gap_t`.
-- Confirmar que o choque monetário não absorve meta de inflação.
-
-### TARGET-001 — Inflação-meta
+### TARGET-001 - Inflacao-meta
 
 ```yaml
 decision_id: TARGET-001
-decision_title: Tratamento de `pi_target_t` no MVP clássico
-decision_status: proposed
+decision_title: Tratamento de `pi_target_t` no MVP classico
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Omitir inflação-meta do modelo clássico."
-  - "Tratar mudanças de meta como choque monetário puro."
+  - "Omitir inflacao-meta do modelo classico."
+  - "Tratar mudancas de meta como choque monetario puro."
   - "Implementar processo Redux de meta antes do MVP."
 rationale: >
-  O SPEC exige `pi_target_t` e `eps_pi_target` como objetos explícitos.
-  Para o MVP clássico, a meta pode entrar de forma exógena/determinística, enquanto
-  choques persistentes de meta ficam opcionais ou adiados.
+  `pi_target_t` precisa existir explicitamente para nao absorver meta no choque monetario.
 downstream_files:
   - docs/01_equation_registry.md
   - docs/02_data_dictionary.md
@@ -230,42 +194,34 @@ downstream_files:
   - model/samba_classic/observables.inc
 ```
 
-Proposta:
+Decisao aprovada:
 
 ```text
-Fase clássica:
-- `pi_target_t` entra como série exógena ou deterministic exogenous variable;
-- `eps_pi_target` permanece opcional e desligável no MVP calibrado se necessário;
-- a decisão final entre série exógena e `varexo_det` deve ser confirmada antes do `.mod`.
-
-Fase Redux:
-- processo persistente de meta de inflação fica fora do MVP.
+- `pi_target_t` entra explicitamente.
+- No MVP calibrado, `pi_target_t` entra como serie exogena/deterministica.
+- `eps_pi_target` fica desligado no MVP calibrado.
+- `eps_pi_target` so pode entrar em fase posterior com aprovacao propria.
+- O processo persistente de meta do Redux fica fora do MVP.
 ```
 
-Critério para aprovação humana:
-
-- Escolher `pi_target_t` como série exógena ou `varexo_det` antes da Fase 3.
-- Confirmar se `eps_pi_target` fica desligado no MVP calibrado.
-
-### EXT-001 — UIP e prêmio de risco
+### EXT-001 - UIP e premio de risco
 
 ```yaml
 decision_id: EXT-001
-decision_title: UIP com fechamento NFA/debt-elastic e prêmio de risco
-decision_status: proposed
+decision_title: UIP com fechamento NFA/debt-elastic e premio de risco
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Deixar UIP como 'modificada' sem equação."
-  - "Usar prêmio de risco AR(1) puro como única forma sem registrar alternativa."
+  - "Deixar UIP como 'modificada' sem equacao."
+  - "Usar premio de risco AR(1) puro como unica forma sem registrar alternativa."
   - "Adiar o fechamento externo para depois do .mod."
 rationale: >
-  A economia aberta exige fechamento explícito antes do Dynare. O SPEC define
-  como baseline provisório a UIP com termo elástico em NFA/dívida e processo AR(1)
-  para risco, mantendo alternativa documentada para prêmio AR(1) puro se a réplica
-  clássica exigir.
+  A economia aberta exige fechamento explicito antes do Dynare. O baseline usa
+  risk premium nfa/debt-elastic e processo AR(1) para `risk_t`.
 downstream_files:
   - docs/01_equation_registry.md
   - docs/02_data_dictionary.md
@@ -274,7 +230,16 @@ downstream_files:
   - tests/test_irf_restrictions.py
 ```
 
-Proposta:
+Convencao e baseline aprovados:
+
+```text
+- Convencao de sinal: q_t ↑ = depreciacao real do BRL.
+- `risk_t` segue AR(1).
+- O fechamento externo baseline usa nfa/debt-elastic risk premium.
+- A alternativa de premio AR(1) puro pode ser documentada no equation registry como alternativa, nao como ambiguidade do baseline.
+```
+
+Equacao aprovada:
 
 ```text
 r_t - E_t pi_{t+1}
@@ -284,10 +249,10 @@ r_star_t - E_t pi_star_{t+1}
 + psi_nfa * (nfa_t - nfa_ss)
 + risk_t
 
-risk_t = rho_risk * risk_{t-1} + eps_risk_t
+risk_t = rho_risk * risk_t(-1) + eps_risk_t
 ```
 
-Variáveis necessárias:
+Variaveis necessarias:
 
 ```text
 q
@@ -297,30 +262,24 @@ r_star
 pi_star
 ```
 
-Critério para aprovação humana:
-
-- Confirmar baseline NFA/debt-elastic para MVP.
-- Confirmar que alternativa de prêmio AR(1) puro será registrada no equation registry.
-- Confirmar qual proxy/fonte futura será considerada para prêmio de risco na estimação, sem ainda pinar `source_id`.
-
-### FISC-001 — Regra fiscal
+### FISC-001 - Regra fiscal
 
 ```yaml
 decision_id: FISC-001
-decision_title: Regra fiscal com `sp_target` e feedback sobre dívida/PIB
-decision_status: proposed
+decision_title: Regra fiscal com `sp_target` e feedback sobre divida/PIB
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Usar bloco fiscal sem regra explícita."
-  - "Tratar resultado primário realizado e meta fiscal como a mesma variável."
+  - "Usar bloco fiscal sem regra explicita."
+  - "Tratar resultado primario realizado e meta fiscal como a mesma variavel."
   - "Incluir regimes fiscais 2016/2023 no MVP."
 rationale: >
-  A regra fiscal evita bloco fiscal subidentificado. O SPEC propõe separar `sp_target`
-  de `sp` realizado, usar `b` como dívida/PIB e manter regimes fiscais posteriores
-  fora do MVP.
+  A regra fiscal separa `sp_target` de `sp`, usa `b` como divida/PIB e mantem
+  regimes fiscais fora do MVP.
 downstream_files:
   - docs/01_equation_registry.md
   - docs/02_data_dictionary.md
@@ -328,7 +287,7 @@ downstream_files:
   - model/samba_classic/shocks.inc
 ```
 
-Proposta:
+Decisao aprovada:
 
 ```text
 sp_target_t =
@@ -336,40 +295,37 @@ rho_sp_target * sp_target_{t-1}
 + (1 - rho_sp_target) * [sp_ss + phi_b * (b_t - b_ss) + phi_y_sp * y_gap_t]
 + eps_sp_target_t
 
-b_{t+1} = função de b_t, r_t, crescimento nominal do PIB e resultado primário.
+b_{t+1} = funcao de b_t, r_t, crescimento nominal do PIB e resultado primario.
 ```
 
-Decisões associadas:
+Requisitos aprovados:
 
-- `sp_target` é separado de `sp` realizado.
-- `b` representa dívida pública/PIB.
-- `phi_b > 0` é condição de estabilização fiscal local.
+```text
+- `sp_target` e separado de `sp` realizado.
+- `b` representa divida publica/PIB.
+- `phi_b > 0` e condicao de estabilizacao fiscal local.
+- A identidade completa de divida entra no equation registry antes do `.mod`.
 - Regimes fiscais 2016/2023 ficam fora do MVP.
+```
 
-Critério para aprovação humana:
-
-- Confirmar separação `sp_target` vs `sp`.
-- Confirmar regra de feedback em dívida/PIB.
-- Confirmar exclusão de regimes fiscais do MVP.
-
-### ADMIN-001 — Preços administrados
+### ADMIN-001 - Precos administrados
 
 ```yaml
 decision_id: ADMIN-001
-decision_title: Processo para inflação de preços administrados
-decision_status: proposed
+decision_title: Processo para inflacao de precos administrados
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Tratar preços administrados como choque genérico sem processo próprio."
-  - "Omitir pass-through cambial/importado do processo testável."
-  - "Resolver composição de administrados apenas na estimação."
+  - "Tratar precos administrados como choque generico sem processo proprio."
+  - "Omitir pass-through cambial/importado do processo testavel."
+  - "Resolver composicao de administrados apenas na estimacao."
 rationale: >
-  O SPEC exige que `pi_a` seja processo testável, com persistência e relação com
-  meta, câmbio e/ou preços importados. Isso evita empurrar má especificação para
-  erros de mensuração ou choques genéricos.
+  `pi_a` tem processo proprio, persistencia AR(1), relacao com meta, cambio e
+  inflacao de importados quando disponivel, alem de choque proprio.
 downstream_files:
   - docs/01_equation_registry.md
   - docs/02_data_dictionary.md
@@ -378,7 +334,17 @@ downstream_files:
   - tests/test_irf_restrictions.py
 ```
 
-Proposta:
+Decisao aprovada:
+
+```text
+- `pi_a` tem processo proprio.
+- O processo inclui AR(1).
+- O processo inclui relacao com meta, cambio e inflacao de importados quando disponivel.
+- O processo inclui choque proprio `eps_admin`.
+- Administrados NAO sao apenas choque generico.
+```
+
+Equacao aprovada:
 
 ```text
 pi_a_t =
@@ -387,31 +353,24 @@ rho_a * pi_a_{t-1}
 + eps_admin_t
 ```
 
-Critério para aprovação humana:
-
-- Confirmar que `pi_a` entra como processo próprio.
-- Confirmar quais canais entram no MVP: meta, câmbio e/ou preço de importados.
-- Confirmar que composição e quebras da série serão documentadas no data dictionary.
-
-### OBS-001 — Observáveis iniciais
+### OBS-001 - Observaveis iniciais
 
 ```yaml
 decision_id: OBS-001
-decision_title: Conjunto inicial de observáveis do MVP e primeira estimação
-decision_status: proposed
+decision_title: Conjunto inicial de observaveis do MVP e primeira estimacao
+decision_status: approved
 proposed_by: Codex
-approved_by:
-approval_date:
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
 blocking_status: blocking_for_mvp
 alternatives_rejected:
-  - "Começar a baixar dados antes do data dictionary."
-  - "Começar a estimação com o dataset total."
-  - "Usar `source_id` por memória interna sem verificação."
+  - "Comecar a baixar dados antes do data dictionary."
+  - "Comecar a estimacao com o dataset total."
+  - "Usar `source_id` por memoria interna sem verificacao."
 rationale: >
-  O SPEC permite que o MVP calibrado rode sem `varobs`, mas exige que o pipeline
-  produza base mínima. A primeira estimação deve começar com subconjunto menor
-  do que o dataset total e só após Gate 1b, Gate 2b, modelo calibrado, likelihood
-  finito e identificação local.
+  O MVP calibrado pode rodar sem `varobs`, mas o pipeline futuro deve gerar
+  base minima. Fontes e measurement equations ficam para gates posteriores.
 downstream_files:
   - docs/02_data_dictionary.md
   - docs/01_equation_registry.md
@@ -420,68 +379,126 @@ downstream_files:
   - data/model_input/
 ```
 
-Base mínima que o pipeline deve gerar para MVP:
+Base minima futura do pipeline para MVP:
 
 ```text
 1. crescimento do PIB real;
-2. inflação IPCA cheia;
+2. inflacao IPCA cheia;
 3. Selic;
-4. câmbio real;
+4. cambio real;
 5. consumo privado;
 6. investimento;
 7. gasto do governo;
-8. exportações;
-9. importações;
-10. inflação de livres/administrados, se disponível.
+8. exportacoes;
+9. importacoes;
+10. inflacao de livres/administrados, se disponivel.
 ```
 
-Primeira estimação Bayesiana deve começar com subconjunto menor:
+Regras aprovadas:
 
 ```text
-1. crescimento do PIB real;
-2. inflação cheia;
-3. inflação de livres;
-4. Selic;
-5. câmbio real;
-6. consumo privado;
-7. investimento;
-8. exportações;
-9. importações;
-10. prêmio de risco, se a equação UIP exigir.
+- `y_gap_t` e variavel estrutural do MVP.
+- A measurement equation de `y_gap_t` sera definida depois no data dictionary/equation registry.
+- Nenhum `source_id` sera criado por memoria interna.
+- Fonte nao verificada fica `TBD-verify-in-task-<WBS-ID>` ate Gate 1b.
+- Antes de gerar dataset, PIB, IPCA, Selic, cambio, consumo, investimento, governo, exportacoes e importacoes devem estar sem TBD.
 ```
 
-Política de fonte:
+### STRUCT-001 - Variaveis estruturais minimas
+
+```yaml
+decision_id: STRUCT-001
+decision_title: Variaveis estruturais minimas para o equation registry
+decision_status: approved
+proposed_by: Codex
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
+blocking_status: blocking_for_mvp
+alternatives_rejected:
+  - "Permitir que variaveis estruturais sejam descobertas apenas durante a escrita do .mod."
+  - "Omitir variaveis incorporadas pelo SPEC, como mc, q_k, wn, lambda, y_gap, y_pot, nfa, m_int e pi_target."
+rationale: >
+  O SPEC consolidado incorporou variaveis estruturais ausentes como correcao tecnica.
+  O equation registry deve carrega-las explicitamente antes de qualquer implementacao Dynare.
+downstream_files:
+  - docs/01_equation_registry.md
+  - docs/03_calibration_notes.md
+  - model/samba_classic/samba_classic.mod
+```
+
+Variaveis estruturais minimas aprovadas:
 
 ```text
-Nenhum `source_id` será criado por memória interna.
-Fonte não verificada fica `TBD-verify-in-task-<WBS-ID>` até Gate 1b.
-Antes de gerar dataset, PIB, IPCA, Selic, câmbio, consumo, investimento, governo, exportações e importações devem estar sem TBD.
+mc
+q_k
+wn
+lambda
+y_gap
+y_pot
+nfa
+m_int
+pi_target
+sp_target
+risk
 ```
 
-Critério para aprovação humana:
+### SCOPE-001 - Escopo do MVP e exclusoes explicitas
 
-- Confirmar lista mínima do MVP.
-- Confirmar subconjunto inicial de estimação.
-- Confirmar que Gate 1b bloqueia extração e transformação real de dados.
+```yaml
+decision_id: SCOPE-001
+decision_title: Escopo do MVP e exclusoes explicitas
+decision_status: approved
+proposed_by: Codex
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
+blocking_status: blocking_for_mvp
+alternatives_rejected:
+  - "Incluir Redux no MVP."
+  - "Incluir extensao soberana no MVP."
+  - "Iniciar estimacao Bayesiana completa no MVP."
+rationale: >
+  O MVP deve permanecer pequeno, auditavel e limitado ao SAMBA classico calibrado.
+downstream_files:
+  - docs/08_implementation_plan.md
+  - docs/01_equation_registry.md
+  - model/samba_classic/samba_classic.mod
+```
+
+Escopo aprovado:
+
+```text
+- Redux esta fora do MVP.
+- Extensao soberana esta fora do MVP.
+- Estimacao Bayesiana completa esta fora do MVP.
+- O MVP e SAMBA classico calibrado, log-linear, primeira ordem.
+```
 
 ---
 
-## 3. Implicações para os próximos gates
+## 3. Implicacoes para os proximos gates
 
-Enquanto todas as decisões bloqueantes estiverem em `decision_status: proposed`:
+Gate 0 aprovado desbloqueia apenas os proximos artefatos permitidos pelo plano:
 
 ```text
-- Não criar config/sample.yaml.
-- Não criar dataset.
-- Não criar equation registry core final.
-- Não criar .mod.
-- Não iniciar estimação.
+- configs iniciais;
+- runtime verification;
+- skeletons e contratos de fases posteriores, conforme gate aplicavel.
 ```
 
-Próxima ação humana:
+Continuam proibidos ate seus gates proprios:
 
 ```text
-Revisar cada decisão, ajustar texto se necessário e preencher `decision_status: approved`, `approved_by` e `approval_date` apenas quando houver concordância explícita.
+- inventar source IDs;
+- gerar dados;
+- criar pipeline;
+- criar equation registry final;
+- criar data dictionary final;
+- criar .mod;
+- iniciar estimacao;
+- iniciar Redux;
+- iniciar extensao soberana.
 ```
 
 ---
@@ -490,9 +507,22 @@ Revisar cada decisão, ajustar texto se necessário e preencher `decision_status
 
 ```yaml
 gate: Gate 0
-gate_status: not_passed
-reason: "Todas as decisões estão em proposed e aguardam aprovação humana."
-created_by: Codex
-approved_by:
-approval_date:
+gate_status: approved
+approved_by: Bruno
+approval_date: 2026-05-19
+approval_basis: "Approved by Bruno via objective technical corrections specified in prompt."
+approved_decision_ids:
+  - SAMPLE-001
+  - TREND-001
+  - MON-001
+  - TARGET-001
+  - EXT-001
+  - FISC-001
+  - ADMIN-001
+  - OBS-001
+  - STRUCT-001
+  - SCOPE-001
+limitations:
+  - "Approval limited to MVP."
+  - "Does not approve source IDs, data, priors, Dynare, Redux or sovereign extension."
 ```
