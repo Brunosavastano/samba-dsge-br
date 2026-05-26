@@ -28,7 +28,7 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: household_block_registered" in text
+    assert "gate_status: firm_block_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
@@ -173,3 +173,21 @@ def test_household_registry_entries_are_complete_for_wbs039():
     assert "wn" in by_id["EQ-HH-003"]["variables"]
     assert "labor_supply_locator_present" in by_id["EQ-HH-003"]["tests"]
     assert "rule_of_thumb_locator_present" in by_id["EQ-HH-004"]["tests"]
+
+
+def test_firm_registry_entries_are_complete_for_wbs040():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    firm_entries = [entry for entry in entries if entry["block"] == "FIRM"]
+    by_id = {entry["equation_id"]: entry for entry in firm_entries}
+
+    assert set(by_id) == {"EQ-FIRM-001", "EQ-FIRM-002", "EQ-FIRM-003", "EQ-FIRM-004"}
+    assert all(entry["gate"] == "WBS-040" for entry in firm_entries)
+    assert "mc" in by_id["EQ-FIRM-001"]["variables"]
+    assert "m_int" in by_id["EQ-FIRM-001"]["variables"]
+    assert "production_locator_present" in by_id["EQ-FIRM-001"]["tests"]
+    assert "phillips_locator_present" in by_id["EQ-FIRM-002"]["tests"]
+    assert "mc_used_in_pricing" in by_id["EQ-FIRM-002"]["tests"]
+    assert "q_k" in by_id["EQ-FIRM-003"]["variables"]
+    assert "investment_locator_present" in by_id["EQ-FIRM-003"]["tests"]
+    assert "imported_input_locator_present" in by_id["EQ-FIRM-004"]["tests"]

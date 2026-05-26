@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT FISC ADMIN and HH entries partial
+**Status:** Gate 2b MON EXT FISC ADMIN HH and FIRM entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,8 +11,8 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-039
-gate_status: household_block_registered
+wbs: WBS-040
+gate_status: firm_block_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
@@ -22,13 +22,14 @@ external_block_registered: true
 fiscal_block_registered: true
 administered_prices_registered: true
 household_block_registered: true
+firm_block_registered: true
 core_blocks_registered: false
-registry_version: 0.6.0-hh
+registry_version: 0.7.0-firm
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, administered-prices, and household entries are registered through WBS-039.
+Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, administered-prices, household, and firm entries are registered through WBS-040.
 
 ---
 
@@ -75,7 +76,7 @@ EQ-EXT,EXT,LM-EXT-001,WBS-036,registered_partial
 EQ-FISC,FISC,LM-FISC-001,WBS-037,registered_partial
 EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_partial
 EQ-HH,HH,LM-HH-001,WBS-039,registered_partial
-EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,ready_for_registry_entry
+EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,registered_partial
 EQ-AGG,AGG,LM-AGG-001,WBS-041,ready_for_registry_entry
 EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,ready_for_registry_entry
 EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
@@ -85,7 +86,7 @@ EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 
 ## 4. Registry entries
 
-WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, WBS-038 administered-prices, and WBS-039 household entries are registered.
+WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, WBS-038 administered-prices, WBS-039 household, and WBS-040 firm entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
@@ -107,4 +108,8 @@ EQ-HH-001,HH,Optimizing household intertemporal conditions,structural,LM-HH-001,
 EQ-HH-002,HH,Consumption habit contract,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1.1 Optimizing Households PDF pages 11-17; Appendix C.1 PDF pages 84-86,c|c_lag|habit_state|lambda,source_located_parameters_pending_calibration,preference_shock,consumption_habit_locator_present;habit_state_mapped;measurement_deferred_to_gate1b,sourced,WBS-039,Consumption-habit implementation details remain registry-to-Dynare work after Gate 2b.
 EQ-HH-003,HH,Labor supply and real wage contract,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1 Households PDF page 10; Section 2.1.1 PDF pages 11-17; Appendix C.1 PDF pages 84-86,labor|wn|lambda|wage_markup,source_located_parameters_pending_calibration,wage_markup_shock,wn_mapped;labor_supply_locator_present;variables_mapped,sourced,WBS-039,Nominal wage setting details remain source-located for later registry entries if needed.
 EQ-HH-004,HH,Rule-of-thumb household contract,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1.2 Rule-of-Thumb Households PDF page 18; Appendix C.1 PDF pages 84-86,c_rt|labor_rt|wn|tax_rate|transfers,source_located_parameters_pending_calibration,none,rule_of_thumb_locator_present;consumption_labor_variables_mapped;parameters_not_invented,sourced,WBS-039,Rule-of-thumb household variables are mapped without choosing calibration values.
+EQ-FIRM-001,FIRM,Production and marginal cost contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,y|mc|k|labor|m_int|technology,source_located_parameters_pending_calibration,technology_shock,mc_mapped;m_int_mapped;production_locator_present;parameters_not_calibrated_here,sourced,WBS-040,No formula is copied and calibration remains future work.
+EQ-FIRM-002,FIRM,Price Phillips curve and markup contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,pi|mc|price_markup|relative_price,source_located_parameters_pending_calibration,price_markup_shock,phillips_locator_present;mc_used_in_pricing;price_markup_shock_mapped;sources_located,sourced,WBS-040,Free-price implementation details remain registry-to-Dynare work after Gate 2b.
+EQ-FIRM-003,FIRM,Investment and Tobins Q contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,i|k|q_k|investment_adjustment_state,source_located_parameters_pending_calibration,investment_shock,q_k_mapped;investment_locator_present;capital_accumulation_locator_present;parameters_not_invented,sourced,WBS-040,Tobins Q and investment frictions are source-located only.
+EQ-FIRM-004,FIRM,Imported intermediate inputs contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,m_int|import_price|domestic_input|sectoral_output,source_located_parameters_pending_calibration,import_price_shock,m_int_mapped;imported_input_locator_present;external_linkage_mapped;sources_located,sourced,WBS-040,Intermediate imports are mapped without data extraction or source_id invention.
 ```
