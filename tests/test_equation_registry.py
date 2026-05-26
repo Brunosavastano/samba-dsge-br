@@ -1,0 +1,75 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+REGISTRY = ROOT / "docs" / "01_equation_registry.md"
+LITERATURE_MAP = ROOT / "docs" / "00a_literature_map.md"
+
+
+def _csv_block_after(text: str, heading: str) -> list[str]:
+    start = text.index(heading)
+    fenced = text.index("```csv", start)
+    body_start = text.index("\n", fenced) + 1
+    body_end = text.index("```", body_start)
+    return [
+        line.strip()
+        for line in text[body_start:body_end].splitlines()
+        if line.strip()
+    ]
+
+
+def test_equation_registry_template_exists_and_blocks_dynare():
+    text = REGISTRY.read_text(encoding="utf-8")
+
+    assert "gate_status: template_created" in text
+    assert "gate2b_passed: false" in text
+    assert "dynare_allowed: false" in text
+    assert "core_blocks_registered: false" in text
+    assert "Gate 2b is not passed." in text
+    assert not (ROOT / "model").exists()
+
+
+def test_equation_registry_declares_required_entry_fields():
+    text = REGISTRY.read_text(encoding="utf-8")
+    schema_rows = _csv_block_after(text, "## 2. Entry schema")
+    declared_fields = {row.split(",", 1)[0] for row in schema_rows[1:]}
+
+    required_fields = {
+        "equation_id",
+        "block",
+        "title",
+        "equation_type",
+        "source_map_id",
+        "source_reference_id",
+        "source_locator",
+        "variables",
+        "parameters",
+        "shocks",
+        "tests",
+        "status",
+        "gate",
+    }
+
+    assert required_fields.issubset(declared_fields)
+
+
+def test_equation_registry_namespaces_are_unique_and_sourced():
+    text = REGISTRY.read_text(encoding="utf-8")
+    literature = LITERATURE_MAP.read_text(encoding="utf-8")
+    namespace_rows = _csv_block_after(text, "## 3. Planned namespaces")[1:]
+
+    namespaces = [row.split(",", 1)[0] for row in namespace_rows]
+    assert len(namespaces) == len(set(namespaces))
+
+    for row in namespace_rows:
+        source_map_id = row.split(",")[2]
+        assert source_map_id in literature
+
+
+def test_equation_registry_entries_are_empty_for_wbs034():
+    text = REGISTRY.read_text(encoding="utf-8")
+    registry_rows = _csv_block_after(text, "## 4. Registry entries")
+
+    assert len(registry_rows) == 1
+    assert registry_rows[0].startswith("equation_id,block,title")
+

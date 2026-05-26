@@ -32,7 +32,6 @@ def test_forbidden_implementation_paths_not_created_in_bootstrap():
         "model",
         "data",
         "src/data_pipeline",
-        "docs/01_equation_registry.md",
     ]
 
     present = [path for path in forbidden if (ROOT / path).exists()]
