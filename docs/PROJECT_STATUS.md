@@ -2,12 +2,12 @@
 
 Updated: 2026-05-26
 
-Current gate: Gate 2b template created; Gate 2b not passed.
-Current PR/WBS: PR 08 / WBS-034 complete.
-Last completed task: Created `docs/01_equation_registry.md` template with schema, namespaces, source anchors, and tests; no equation entries registered.
-Next task: WBS-035 / monetary policy registry entries.
-Blockers: None for WBS-035. Dynare, data, `model/`, Redux, and sovereign extension remain blocked.
-Files changed: `docs/01_equation_registry.md`, `tests/test_equation_registry.py`, `tests/test_project_structure.py`, `docs/PROJECT_STATUS.md`.
-Tests run: `python -m pytest` - 16 passed; `git diff --check`.
-Commit hash: `61079f6`.
+Current gate: Gate 2b partial registry entries; Gate 2b not passed.
+Current PR/WBS: PR 08 / WBS-035 complete.
+Last completed task: Registered MON entries for Taylor rule, inflation target treatment, and monetary policy shock with source locators and IRF-test contract.
+Next task: WBS-036 / external block registry entries.
+Blockers: None for WBS-036. Dynare, data, `model/`, Redux, and sovereign extension remain blocked.
+Files changed: `docs/01_equation_registry.md`, `tests/test_equation_registry.py`, `docs/PROJECT_STATUS.md`.
+Tests run: `python -m pytest` - 17 passed; `git diff --check`.
+Commit hash: `ab42344`.
 Safe to continue: yes, but only to Gate 2b registry entries; do not create Dynare, data, model files, Redux, or sovereign extension.
