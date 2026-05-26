@@ -83,7 +83,7 @@ br_real_exchange_rate,q,Cambio real efetivo IPCA with q_t up as BRL real depreci
 br_private_consumption,c,Consumo privado real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1,verified,final_revised,quarterly,WBS-045,Gate 1b source verified
 br_investment,i,Investimento real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93406-n1-1,verified,final_revised,quarterly,WBS-046,Gate 1b source verified
 br_government_consumption,g,Gasto do governo real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93405-n1-1,verified,final_revised,quarterly,WBS-047,Gate 1b source verified
-br_exports,x,Exportacoes reais,TBD,TBD-verify-in-task-WBS-048,tbd,final_revised,quarterly,WBS-048,Gate 1a skeleton
+br_exports,x,Exportacoes reais seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93407-n1-1,verified,final_revised,quarterly,WBS-048,Gate 1b source verified
 br_imports,m,Importacoes reais,TBD,TBD-verify-in-task-WBS-049,tbd,final_revised,quarterly,WBS-049,Gate 1a skeleton
 ```
 
@@ -148,6 +148,14 @@ WBS-047 br_government_consumption:
 - metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
 - source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93405 Despesa de consumo da administracao publica; N1 Brasil.
 - no data was extracted or saved in WBS-047.
+
+WBS-048 br_exports:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93407-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93407 Exportacao de bens e servicos; N1 Brasil.
+- no data was extracted or saved in WBS-048.
 ```
 
 ---
