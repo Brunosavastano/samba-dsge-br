@@ -13,7 +13,7 @@ Blockers: WBS-055 requires approved calibration values/rationale before `calibra
 Required user action: approve numeric calibration values and rationale in `docs/03_calibration_notes.md`.
 Files changed: `docs/calibration_blockers.md`, `docs/PROJECT_STATUS.md`.
 Tests run: `python -m pytest` - 60 passed; `git diff --check`; `model/samba_classic/calibration.m` absent.
-Commit hash: pending until commit.
+Commit hash: `2241cae`.
 Safe to continue: false. Do not create `calibration.m`, `.mod`, `.inc`, fake outputs, estimation, Redux, or sovereign extension without approved calibration inputs.
 
 Visual status:
