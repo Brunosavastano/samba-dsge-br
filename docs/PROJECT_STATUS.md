@@ -3,17 +3,17 @@
 Updated: 2026-05-26
 
 Current gate: Gate 3 started; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: BLOCKED_AT_WBS_055.
+Execution status: BLOCKED_CALIBRATION_VALUES.
 Current PR/WBS: WBS-054 complete.
 Blocked WBS: WBS-055 / PR11.
 Last completed task: WBS-054 model directory structure.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
 Next task: WBS-055 calibration implementation.
-Blockers: WBS-055 requires approved calibration values/rationale before `calibration.m`; `.mod`, Dynare model execution, steady-state values, estimation, Redux, and sovereign extension remain blocked.
-Required user action: provide or approve objective calibration values and rationale for WBS-055.
-Files changed: `docs/runtime_verification.md`, `model/samba_classic/`, model-structure tests, existing guard tests, `docs/PROJECT_STATUS.md`.
-Tests run: runtime commands passed for Python, Dynare, and Octave; MATLAB unavailable; `python -m pytest` - 60 passed; `git diff --check`; no `.mod`, `.m`, or `.inc` files in `model/samba_classic/`.
-Commit hash: `f3a66d3`.
+Blockers: WBS-055 requires approved calibration values/rationale before `calibration.m`; see `docs/calibration_blockers.md`.
+Required user action: approve numeric calibration values and rationale in `docs/03_calibration_notes.md`.
+Files changed: `docs/calibration_blockers.md`, `docs/PROJECT_STATUS.md`.
+Tests run: `python -m pytest` - 60 passed; `git diff --check`; `model/samba_classic/calibration.m` absent.
+Commit hash: pending until commit.
 Safe to continue: false. Do not create `calibration.m`, `.mod`, `.inc`, fake outputs, estimation, Redux, or sovereign extension without approved calibration inputs.
 
 Visual status:
