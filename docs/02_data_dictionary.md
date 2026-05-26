@@ -182,7 +182,7 @@ br_risk_premium,risk,Premio de risco domestico if needed for estimation,TBD,TBD-
 br_output_gap,y_gap,Hiato do produto measurement candidate,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
 ```
 
-### 4.1 Verified auxiliary source notes
+### 4.1 Auxiliary source notes
 
 ```text
 WBS-050 br_ipca_free:
@@ -200,6 +200,30 @@ WBS-050 br_ipca_administered:
 - official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.4449/dados?formato=json.
 - source meaning: IPCA precos monitorados/administrados total, variacao percentual mensal.
 - quarterly transformation remains future Gate 1b/WBS-031 work; no data was extracted or saved in WBS-050.
+
+WBS-051 br_import_price_inflation:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- WBS-051 permits pinned source or TBD for non-core auxiliary/external series.
+- no reproducible source_id was pinned without a measurement decision for imported inflation.
+- no data was extracted or saved in WBS-051.
+
+WBS-051 br_inflation_target:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- pi_target_t is explicit and exogenous/deterministic in the calibrated MVP.
+- official target source must be pinned before data generation.
+- no data was extracted or saved in WBS-051.
+
+WBS-051 br_risk_premium:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- risk_t has an AR(1) structural process, but the observable proxy is not pinned here.
+- proxy selection such as EMBI, CDS, or another country-risk measure is a future measurement/source decision.
+- no data was extracted or saved in WBS-051.
+
+WBS-051 br_output_gap:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- y_gap_t is structural in the MVP; its measurement equation is future Gate 1/2 work.
+- no observable output-gap source is pinned in WBS-051.
+- no data was extracted or saved in WBS-051.
 ```
 
 ---

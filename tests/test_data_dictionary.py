@@ -223,3 +223,30 @@ def test_free_and_administered_ipca_sources_are_verified_for_wbs050():
     assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11428/dados?formato=json" in text
     assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.4449/dados?formato=json" in text
     assert "no data was extracted or saved in WBS-050" in text
+
+
+def test_wbs051_auxiliary_sources_remain_explicitly_deferred():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 4. Additional planned MVP observables")
+    by_series = {row["series_id"]: row for row in rows}
+    deferred_series = [
+        "br_import_price_inflation",
+        "br_inflation_target",
+        "br_risk_premium",
+        "br_output_gap",
+    ]
+
+    for series_id in deferred_series:
+        row = by_series[series_id]
+        assert row["source"] == "TBD"
+        assert row["source_id"] == "TBD-verify-in-task-WBS-051"
+        assert row["source_status"] == "tbd"
+        assert row["wbs"] == "WBS-051"
+        assert row["gate_status"] == "Gate 1a skeleton"
+
+    assert text.count("source_selection_deferred") == len(deferred_series)
+    assert "WBS-051 permits pinned source or TBD" in text
+    assert "pi_target_t is explicit and exogenous/deterministic in the calibrated MVP" in text
+    assert "risk_t has an AR(1) structural process" in text
+    assert "y_gap_t is structural in the MVP" in text
+    assert "no data was extracted or saved in WBS-051" in text
