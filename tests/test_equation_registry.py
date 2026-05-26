@@ -28,7 +28,7 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: monetary_block_registered" in text
+    assert "gate_status: external_block_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
@@ -90,13 +90,31 @@ def test_equation_registry_entries_are_unique_and_sourced():
 def test_monetary_policy_registry_entries_are_complete_for_wbs035():
     text = REGISTRY.read_text(encoding="utf-8")
     entries = _registry_entries(text)
-    by_id = {entry["equation_id"]: entry for entry in entries}
+    mon_entries = [entry for entry in entries if entry["block"] == "MON"]
+    by_id = {entry["equation_id"]: entry for entry in mon_entries}
 
     assert set(by_id) == {"EQ-MON-001", "EQ-MON-002", "EQ-MON-003"}
-    assert all(entry["block"] == "MON" for entry in entries)
-    assert all(entry["gate"] == "WBS-035" for entry in entries)
+    assert all(entry["gate"] == "WBS-035" for entry in mon_entries)
     assert "monetary_irf_sign_timing_magnitude_benchmark" in by_id["EQ-MON-001"]["tests"]
     assert "pi_target" in by_id["EQ-MON-001"]["variables"]
     assert "y_gap" in by_id["EQ-MON-001"]["variables"]
     assert "eps_pi_target_absent_in_calibrated_mvp" in by_id["EQ-MON-002"]["tests"]
     assert "eps_monetary" in by_id["EQ-MON-003"]["shocks"]
+
+
+def test_external_registry_entries_are_complete_for_wbs036():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    ext_entries = [entry for entry in entries if entry["block"] == "EXT"]
+    by_id = {entry["equation_id"]: entry for entry in ext_entries}
+
+    assert set(by_id) == {"EQ-EXT-001", "EQ-EXT-002", "EQ-EXT-003", "EQ-EXT-004"}
+    assert all(entry["gate"] == "WBS-036" for entry in ext_entries)
+    assert "nfa" in by_id["EQ-EXT-001"]["variables"]
+    assert "risk" in by_id["EQ-EXT-001"]["variables"]
+    assert "psi_nfa" in by_id["EQ-EXT-001"]["parameters"]
+    assert "nfa_debt_elastic_premium_present" in by_id["EQ-EXT-001"]["tests"]
+    assert "rho_risk" in by_id["EQ-EXT-002"]["parameters"]
+    assert "eps_risk" in by_id["EQ-EXT-002"]["shocks"]
+    assert "external_balance_identity_located" in by_id["EQ-EXT-003"]["tests"]
+    assert "q_up_means_brl_real_depreciation" in by_id["EQ-EXT-004"]["tests"]
