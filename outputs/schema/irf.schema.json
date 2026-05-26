@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IRF output metadata",
+  "type": "object",
+  "required": ["model_id", "shock", "variables", "horizon", "units"],
+  "properties": {
+    "model_id": { "type": "string" },
+    "shock": { "type": "string" },
+    "variables": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "horizon": { "type": "integer", "minimum": 1 },
+    "units": { "type": "string" },
+    "created_by": { "type": "string" }
+  },
+  "additionalProperties": true
+}
+

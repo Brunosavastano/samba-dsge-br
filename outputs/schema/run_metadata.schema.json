@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Run metadata",
+  "type": "object",
+  "required": ["model_id", "spec_version", "plan_version", "sample", "seed"],
+  "properties": {
+    "model_id": { "type": "string" },
+    "spec_version": { "type": "string" },
+    "plan_version": { "type": "string" },
+    "sample": { "type": "string" },
+    "seed": { "type": "integer" },
+    "runtime": { "type": "object" }
+  },
+  "additionalProperties": true
+}
+

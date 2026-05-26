@@ -32,9 +32,9 @@ models/ = metadata registry e versionamento.
 model/  = arquivos executaveis Dynare/MATLAB/Octave.
 ```
 
-`pyproject.toml` sera a fonte de verdade do ambiente Python quando o bootstrap tecnico for criado.
+`pyproject.toml` e a fonte de verdade do ambiente Python.
+`requirements.txt` existe apenas para compatibilidade e deve permanecer coerente com o `pyproject.toml`.
 
 ## Escopo do MVP
 
 O MVP cobre SAMBA classico calibrado, log-linear e de primeira ordem. Redux e extensao soberana ficam fora do MVP.
-

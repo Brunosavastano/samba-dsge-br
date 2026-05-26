@@ -20,3 +20,8 @@
 - Se uma fonte nao estiver verificada, use `TBD-verify-in-task-<WBS-ID>`.
 - Nao misture dados final-revised e real-time no mesmo experimento.
 
+## Python
+
+- `pyproject.toml` e a fonte de verdade para package, pytest e tooling.
+- `requirements.txt` e arquivo de compatibilidade, nao fonte primaria.
+- Nao instale dependencias em rede como parte de tarefas de bootstrap.
