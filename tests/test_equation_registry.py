@@ -50,7 +50,7 @@ def test_equation_registry_gate2b_is_approved_but_blocks_dynare_until_calibratio
     assert "measurement_draft_registered: true" in text
     assert "Gate 2b is passed for the minimum viable equation registry." in text
     assert "Runtime verification and calibration notes are required" in text
-    assert not (ROOT / "model").exists()
+    assert not list((ROOT / "model").rglob("*.mod")) if (ROOT / "model").exists() else True
 
 
 def test_equation_registry_declares_required_entry_fields():
@@ -355,4 +355,4 @@ def test_measurement_registry_entries_are_draft_for_wbs043():
     assert "q_up_means_brl_real_depreciation" in by_variable["q"]["tests"]
     assert "pi_target_deterministic_in_calibrated_mvp" in by_variable["pi_target"]["tests"]
     assert "y_gap_structural_variable_present" in by_variable["y_gap"]["tests"]
-    assert not (ROOT / "model").exists()
+    assert not list((ROOT / "model").rglob("*.mod")) if (ROOT / "model").exists() else True

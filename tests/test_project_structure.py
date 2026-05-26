@@ -32,9 +32,8 @@ def test_required_bootstrap_files_exist():
     assert missing == []
 
 
-def test_forbidden_implementation_paths_not_created_in_bootstrap():
+def test_forbidden_pipeline_paths_not_created():
     forbidden = [
-        "model",
         "src/data_pipeline",
     ]
 

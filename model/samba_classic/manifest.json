@@ -1,0 +1,34 @@
+{
+  "model_id": "samba_classic_mvp_v0",
+  "wbs": "WBS-054",
+  "status": "structure_only",
+  "runtime_path": "octave_dynare",
+  "dynare_version_verified": "7.0",
+  "octave_version_verified": "11.1.0",
+  "matlab_version_verified": null,
+  "equation_registry": "docs/01_equation_registry.md",
+  "calibration_notes": "docs/03_calibration_notes.md",
+  "allowed_current_files": [
+    "README.md",
+    "manifest.json"
+  ],
+  "planned_future_files": {
+    "WBS-055": "calibration.m",
+    "WBS-056": "steady_state.m",
+    "WBS-057": "samba_classic.mod",
+    "WBS-058": "shocks.inc",
+    "WBS-059": "observables.inc"
+  },
+  "blocked_in_wbs_054": [
+    ".mod files",
+    ".m files",
+    ".inc files",
+    "equations outside docs/01_equation_registry.md",
+    "calibration values",
+    "steady-state values",
+    "fake outputs",
+    "estimation",
+    "Redux",
+    "sovereign extension"
+  ]
+}

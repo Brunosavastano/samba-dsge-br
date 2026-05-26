@@ -73,6 +73,15 @@ def test_wbs052_metadata_documents_no_source_id_invention():
     assert metadata["no_model_or_dynare_files_created"] is True
 
 
-def test_wbs052_does_not_create_model_or_pipeline_code():
-    assert not (ROOT / "model").exists()
+def test_wbs052_does_not_create_pipeline_or_executable_model_code():
+    model_dir = ROOT / "model"
+    executable_model_files = []
+    if model_dir.exists():
+        executable_model_files = [
+            path.relative_to(ROOT).as_posix()
+            for path in model_dir.rglob("*")
+            if path.is_file() and path.suffix in {".mod", ".m", ".inc"}
+        ]
+
+    assert executable_model_files == []
     assert not (ROOT / "src" / "data_pipeline").exists()

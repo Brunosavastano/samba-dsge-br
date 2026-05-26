@@ -33,6 +33,15 @@ def test_model_validation_template_is_not_a_result():
     assert "no_result_invention: true" in text
 
 
-def test_validation_templates_do_not_create_forbidden_implementation_paths():
-    assert not (ROOT / "model").exists()
+def test_validation_templates_do_not_create_forbidden_implementation_files():
+    model_dir = ROOT / "model"
+    executable_model_files = []
+    if model_dir.exists():
+        executable_model_files = [
+            path.relative_to(ROOT).as_posix()
+            for path in model_dir.rglob("*")
+            if path.is_file() and path.suffix in {".mod", ".m", ".inc"}
+        ]
+
+    assert executable_model_files == []
     assert not (ROOT / "src" / "data_pipeline").exists()

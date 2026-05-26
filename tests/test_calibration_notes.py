@@ -90,11 +90,21 @@ def test_calibration_notes_do_not_assign_numeric_values():
     assert assignment.search(text) is None
 
 
-def test_calibration_notes_do_not_create_forbidden_model_paths():
-    forbidden = [
-        ROOT / "model",
+def test_calibration_notes_do_not_create_forbidden_executable_model_files():
+    forbidden_suffixes = {".mod", ".m", ".inc"}
+    model_dir = ROOT / "model"
+    forbidden_model_files = []
+    if model_dir.exists():
+        forbidden_model_files = [
+            str(path.relative_to(ROOT))
+            for path in model_dir.rglob("*")
+            if path.is_file() and path.suffix in forbidden_suffixes
+        ]
+
+    forbidden_paths = [
         ROOT / "src" / "data_pipeline",
     ]
+    present_paths = [str(path.relative_to(ROOT)) for path in forbidden_paths if path.exists()]
 
-    present = [str(path.relative_to(ROOT)) for path in forbidden if path.exists()]
-    assert present == []
+    assert forbidden_model_files == []
+    assert present_paths == []
