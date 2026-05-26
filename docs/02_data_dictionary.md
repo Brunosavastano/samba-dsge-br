@@ -318,6 +318,25 @@ data_created: false
 pipeline_created: false
 ```
 
+### 5.5 WBS-030 missing-policy validation contract
+
+```yaml
+wbs: WBS-030
+status: validation_contract_defined_no_data_created
+applies_to: all_planned_observables
+silent_missing: forbidden
+default_interpolation: forbidden
+required_missing_flags:
+  - missing_source_observation
+  - incomplete_quarter
+  - transformation_not_computed
+baseline_action: "drop or fail the affected quarter before dataset generation; do not fill silently"
+future_interpolation_policy: "any interpolation or nowcast must be explicit, source-tagged, and outside the default MVP dataset"
+failure_condition: "missing observation without a missing flag fails validation"
+data_created: false
+pipeline_created: false
+```
+
 ---
 
 ## 6. Gate 1b acceptance
