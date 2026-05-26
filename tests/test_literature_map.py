@@ -8,7 +8,7 @@ LITERATURE_MAP = ROOT / "docs" / "00a_literature_map.md"
 def test_literature_map_exists_and_blocks_equation_registry():
     text = LITERATURE_MAP.read_text(encoding="utf-8")
 
-    assert "gate_status: source_skeleton_created" in text
+    assert "gate_status: source_locator_pass_partial" in text
     assert "equation_registry_allowed: false" in text
     assert "dynare_allowed: false" in text
     assert "Gate 2b is not passed." in text
@@ -27,6 +27,13 @@ def test_literature_map_has_verified_bcb_primary_sources():
 def test_literature_map_keeps_precise_locators_pending():
     text = LITERATURE_MAP.read_text(encoding="utf-8")
 
-    assert "TBD-after-primary-source-reading-WBS-033A" in text
-    assert "Current status: source skeleton created; precise locators pending." in text
+    assert "pending_equation_locator" in text
+    assert "exact WP239 equation/table locators" in text
 
+
+def test_literature_map_has_verified_wp578_section_locators():
+    text = LITERATURE_MAP.read_text(encoding="utf-8")
+
+    assert "WP578 The model, PDF page 8" in text
+    assert "WP578 Priors, posteriors and SMC estimation, PDF page 42" in text
+    assert "Computational details, PDF page 91" in text
