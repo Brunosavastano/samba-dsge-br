@@ -300,6 +300,24 @@ data_created: false
 pipeline_created: false
 ```
 
+### 5.4 WBS-029 revision-policy validation contract
+
+```yaml
+wbs: WBS-029
+status: validation_contract_defined_no_data_created
+experiment_revision_policy_required: final_revised
+applies_to: all_planned_observables
+validation_rule: "all observable rows in one experiment must share the same revision_policy"
+current_mvp_policy: final_revised
+forbidden_mix:
+  - final_revised
+  - real_time_vintage
+failure_condition: "mixing final_revised and real_time_vintage fails validation"
+future_operational_policy: "real_time_vintage is out_of_mvp and must use a separate experiment config"
+data_created: false
+pipeline_created: false
+```
+
 ---
 
 ## 6. Gate 1b acceptance
