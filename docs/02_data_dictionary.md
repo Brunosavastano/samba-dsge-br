@@ -78,7 +78,7 @@ The following core sources must have verified `source_id` values before extracti
 series_id,variable,description,source,source_id,source_status,revision_policy,frequency_model,wbs,gate_status
 br_gdp_real,y,PIB real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1,verified,final_revised,quarterly,WBS-024,Gate 1b source verified
 br_ipca_headline,pi,Inflacao IPCA cheia variacao mensal,IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo,IBGE-SIDRA-IPCA-1737-v63-n1-1,verified,final_revised,quarterly,WBS-025,Gate 1b source verified
-br_selic,r,Taxa Selic,TBD,TBD-verify-in-task-WBS-026,tbd,final_revised,quarterly,WBS-026,Gate 1a skeleton
+br_selic,r,Taxa Selic meta definida pelo Copom,Banco Central do Brasil SGS,BCB-SGS-432,verified,final_revised,quarterly,WBS-026,Gate 1b source verified
 br_real_exchange_rate,q,Cambio real with q_t up as BRL real depreciation,TBD,TBD-verify-in-task-WBS-027,tbd,final_revised,quarterly,WBS-027,Gate 1a skeleton
 br_private_consumption,c,Consumo privado real,TBD,TBD-verify-in-task-WBS-045,tbd,final_revised,quarterly,WBS-045,Gate 1a skeleton
 br_investment,i,Investimento real,TBD,TBD-verify-in-task-WBS-046,tbd,final_revised,quarterly,WBS-046,Gate 1a skeleton
@@ -105,6 +105,15 @@ WBS-025 br_ipca_headline:
 - metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1737/metadados.
 - source meaning: table 1737 IPCA serie historica; variable 63 IPCA variacao mensal; N1 Brasil.
 - quarterly transformation remains future Gate 1b work; no data was extracted or saved in WBS-025.
+
+WBS-026 br_selic:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-432.
+- official SGS page: https://www.bcb.gov.br/estatisticas/sgs.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json.
+- source meaning: Meta Selic definida pelo Copom, baseline observable for the policy rate `r`.
+- Selic over SGS 11 is a documented alternative for later measurement-equation review, not the WBS-026 baseline.
+- quarterly average or effective-rate transformation remains future Gate 1b/WBS-032 work; no data was extracted or saved in WBS-026.
 ```
 
 ---
