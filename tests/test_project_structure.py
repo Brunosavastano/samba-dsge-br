@@ -15,6 +15,7 @@ def test_required_bootstrap_files_exist():
         "samba_dsge_br_spec_standalone_consolidado.md",
         "docs/08_implementation_plan.md",
         "docs/00b_modeling_decisions.md",
+        "docs/03_calibration_notes.md",
         "docs/05_replication_targets.md",
         "docs/06_model_validation.md",
         "docs/gate0_approval_record.md",
