@@ -77,7 +77,7 @@ The following core sources must have verified `source_id` values before extracti
 ```csv
 series_id,variable,description,source,source_id,source_status,revision_policy,frequency_model,wbs,gate_status
 br_gdp_real,y,PIB real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1,verified,final_revised,quarterly,WBS-024,Gate 1b source verified
-br_ipca_headline,pi,Inflacao IPCA cheia,TBD,TBD-verify-in-task-WBS-025,tbd,final_revised,quarterly,WBS-025,Gate 1a skeleton
+br_ipca_headline,pi,Inflacao IPCA cheia variacao mensal,IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo,IBGE-SIDRA-IPCA-1737-v63-n1-1,verified,final_revised,quarterly,WBS-025,Gate 1b source verified
 br_selic,r,Taxa Selic,TBD,TBD-verify-in-task-WBS-026,tbd,final_revised,quarterly,WBS-026,Gate 1a skeleton
 br_real_exchange_rate,q,Cambio real with q_t up as BRL real depreciation,TBD,TBD-verify-in-task-WBS-027,tbd,final_revised,quarterly,WBS-027,Gate 1a skeleton
 br_private_consumption,c,Consumo privado real,TBD,TBD-verify-in-task-WBS-045,tbd,final_revised,quarterly,WBS-045,Gate 1a skeleton
@@ -97,6 +97,14 @@ WBS-024 br_gdp_real:
 - metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
 - source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 90707 PIB a precos de mercado; N1 Brasil.
 - no data was extracted or saved in WBS-024.
+
+WBS-025 br_ipca_headline:
+- source: IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo.
+- source_id: IBGE-SIDRA-IPCA-1737-v63-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1737.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1737/metadados.
+- source meaning: table 1737 IPCA serie historica; variable 63 IPCA variacao mensal; N1 Brasil.
+- quarterly transformation remains future Gate 1b work; no data was extracted or saved in WBS-025.
 ```
 
 ---

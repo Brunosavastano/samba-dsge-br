@@ -32,7 +32,6 @@ def test_data_dictionary_skeleton_exists_and_blocks_data_extraction():
 def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
     expected = [
-        "TBD-verify-in-task-WBS-025",
         "TBD-verify-in-task-WBS-026",
         "TBD-verify-in-task-WBS-027",
         "TBD-verify-in-task-WBS-045",
@@ -45,6 +44,7 @@ def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     missing = [placeholder for placeholder in expected if placeholder not in text]
     assert missing == []
     assert "TBD-verify-in-task-WBS-024" not in text
+    assert "TBD-verify-in-task-WBS-025" not in text
 
 
 def test_data_dictionary_declares_required_metadata_fields():
@@ -78,3 +78,19 @@ def test_real_gdp_source_is_verified_for_wbs024():
     assert gdp["gate_status"] == "Gate 1b source verified"
     assert "https://sidra.ibge.gov.br/tabela/1621" in text
     assert "no data was extracted or saved in WBS-024" in text
+
+
+def test_headline_ipca_source_is_verified_for_wbs025():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 3. Core sources required for Gate 1b")
+    by_series = {row["series_id"]: row for row in rows}
+    ipca = by_series["br_ipca_headline"]
+
+    assert ipca["source"] == "IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo"
+    assert ipca["source_id"] == "IBGE-SIDRA-IPCA-1737-v63-n1-1"
+    assert ipca["source_status"] == "verified"
+    assert ipca["wbs"] == "WBS-025"
+    assert ipca["gate_status"] == "Gate 1b source verified"
+    assert "https://sidra.ibge.gov.br/tabela/1737" in text
+    assert "quarterly transformation remains future Gate 1b work" in text
+    assert "no data was extracted or saved in WBS-025" in text
