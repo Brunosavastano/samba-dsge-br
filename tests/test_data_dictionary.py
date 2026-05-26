@@ -32,7 +32,6 @@ def test_data_dictionary_skeleton_exists_and_blocks_data_extraction():
 def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
     expected = [
-        "TBD-verify-in-task-WBS-045",
         "TBD-verify-in-task-WBS-046",
         "TBD-verify-in-task-WBS-047",
         "TBD-verify-in-task-WBS-048",
@@ -45,6 +44,7 @@ def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     assert "TBD-verify-in-task-WBS-025" not in text
     assert "TBD-verify-in-task-WBS-026" not in text
     assert "TBD-verify-in-task-WBS-027" not in text
+    assert "TBD-verify-in-task-WBS-045" not in text
 
 
 def test_data_dictionary_declares_required_metadata_fields():
@@ -126,3 +126,19 @@ def test_real_exchange_rate_source_is_verified_for_wbs027():
     assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11752/dados?formato=json" in text
     assert "q_t` up = BRL real depreciation" in text
     assert "no dataset was generated or saved in WBS-027" in text
+
+
+def test_private_consumption_source_is_verified_for_wbs045():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 3. Core sources required for Gate 1b")
+    by_series = {row["series_id"]: row for row in rows}
+    consumption = by_series["br_private_consumption"]
+
+    assert consumption["source"] == "IBGE SIDRA Contas Nacionais Trimestrais"
+    assert consumption["source_id"] == "IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1"
+    assert consumption["source_status"] == "verified"
+    assert consumption["wbs"] == "WBS-045"
+    assert consumption["gate_status"] == "Gate 1b source verified"
+    assert "category 93404 Despesa de consumo das familias" in text
+    assert "https://sidra.ibge.gov.br/tabela/1621" in text
+    assert "no data was extracted or saved in WBS-045" in text

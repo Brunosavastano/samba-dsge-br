@@ -80,7 +80,7 @@ br_gdp_real,y,PIB real seasonally adjusted chained volume index,IBGE SIDRA Conta
 br_ipca_headline,pi,Inflacao IPCA cheia variacao mensal,IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo,IBGE-SIDRA-IPCA-1737-v63-n1-1,verified,final_revised,quarterly,WBS-025,Gate 1b source verified
 br_selic,r,Taxa Selic meta definida pelo Copom,Banco Central do Brasil SGS,BCB-SGS-432,verified,final_revised,quarterly,WBS-026,Gate 1b source verified
 br_real_exchange_rate,q,Cambio real efetivo IPCA with q_t up as BRL real depreciation,Banco Central do Brasil SGS,BCB-SGS-11752,verified,final_revised,quarterly,WBS-027,Gate 1b source verified
-br_private_consumption,c,Consumo privado real,TBD,TBD-verify-in-task-WBS-045,tbd,final_revised,quarterly,WBS-045,Gate 1a skeleton
+br_private_consumption,c,Consumo privado real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1,verified,final_revised,quarterly,WBS-045,Gate 1b source verified
 br_investment,i,Investimento real,TBD,TBD-verify-in-task-WBS-046,tbd,final_revised,quarterly,WBS-046,Gate 1a skeleton
 br_government_consumption,g,Gasto do governo real,TBD,TBD-verify-in-task-WBS-047,tbd,final_revised,quarterly,WBS-047,Gate 1a skeleton
 br_exports,x,Exportacoes reais,TBD,TBD-verify-in-task-WBS-048,tbd,final_revised,quarterly,WBS-048,Gate 1a skeleton
@@ -124,6 +124,14 @@ WBS-027 br_real_exchange_rate:
 - project convention remains `q_t` up = BRL real depreciation.
 - nominal exchange rate or bilateral real USD measures are documented alternatives for later measurement-equation review, not the WBS-027 baseline.
 - quarterly conversion remains future Gate 1b work; no dataset was generated or saved in WBS-027.
+
+WBS-045 br_private_consumption:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93404 Despesa de consumo das familias; N1 Brasil.
+- no data was extracted or saved in WBS-045.
 ```
 
 ---
