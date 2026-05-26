@@ -3,14 +3,17 @@
 Updated: 2026-05-26
 
 Current gate: Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
+Execution status: BLOCKED_BY_RUNTIME.
 Current PR/WBS: WBS-053 complete.
-Last completed task: Added calibration notes scaffold with parameter and steady-state rationale placeholders, without invented values.
-Next task: WBS-054 model directory structure, blocked until a Dynare/MATLAB/Octave runtime is available and verified.
+Blocked WBS: WBS-054 / PR11.
+Last completed task: WBS-053 calibration notes.
+Next task after unblock: WBS-054 model directory structure.
 Blockers: `model/`, `.mod`, Dynare execution, calibration values, steady-state values, estimation, Redux, and sovereign extension remain blocked.
-Files changed: `docs/03_calibration_notes.md`, `tests/test_calibration_notes.py`, `tests/test_project_structure.py`, `docs/PROJECT_STATUS.md`.
-Tests run: `python -m pytest` - 57 passed; `git diff --check`; forbidden path check for `model` and `src/data_pipeline` - both absent.
-Commit hash: `bed6a62`.
-Safe to continue: no. The next WBS creates `model/samba_classic/`, and `docs/runtime_verification.md` currently records Dynare, Octave, and MATLAB as unavailable.
+Required user action: install or expose Dynare plus Octave or MATLAB runtime in PATH.
+Files changed: `docs/runtime_unblock_guide.md`, `docs/runtime_verification.md`, `docs/PROJECT_STATUS.md`.
+Tests run: `python -m pytest` - 57 passed; `git diff --check`.
+Commit hash: pending until commit.
+Safe to continue: false. The next WBS creates `model/samba_classic/`, and `docs/runtime_verification.md` records Dynare, Octave, and MATLAB as unavailable.
 
 Visual status:
 
@@ -28,7 +31,7 @@ Progress metric: 57/86 WBS complete, approximately 66% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 0/11 | blocked | Dynare/MATLAB/Octave runtime unavailable |
+| PR 11 Dynare calibrated model | 054..064 | 0/11 | BLOCKED_BY_RUNTIME | install or expose Dynare plus Octave/MATLAB |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
