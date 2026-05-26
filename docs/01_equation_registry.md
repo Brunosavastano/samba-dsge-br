@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT FISC ADMIN HH FIRM and AGG entries partial
+**Status:** Gate 2b MON EXT FISC ADMIN HH FIRM AGG and SHOCK entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,8 +11,8 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-041
-gate_status: aggregation_block_registered
+wbs: WBS-042
+gate_status: shock_block_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
@@ -24,13 +24,14 @@ administered_prices_registered: true
 household_block_registered: true
 firm_block_registered: true
 aggregation_block_registered: true
+shock_block_registered: true
 core_blocks_registered: false
-registry_version: 0.8.0-agg
+registry_version: 0.9.0-shock
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, administered-prices, household, firm, and aggregation entries are registered through WBS-041.
+Gate 2b is not passed. Registry entries are registered through WBS-042.
 
 ---
 
@@ -79,7 +80,7 @@ EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_partial
 EQ-HH,HH,LM-HH-001,WBS-039,registered_partial
 EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,registered_partial
 EQ-AGG,AGG,LM-AGG-001,WBS-041,registered_partial
-EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,ready_for_registry_entry
+EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,registered_partial
 EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 ```
 
@@ -87,7 +88,7 @@ EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 
 ## 4. Registry entries
 
-WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, WBS-038 administered-prices, WBS-039 household, WBS-040 firm, and WBS-041 aggregation entries are registered.
+WBS-035 through WBS-042 entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
@@ -117,4 +118,21 @@ EQ-AGG-001,AGG,Final goods market clearing,identity,LM-AGG-001,BCB_WP239,WP239 S
 EQ-AGG-002,AGG,Absorption and net exports accounting,identity,LM-AGG-001,BCB_WP239,WP239 Section 2.7 PDF pages 41-42; Appendix C.4 PDF page 90; main equations 78-80; log-linear equations C.37-C.39,abs|c|i|g|nx|x|m|q|nfa,source_located_weights_pending_calibration,none,absorption_mapped;net_exports_mapped;nfa_link_mapped;identity_required_before_dynare,sourced,WBS-041,Absorption and NX links remain registry-only until model implementation is allowed.
 EQ-AGG-003,AGG,Real GDP and GDP deflator identities,identity,LM-AGG-001,BCB_WP239,WP239 Section 2.7 PDF pages 41-42; Appendix C.5 PDF page 91; main equations 86-87; log-linear equations C.40-C.42,y|pi_y|q_y|c|i|g|x|m,source_located_weights_pending_calibration,none,real_gdp_identity_located;gdp_deflator_identity_located;inflation_aggregation_test_required,sourced,WBS-041,Weights and observable measurement remain future calibration/data work.
 EQ-AGG-004,AGG,Output gap and potential output accounting,auxiliary,LM-AGG-001,BCB_WP239,WP239 Section 2.6 Aggregation PDF pages 38-40; Section 2.7 PDF pages 41-42; Appendix C.4-C.5 PDF pages 90-91,y|y_pot|y_gap|trend_growth,source_located_parameters_pending_calibration,none,y_gap_structural_variable_present;y_pot_structural_variable_present;measurement_deferred_to_data_dictionary,sourced,WBS-041,STRUCT-001 variables are mapped; measurement equation remains Gate 1b or later work.
+EQ-SHOCK-001,SHOCK,Monetary policy innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 93; equation C.60,monetary_policy_shock_state,std_pending_calibration,eps_monetary,shock_name_declared;std_not_calibrated_here;linked_to_EQ-MON-003,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-002,SHOCK,Inflation target innovation disabled in calibrated MVP,shock_process,LM-MON-001,BCB_WP239,WP239 Section 2.3.1 PDF page 34; Appendix C.3 PDF page 89; equation C.29,pi_target,std_pending_future_phase,eps_pi_target,shock_name_declared;eps_pi_target_off_in_calibrated_mvp;target_is_deterministic_series;future_phase_only,deferred,WBS-042,Recorded from TARGET-001 but disabled for calibrated MVP.
+EQ-SHOCK-003,SHOCK,Fiscal government spending innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 93; equation C.61,government_spending_shock_state,std_pending_calibration,eps_fiscal_g,shock_name_declared;std_not_calibrated_here;linked_to_EQ-FISC-002,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-004,SHOCK,Primary surplus target innovation,shock_process,LM-FISC-001,BCB_WP239,WP239 Appendix C.3 PDF page 89; equation C.31,sp_target,std_pending_calibration,eps_sp_target,shock_name_declared;std_not_calibrated_here;linked_to_EQ-FISC-001,sourced,WBS-042,Primary surplus target shock is distinct from realized surplus.
+EQ-SHOCK-005,SHOCK,Tax rate innovation,shock_process,LM-FISC-001,BCB_WP239,WP239 Appendix C.3 PDF page 89; equation C.32,tax_rate,std_pending_calibration,eps_tax,shock_name_declared;std_not_calibrated_here;linked_to_EQ-FISC-004,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-006,SHOCK,Technology innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF pages 91-92; equations C.51-C.52,technology_state,std_pending_calibration,eps_tfp,shock_name_declared;transitory_and_permanent_technology_located;std_not_calibrated_here,sourced,WBS-042,SPEC name maps to WP239 technology shock locators without choosing calibration.
+EQ-SHOCK-007,SHOCK,Preference innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 91; equation C.48,preference_shock_state,std_pending_calibration,eps_pref,shock_name_declared;std_not_calibrated_here;linked_to_EQ-HH-001,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-008,SHOCK,Investment innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; equation C.53,investment_shock_state,std_pending_calibration,eps_investment,shock_name_declared;std_not_calibrated_here;linked_to_EQ-FIRM-003,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-009,SHOCK,Free-price markup innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; equation C.57,price_markup_state,std_pending_calibration,eps_price_free,shock_name_declared;std_not_calibrated_here;linked_to_EQ-FIRM-002,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-010,SHOCK,Administered-price innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; equation C.58,admin_price_shock_state,std_pending_calibration,eps_price_admin,shock_name_declared;std_not_calibrated_here;linked_to_EQ-PRICE-001,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-011,SHOCK,Wage markup innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; equation C.56,wage_markup_state,std_pending_calibration,eps_wage,shock_name_declared;std_not_calibrated_here;linked_to_EQ-HH-003,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-012,SHOCK,Import price innovation,shock_process,LM-EXT-001,BCB_WP239,WP239 Appendix C.5 PDF page 91; equation C.44,import_price_state,std_pending_calibration,eps_import_price,shock_name_declared;std_not_calibrated_here;linked_to_EQ-FIRM-004,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-013,SHOCK,Risk premium innovation,shock_process,LM-SHOCK-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; equation C.50,risk,std_pending_calibration,eps_risk,shock_name_declared;std_not_calibrated_here;linked_to_EQ-EXT-002,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-014,SHOCK,Foreign output innovation,shock_process,LM-EXT-001,BCB_WP239,WP239 Appendix C.5 PDF page 91; equation C.43,foreign_output_state,std_pending_calibration,eps_foreign_y,shock_name_declared;std_not_calibrated_here;foreign_block_locator_present,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-015,SHOCK,Foreign interest rate innovation,shock_process,LM-EXT-001,BCB_WP239,WP239 Appendix C.5 PDF page 91; equation C.47,foreign_interest_state,std_pending_calibration,eps_foreign_r,shock_name_declared;std_not_calibrated_here;foreign_block_locator_present,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-016,SHOCK,Foreign inflation innovation,shock_process,LM-EXT-001,BCB_WP239,WP239 Appendix C.5 PDF page 91; equation C.45,foreign_inflation_state,std_pending_calibration,eps_foreign_pi,shock_name_declared;std_not_calibrated_here;foreign_block_locator_present,sourced,WBS-042,Dynare name reserved only; no model file created.
+EQ-SHOCK-017,SHOCK,Commodity innovation deferred,shock_process,LM-SHOCK-001,BCB_WP239,SPEC Section 10.1 lists eps_commodity; WP239 equation locator not verified,commodity_shock_state,std_pending_source_locator,eps_commodity,shock_name_declared;source_locator_pending;not_enabled_for_mvp_until_source_verified,deferred,WBS-042,Registered as deferred to avoid inventing a WP239 equation.
 ```

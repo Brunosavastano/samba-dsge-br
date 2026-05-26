@@ -28,7 +28,7 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: aggregation_block_registered" in text
+    assert "gate_status: shock_block_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
@@ -209,3 +209,39 @@ def test_aggregation_registry_entries_are_complete_for_wbs041():
     assert "gdp_deflator_identity_located" in by_id["EQ-AGG-003"]["tests"]
     assert "y_pot" in by_id["EQ-AGG-004"]["variables"]
     assert "y_gap_structural_variable_present" in by_id["EQ-AGG-004"]["tests"]
+
+
+def test_shock_registry_entries_are_complete_for_wbs042():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    shock_entries = [entry for entry in entries if entry["block"] == "SHOCK"]
+    by_shock = {entry["shocks"]: entry for entry in shock_entries}
+    expected_shocks = {
+        "eps_monetary",
+        "eps_pi_target",
+        "eps_fiscal_g",
+        "eps_sp_target",
+        "eps_tax",
+        "eps_tfp",
+        "eps_pref",
+        "eps_investment",
+        "eps_price_free",
+        "eps_price_admin",
+        "eps_wage",
+        "eps_import_price",
+        "eps_risk",
+        "eps_foreign_y",
+        "eps_foreign_r",
+        "eps_foreign_pi",
+        "eps_commodity",
+    }
+
+    assert set(by_shock) == expected_shocks
+    assert all(entry["gate"] == "WBS-042" for entry in shock_entries)
+    assert all(entry["equation_type"] == "shock_process" for entry in shock_entries)
+    assert all("std_pending" in entry["parameters"] for entry in shock_entries)
+    assert all("shock_name_declared" in entry["tests"] for entry in shock_entries)
+    assert by_shock["eps_pi_target"]["status"] == "deferred"
+    assert "eps_pi_target_off_in_calibrated_mvp" in by_shock["eps_pi_target"]["tests"]
+    assert by_shock["eps_commodity"]["status"] == "deferred"
+    assert "source_locator_pending" in by_shock["eps_commodity"]["tests"]
