@@ -1,4 +1,5 @@
 import csv
+import re
 from io import StringIO
 from pathlib import Path
 
@@ -6,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "docs" / "01_equation_registry.md"
 LITERATURE_MAP = ROOT / "docs" / "00a_literature_map.md"
+DATA_DICTIONARY = ROOT / "docs" / "02_data_dictionary.md"
 
 
 def _csv_block_after(text: str, heading: str) -> list[str]:
@@ -23,6 +25,17 @@ def _csv_block_after(text: str, heading: str) -> list[str]:
 def _registry_entries(text: str) -> list[dict[str, str]]:
     rows = _csv_block_after(text, "## 4. Registry entries")
     return list(csv.DictReader(StringIO("\n".join(rows))))
+
+
+def _csv_dicts_after(text: str, heading: str) -> list[dict[str, str]]:
+    rows = _csv_block_after(text, heading)
+    return list(csv.DictReader(StringIO("\n".join(rows))))
+
+
+def _pipe_tokens(value: str) -> set[str]:
+    if value == "none":
+        return set()
+    return {token for token in value.split("|") if token}
 
 
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
@@ -86,6 +99,59 @@ def test_equation_registry_entries_are_unique_and_sourced():
         assert entry["source_map_id"] in literature
         assert entry["source_reference_id"] in literature
         assert entry["status"] in {"draft", "sourced", "reviewed", "approved", "deferred"}
+
+
+def test_registry_has_no_orphan_blocks_sources_or_links_for_wbs044():
+    text = REGISTRY.read_text(encoding="utf-8")
+    literature = LITERATURE_MAP.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    namespace_rows = _csv_dicts_after(text, "## 3. Planned namespaces")
+    map_rows = (
+        _csv_dicts_after(literature, "## 4. MVP block map")
+        + _csv_dicts_after(literature, "## 5. Out-of-MVP map")
+    )
+    reference_rows = _csv_dicts_after(literature, "## 2. Canonical references")
+    equation_ids = {entry["equation_id"] for entry in entries}
+    blocks = {row["block"] for row in namespace_rows}
+    map_ids = {row["map_id"] for row in map_rows}
+    reference_ids = {row["reference_id"] for row in reference_rows}
+    id_pattern = re.compile(r"^EQ-(MON|EXT|FISC|PRICE|HH|FIRM|AGG|SHOCK|MEAS)-\d{3}$")
+
+    assert all(id_pattern.match(entry["equation_id"]) for entry in entries)
+    assert all(entry["block"] in blocks for entry in entries)
+    assert all(entry["source_map_id"] in map_ids for entry in entries)
+    assert all(entry["source_reference_id"] in reference_ids for entry in entries)
+
+    for entry in entries:
+        linked_ids = [
+            marker.removeprefix("linked_to_")
+            for marker in entry["tests"].split(";")
+            if marker.startswith("linked_to_EQ-")
+        ]
+        assert set(linked_ids).issubset(equation_ids)
+
+
+def test_registry_measurement_variables_are_not_orphaned_for_wbs044():
+    registry_text = REGISTRY.read_text(encoding="utf-8")
+    dictionary_text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    entries = _registry_entries(registry_text)
+    dictionary_rows = (
+        _csv_dicts_after(dictionary_text, "## 3. Core sources required for Gate 1b")
+        + _csv_dicts_after(dictionary_text, "## 4. Additional planned MVP observables")
+    )
+    dictionary_variables = {row["variable"] for row in dictionary_rows}
+    dictionary_series_ids = {row["series_id"] for row in dictionary_rows}
+    all_registry_variables = set().union(
+        *(_pipe_tokens(entry["variables"]) for entry in entries)
+    )
+    measurement_entries = [entry for entry in entries if entry["block"] == "MEAS"]
+
+    assert dictionary_variables.issubset(all_registry_variables)
+
+    for entry in measurement_entries:
+        model_var, series_id = entry["variables"].split("|", 1)
+        assert model_var in dictionary_variables
+        assert series_id in dictionary_series_ids
 
 
 def test_monetary_policy_registry_entries_are_complete_for_wbs035():
