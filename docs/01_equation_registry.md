@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT FISC ADMIN HH FIRM AGG and SHOCK entries partial
+**Status:** Gate 2b MON EXT FISC ADMIN HH FIRM AGG SHOCK and MEAS draft entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,8 +11,8 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-042
-gate_status: shock_block_registered
+wbs: WBS-043
+gate_status: measurement_draft_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
@@ -25,13 +25,14 @@ household_block_registered: true
 firm_block_registered: true
 aggregation_block_registered: true
 shock_block_registered: true
+measurement_draft_registered: true
 core_blocks_registered: false
-registry_version: 0.9.0-shock
+registry_version: 0.10.0-meas
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Registry entries are registered through WBS-042.
+Gate 2b is not passed. Registry entries are registered through WBS-043.
 
 ---
 
@@ -81,14 +82,14 @@ EQ-HH,HH,LM-HH-001,WBS-039,registered_partial
 EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,registered_partial
 EQ-AGG,AGG,LM-AGG-001,WBS-041,registered_partial
 EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,registered_partial
-EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
+EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_registered_until_gate1b
 ```
 
 ---
 
 ## 4. Registry entries
 
-WBS-035 through WBS-042 entries are registered.
+WBS-035 through WBS-043 entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
@@ -135,4 +136,19 @@ EQ-SHOCK-014,SHOCK,Foreign output innovation,shock_process,LM-EXT-001,BCB_WP239,
 EQ-SHOCK-015,SHOCK,Foreign interest rate innovation,shock_process,LM-EXT-001,BCB_WP239,WP239 Appendix C.5 PDF page 91; equation C.47,foreign_interest_state,std_pending_calibration,eps_foreign_r,shock_name_declared;std_not_calibrated_here;foreign_block_locator_present,sourced,WBS-042,Dynare name reserved only; no model file created.
 EQ-SHOCK-016,SHOCK,Foreign inflation innovation,shock_process,LM-EXT-001,BCB_WP239,WP239 Appendix C.5 PDF page 91; equation C.45,foreign_inflation_state,std_pending_calibration,eps_foreign_pi,shock_name_declared;std_not_calibrated_here;foreign_block_locator_present,sourced,WBS-042,Dynare name reserved only; no model file created.
 EQ-SHOCK-017,SHOCK,Commodity innovation deferred,shock_process,LM-SHOCK-001,BCB_WP239,SPEC Section 10.1 lists eps_commodity; WP239 equation locator not verified,commodity_shock_state,std_pending_source_locator,eps_commodity,shock_name_declared;source_locator_pending;not_enabled_for_mvp_until_source_verified,deferred,WBS-042,Registered as deferred to avoid inventing a WP239 equation.
+EQ-MEAS-001,MEAS,Real GDP growth observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_gdp_real,y|br_gdp_real,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;no_source_id_invention;no_data_created,draft,WBS-043,Final growth or log-deviation mapping remains blocked until Gate 1b.
+EQ-MEAS-002,MEAS,Headline IPCA inflation observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_ipca_headline,pi|br_ipca_headline,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;inflation_compounding_rule_required;no_data_created,draft,WBS-043,Monthly-to-quarterly treatment remains Gate 1b work.
+EQ-MEAS-003,MEAS,Selic policy rate observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_selic,r|br_selic,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;interest_rate_average_or_effective_rule_pending;no_data_created,draft,WBS-043,Meta versus over and quarterly conversion remain Gate 1b decisions.
+EQ-MEAS-004,MEAS,Real exchange rate observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_real_exchange_rate,q|br_real_exchange_rate,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;q_up_means_brl_real_depreciation;no_data_created,draft,WBS-043,Uses project sign convention only; source and conversion remain Gate 1b.
+EQ-MEAS-005,MEAS,Private consumption observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_private_consumption,c|br_private_consumption,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;real_activity_transform_pending;no_data_created,draft,WBS-043,Final source and transformation remain Gate 1b.
+EQ-MEAS-006,MEAS,Investment observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_investment,i|br_investment,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;real_activity_transform_pending;no_data_created,draft,WBS-043,Final source and transformation remain Gate 1b.
+EQ-MEAS-007,MEAS,Government consumption observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_government_consumption,g|br_government_consumption,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;real_activity_transform_pending;no_data_created,draft,WBS-043,Final source and transformation remain Gate 1b.
+EQ-MEAS-008,MEAS,Exports observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_exports,x|br_exports,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;real_activity_transform_pending;no_data_created,draft,WBS-043,Final source and transformation remain Gate 1b.
+EQ-MEAS-009,MEAS,Imports observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_imports,m|br_imports,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;real_activity_transform_pending;no_data_created,draft,WBS-043,Final source and transformation remain Gate 1b.
+EQ-MEAS-010,MEAS,Free-price inflation observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_ipca_free,pi_f|br_ipca_free,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;inflation_compounding_rule_required;no_data_created,draft,WBS-043,Optional composition remains blocked until source verification.
+EQ-MEAS-011,MEAS,Administered-price inflation observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_ipca_administered,pi_a|br_ipca_administered,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;admin_process_not_generic_shock;no_data_created,draft,WBS-043,Connects to ADMIN process only after source and transformation verification.
+EQ-MEAS-012,MEAS,Import price inflation observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_import_price_inflation,pi_m|br_import_price_inflation,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;imported_inflation_measure_pending;no_data_created,draft,WBS-043,Used by administered-price pass-through only when available.
+EQ-MEAS-013,MEAS,Inflation target observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_inflation_target,pi_target|br_inflation_target,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;pi_target_deterministic_in_calibrated_mvp;eps_pi_target_off,draft,WBS-043,Calibrated MVP treats target as deterministic or exogenous series.
+EQ-MEAS-014,MEAS,Risk premium observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_risk_premium,risk|br_risk_premium,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;risk_ar1_structural_process_present;no_data_created,draft,WBS-043,Observable candidate does not replace structural risk process.
+EQ-MEAS-015,MEAS,Output gap observable candidate draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_output_gap,y_gap|br_output_gap,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;y_gap_structural_variable_present;measurement_not_final,draft,WBS-043,Observed or semi-observed output gap remains future Gate 1b or later work.
 ```

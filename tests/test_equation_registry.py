@@ -28,10 +28,11 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: shock_block_registered" in text
+    assert "gate_status: measurement_draft_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
+    assert "measurement_draft_registered: true" in text
     assert "Gate 2b is not passed." in text
     assert not (ROOT / "model").exists()
 
@@ -245,3 +246,44 @@ def test_shock_registry_entries_are_complete_for_wbs042():
     assert "eps_pi_target_off_in_calibrated_mvp" in by_shock["eps_pi_target"]["tests"]
     assert by_shock["eps_commodity"]["status"] == "deferred"
     assert "source_locator_pending" in by_shock["eps_commodity"]["tests"]
+
+
+def test_measurement_registry_entries_are_draft_for_wbs043():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    meas_entries = [entry for entry in entries if entry["block"] == "MEAS"]
+    by_variable = {
+        entry["variables"].split("|", 1)[0]: entry
+        for entry in meas_entries
+    }
+    expected_variables = {
+        "y",
+        "pi",
+        "r",
+        "q",
+        "c",
+        "i",
+        "g",
+        "x",
+        "m",
+        "pi_f",
+        "pi_a",
+        "pi_m",
+        "pi_target",
+        "risk",
+        "y_gap",
+    }
+
+    assert set(by_variable) == expected_variables
+    assert all(entry["gate"] == "WBS-043" for entry in meas_entries)
+    assert all(entry["equation_type"] == "measurement_draft" for entry in meas_entries)
+    assert all(entry["status"] == "draft" for entry in meas_entries)
+    assert all(entry["source_map_id"] == "LM-MEAS-001" for entry in meas_entries)
+    assert all("measurement_draft_until_gate1b" in entry["tests"] for entry in meas_entries)
+    assert all("source_id_tbd_allowed_until_gate1b" in entry["tests"] for entry in meas_entries)
+    assert all("measurement_transform_pending_gate1b" in entry["parameters"] for entry in meas_entries)
+    assert all(entry["shocks"] == "none" for entry in meas_entries)
+    assert "q_up_means_brl_real_depreciation" in by_variable["q"]["tests"]
+    assert "pi_target_deterministic_in_calibrated_mvp" in by_variable["pi_target"]["tests"]
+    assert "y_gap_structural_variable_present" in by_variable["y_gap"]["tests"]
+    assert not (ROOT / "data").exists()
