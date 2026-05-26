@@ -76,7 +76,7 @@ The following core sources must have verified `source_id` values before extracti
 
 ```csv
 series_id,variable,description,source,source_id,source_status,revision_policy,frequency_model,wbs,gate_status
-br_gdp_real,y,PIB real,TBD,TBD-verify-in-task-WBS-024,tbd,final_revised,quarterly,WBS-024,Gate 1a skeleton
+br_gdp_real,y,PIB real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1,verified,final_revised,quarterly,WBS-024,Gate 1b source verified
 br_ipca_headline,pi,Inflacao IPCA cheia,TBD,TBD-verify-in-task-WBS-025,tbd,final_revised,quarterly,WBS-025,Gate 1a skeleton
 br_selic,r,Taxa Selic,TBD,TBD-verify-in-task-WBS-026,tbd,final_revised,quarterly,WBS-026,Gate 1a skeleton
 br_real_exchange_rate,q,Cambio real with q_t up as BRL real depreciation,TBD,TBD-verify-in-task-WBS-027,tbd,final_revised,quarterly,WBS-027,Gate 1a skeleton
@@ -85,6 +85,18 @@ br_investment,i,Investimento real,TBD,TBD-verify-in-task-WBS-046,tbd,final_revis
 br_government_consumption,g,Gasto do governo real,TBD,TBD-verify-in-task-WBS-047,tbd,final_revised,quarterly,WBS-047,Gate 1a skeleton
 br_exports,x,Exportacoes reais,TBD,TBD-verify-in-task-WBS-048,tbd,final_revised,quarterly,WBS-048,Gate 1a skeleton
 br_imports,m,Importacoes reais,TBD,TBD-verify-in-task-WBS-049,tbd,final_revised,quarterly,WBS-049,Gate 1a skeleton
+```
+
+### 3.1 Verified source notes
+
+```text
+WBS-024 br_gdp_real:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 90707 PIB a precos de mercado; N1 Brasil.
+- no data was extracted or saved in WBS-024.
 ```
 
 ---
@@ -130,4 +142,3 @@ Gate 1a is satisfied by this skeleton if:
 - no data file is created;
 - Gate 1b remains blocked until core source IDs are verified.
 ```
-
