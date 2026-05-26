@@ -23,15 +23,17 @@ PLACEHOLDER_PARAMETERS = {
     "std_pending_source_locator",
 }
 ALLOWED_SOURCE_STATUSES = {
-    "sourced_from_samba",
+    "sourced_from_samba_calibration",
+    "sourced_from_samba_posterior_mean",
+    "sourced_from_samba_posterior_mode",
     "sourced_from_project_decision",
-    "estimated_not_calibrated",
+    "estimated_in_samba_no_point_value_found",
     "missing_source",
     "naming_conflict",
     "not_required_for_mvp",
 }
 BLOCKING_SOURCE_STATUSES = {
-    "estimated_not_calibrated",
+    "estimated_in_samba_no_point_value_found",
     "missing_source",
     "naming_conflict",
 }
@@ -90,12 +92,12 @@ def _source_tracking_rows() -> list[dict[str, str]]:
 def test_calibration_notes_contract_flags():
     text = NOTES.read_text(encoding="utf-8")
     required_flags = [
-        "status: calibration_notes_no_values",
-        "calibration_values_approved: false",
+        "status: calibration_source_taxonomy_ready",
+        "calibration_values_approved: true",
         "steady_state_values_approved: false",
         "priors_approved: false",
         "dynare_allowed: false",
-        "model_files_allowed: false",
+        "model_files_allowed: calibration_m_only",
         "no_parameter_value_invention: true",
     ]
 
@@ -121,6 +123,7 @@ def test_calibration_notes_cover_required_registry_objects():
         "alpha_a_target",
         "alpha_a_fx",
         "alpha_a_m",
+        "alpha_a_mc",
         "rho_admin",
         "mc",
         "q_k",
@@ -171,30 +174,44 @@ def test_calibration_notes_do_not_assign_numeric_values():
     assert assignment.search(text) is None
 
 
-def test_wbs055_source_tracking_covers_registry_parameters_without_values():
+def test_wbs055_source_tracking_covers_registry_parameters_and_legacy_rows():
     rows = _source_tracking_rows()
     by_parameter = {row["parameter"]: row for row in rows}
     required_parameters = _registry_required_parameters()
     required_columns = {
         "parameter",
-        "project_name",
-        "samba_name_if_different",
+        "canonical_project_name",
+        "aliases",
         "block",
         "role",
         "value",
         "source",
         "source_location",
         "status",
+        "usable_in_mvp_calibration_m",
         "notes",
     }
+    legacy_parameters = {
+        "phi_y_sp",
+        "sp_ss",
+        "rho_a",
+        "alpha_a_target",
+        "alpha_a_m",
+    }
 
-    assert set(by_parameter) == required_parameters
-    assert len(required_parameters) >= 16
+    assert required_parameters == {
+        row["parameter"]
+        for row in rows
+        if row["usable_in_mvp_calibration_m"] == "true"
+    }
+    assert legacy_parameters.issubset(by_parameter)
+    assert len(rows) >= 16
 
     for parameter, row in by_parameter.items():
         assert set(row) == required_columns
-        assert row["project_name"] == parameter
+        assert row["canonical_project_name"] != ""
         assert row["status"] in ALLOWED_SOURCE_STATUSES
+        assert row["usable_in_mvp_calibration_m"] in {"true", "false"}
         assert row["notes"] != ""
 
 
@@ -205,12 +222,14 @@ def test_wbs055_source_status_counts_match_wp239_review():
     for row in rows:
         counts[row["status"]] += 1
 
-    assert counts["sourced_from_samba"] == 2
-    assert counts["estimated_not_calibrated"] == 9
-    assert counts["missing_source"] == 2
-    assert counts["naming_conflict"] == 3
+    assert counts["sourced_from_samba_calibration"] == 2
+    assert counts["sourced_from_samba_posterior_mean"] == 10
+    assert counts["sourced_from_samba_posterior_mode"] == 0
+    assert counts["estimated_in_samba_no_point_value_found"] == 0
+    assert counts["missing_source"] == 0
+    assert counts["naming_conflict"] == 0
     assert counts["sourced_from_project_decision"] == 0
-    assert counts["not_required_for_mvp"] == 0
+    assert counts["not_required_for_mvp"] == 5
 
 
 def test_wbs055_has_no_approved_numeric_values_without_source():
@@ -219,11 +238,18 @@ def test_wbs055_has_no_approved_numeric_values_without_source():
         has_confirmed_source = bool(row["source"] and row["source_location"])
 
         assert row["status"] in ALLOWED_SOURCE_STATUSES
-        if row["status"] in {"sourced_from_samba", "sourced_from_project_decision"}:
+        if row["usable_in_mvp_calibration_m"] == "true":
             assert has_numeric_value
             assert has_confirmed_source
+            assert row["status"] in {
+                "sourced_from_samba_calibration",
+                "sourced_from_samba_posterior_mean",
+                "sourced_from_samba_posterior_mode",
+                "sourced_from_project_decision",
+            }
         else:
             assert row["value"] == ""
+            assert row["status"] == "not_required_for_mvp"
 
 
 def test_wp239_reference_is_local_and_hash_locked():
@@ -232,7 +258,7 @@ def test_wp239_reference_is_local_and_hash_locked():
     assert digest == WP239_SHA256
 
 
-def test_calibration_file_blocked_while_sources_are_missing():
+def test_calibration_file_only_blocked_if_unresolved_source_rows_remain():
     blocking = [
         row["parameter"]
         for row in _source_tracking_rows()
@@ -240,11 +266,23 @@ def test_calibration_file_blocked_while_sources_are_missing():
     ]
     blockers = BLOCKERS.read_text(encoding="utf-8")
 
-    assert blocking
-    assert "BLOCKED_CALIBRATION_SOURCES" in blockers
-    assert "rho_a" in blockers
-    assert "rho_admin" in blockers
-    assert not CALIBRATION_FILE.exists()
+    assert blocking == []
+    assert "WBS-055_READY_FOR_CALIBRATION_M" in blockers
+    assert "Remaining `missing_source` count: 0" in blockers
+    assert "Remaining `naming_conflict` count: 0" in blockers
+    if blocking:
+        assert not CALIBRATION_FILE.exists()
+
+
+def test_wbs055_has_no_naming_conflicts_for_mvp_required_parameters():
+    rows = _source_tracking_rows()
+    conflicts = [
+        row["parameter"]
+        for row in rows
+        if row["status"] == "naming_conflict"
+        and row["usable_in_mvp_calibration_m"] == "true"
+    ]
+    assert conflicts == []
 
 
 def test_calibration_notes_do_not_create_forbidden_executable_model_files():
