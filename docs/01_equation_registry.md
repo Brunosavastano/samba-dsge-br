@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT FISC ADMIN HH and FIRM entries partial
+**Status:** Gate 2b MON EXT FISC ADMIN HH FIRM and AGG entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,8 +11,8 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-040
-gate_status: firm_block_registered
+wbs: WBS-041
+gate_status: aggregation_block_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
@@ -23,13 +23,14 @@ fiscal_block_registered: true
 administered_prices_registered: true
 household_block_registered: true
 firm_block_registered: true
+aggregation_block_registered: true
 core_blocks_registered: false
-registry_version: 0.7.0-firm
+registry_version: 0.8.0-agg
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, administered-prices, household, and firm entries are registered through WBS-040.
+Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, administered-prices, household, firm, and aggregation entries are registered through WBS-041.
 
 ---
 
@@ -77,7 +78,7 @@ EQ-FISC,FISC,LM-FISC-001,WBS-037,registered_partial
 EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_partial
 EQ-HH,HH,LM-HH-001,WBS-039,registered_partial
 EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,registered_partial
-EQ-AGG,AGG,LM-AGG-001,WBS-041,ready_for_registry_entry
+EQ-AGG,AGG,LM-AGG-001,WBS-041,registered_partial
 EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,ready_for_registry_entry
 EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 ```
@@ -86,7 +87,7 @@ EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 
 ## 4. Registry entries
 
-WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, WBS-038 administered-prices, WBS-039 household, and WBS-040 firm entries are registered.
+WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, WBS-038 administered-prices, WBS-039 household, WBS-040 firm, and WBS-041 aggregation entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
@@ -112,4 +113,8 @@ EQ-FIRM-001,FIRM,Production and marginal cost contract,structural,LM-FIRM-001,BC
 EQ-FIRM-002,FIRM,Price Phillips curve and markup contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,pi|mc|price_markup|relative_price,source_located_parameters_pending_calibration,price_markup_shock,phillips_locator_present;mc_used_in_pricing;price_markup_shock_mapped;sources_located,sourced,WBS-040,Free-price implementation details remain registry-to-Dynare work after Gate 2b.
 EQ-FIRM-003,FIRM,Investment and Tobins Q contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,i|k|q_k|investment_adjustment_state,source_located_parameters_pending_calibration,investment_shock,q_k_mapped;investment_locator_present;capital_accumulation_locator_present;parameters_not_invented,sourced,WBS-040,Tobins Q and investment frictions are source-located only.
 EQ-FIRM-004,FIRM,Imported intermediate inputs contract,structural,LM-FIRM-001,BCB_WP239,WP239 Section 2.2 Firms PDF pages 18-32; Appendix C.2 PDF pages 86-88; main equations 22-60; log-linear equations C.11-C.27,m_int|import_price|domestic_input|sectoral_output,source_located_parameters_pending_calibration,import_price_shock,m_int_mapped;imported_input_locator_present;external_linkage_mapped;sources_located,sourced,WBS-040,Intermediate imports are mapped without data extraction or source_id invention.
+EQ-AGG-001,AGG,Final goods market clearing,identity,LM-AGG-001,BCB_WP239,WP239 Section 2.7 Market Clearing and GDP PDF pages 41-42; Appendix C.4 PDF pages 90-91; main equations 81-85; log-linear equations C.35-C.36,y_c|y_i|y_g|y_x|c|i|g|x|m_int,source_located_weights_pending_calibration,none,market_clearing_locator_present;final_goods_identities_mapped;weights_not_invented,sourced,WBS-041,Market-clearing identities are source-located only.
+EQ-AGG-002,AGG,Absorption and net exports accounting,identity,LM-AGG-001,BCB_WP239,WP239 Section 2.7 PDF pages 41-42; Appendix C.4 PDF page 90; main equations 78-80; log-linear equations C.37-C.39,abs|c|i|g|nx|x|m|q|nfa,source_located_weights_pending_calibration,none,absorption_mapped;net_exports_mapped;nfa_link_mapped;identity_required_before_dynare,sourced,WBS-041,Absorption and NX links remain registry-only until model implementation is allowed.
+EQ-AGG-003,AGG,Real GDP and GDP deflator identities,identity,LM-AGG-001,BCB_WP239,WP239 Section 2.7 PDF pages 41-42; Appendix C.5 PDF page 91; main equations 86-87; log-linear equations C.40-C.42,y|pi_y|q_y|c|i|g|x|m,source_located_weights_pending_calibration,none,real_gdp_identity_located;gdp_deflator_identity_located;inflation_aggregation_test_required,sourced,WBS-041,Weights and observable measurement remain future calibration/data work.
+EQ-AGG-004,AGG,Output gap and potential output accounting,auxiliary,LM-AGG-001,BCB_WP239,WP239 Section 2.6 Aggregation PDF pages 38-40; Section 2.7 PDF pages 41-42; Appendix C.4-C.5 PDF pages 90-91,y|y_pot|y_gap|trend_growth,source_located_parameters_pending_calibration,none,y_gap_structural_variable_present;y_pot_structural_variable_present;measurement_deferred_to_data_dictionary,sourced,WBS-041,STRUCT-001 variables are mapped; measurement equation remains Gate 1b or later work.
 ```

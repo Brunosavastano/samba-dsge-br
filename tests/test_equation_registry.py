@@ -28,7 +28,7 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: firm_block_registered" in text
+    assert "gate_status: aggregation_block_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
@@ -191,3 +191,21 @@ def test_firm_registry_entries_are_complete_for_wbs040():
     assert "q_k" in by_id["EQ-FIRM-003"]["variables"]
     assert "investment_locator_present" in by_id["EQ-FIRM-003"]["tests"]
     assert "imported_input_locator_present" in by_id["EQ-FIRM-004"]["tests"]
+
+
+def test_aggregation_registry_entries_are_complete_for_wbs041():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    agg_entries = [entry for entry in entries if entry["block"] == "AGG"]
+    by_id = {entry["equation_id"]: entry for entry in agg_entries}
+
+    assert set(by_id) == {"EQ-AGG-001", "EQ-AGG-002", "EQ-AGG-003", "EQ-AGG-004"}
+    assert all(entry["gate"] == "WBS-041" for entry in agg_entries)
+    assert "market_clearing_locator_present" in by_id["EQ-AGG-001"]["tests"]
+    assert "abs" in by_id["EQ-AGG-002"]["variables"]
+    assert "nx" in by_id["EQ-AGG-002"]["variables"]
+    assert "nfa" in by_id["EQ-AGG-002"]["variables"]
+    assert "real_gdp_identity_located" in by_id["EQ-AGG-003"]["tests"]
+    assert "gdp_deflator_identity_located" in by_id["EQ-AGG-003"]["tests"]
+    assert "y_pot" in by_id["EQ-AGG-004"]["variables"]
+    assert "y_gap_structural_variable_present" in by_id["EQ-AGG-004"]["tests"]
