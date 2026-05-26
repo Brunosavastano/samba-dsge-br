@@ -32,7 +32,6 @@ def test_data_dictionary_skeleton_exists_and_blocks_data_extraction():
 def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
     expected = [
-        "TBD-verify-in-task-WBS-027",
         "TBD-verify-in-task-WBS-045",
         "TBD-verify-in-task-WBS-046",
         "TBD-verify-in-task-WBS-047",
@@ -45,6 +44,7 @@ def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     assert "TBD-verify-in-task-WBS-024" not in text
     assert "TBD-verify-in-task-WBS-025" not in text
     assert "TBD-verify-in-task-WBS-026" not in text
+    assert "TBD-verify-in-task-WBS-027" not in text
 
 
 def test_data_dictionary_declares_required_metadata_fields():
@@ -110,3 +110,19 @@ def test_selic_source_is_verified_for_wbs026():
     assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json" in text
     assert "Selic over SGS 11 is a documented alternative" in text
     assert "no data was extracted or saved in WBS-026" in text
+
+
+def test_real_exchange_rate_source_is_verified_for_wbs027():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 3. Core sources required for Gate 1b")
+    by_series = {row["series_id"]: row for row in rows}
+    exchange_rate = by_series["br_real_exchange_rate"]
+
+    assert exchange_rate["source"] == "Banco Central do Brasil SGS"
+    assert exchange_rate["source_id"] == "BCB-SGS-11752"
+    assert exchange_rate["source_status"] == "verified"
+    assert exchange_rate["wbs"] == "WBS-027"
+    assert exchange_rate["gate_status"] == "Gate 1b source verified"
+    assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11752/dados?formato=json" in text
+    assert "q_t` up = BRL real depreciation" in text
+    assert "no dataset was generated or saved in WBS-027" in text

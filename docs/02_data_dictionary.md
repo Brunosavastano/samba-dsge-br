@@ -79,7 +79,7 @@ series_id,variable,description,source,source_id,source_status,revision_policy,fr
 br_gdp_real,y,PIB real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1,verified,final_revised,quarterly,WBS-024,Gate 1b source verified
 br_ipca_headline,pi,Inflacao IPCA cheia variacao mensal,IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo,IBGE-SIDRA-IPCA-1737-v63-n1-1,verified,final_revised,quarterly,WBS-025,Gate 1b source verified
 br_selic,r,Taxa Selic meta definida pelo Copom,Banco Central do Brasil SGS,BCB-SGS-432,verified,final_revised,quarterly,WBS-026,Gate 1b source verified
-br_real_exchange_rate,q,Cambio real with q_t up as BRL real depreciation,TBD,TBD-verify-in-task-WBS-027,tbd,final_revised,quarterly,WBS-027,Gate 1a skeleton
+br_real_exchange_rate,q,Cambio real efetivo IPCA with q_t up as BRL real depreciation,Banco Central do Brasil SGS,BCB-SGS-11752,verified,final_revised,quarterly,WBS-027,Gate 1b source verified
 br_private_consumption,c,Consumo privado real,TBD,TBD-verify-in-task-WBS-045,tbd,final_revised,quarterly,WBS-045,Gate 1a skeleton
 br_investment,i,Investimento real,TBD,TBD-verify-in-task-WBS-046,tbd,final_revised,quarterly,WBS-046,Gate 1a skeleton
 br_government_consumption,g,Gasto do governo real,TBD,TBD-verify-in-task-WBS-047,tbd,final_revised,quarterly,WBS-047,Gate 1a skeleton
@@ -114,6 +114,16 @@ WBS-026 br_selic:
 - source meaning: Meta Selic definida pelo Copom, baseline observable for the policy rate `r`.
 - Selic over SGS 11 is a documented alternative for later measurement-equation review, not the WBS-026 baseline.
 - quarterly average or effective-rate transformation remains future Gate 1b/WBS-032 work; no data was extracted or saved in WBS-026.
+
+WBS-027 br_real_exchange_rate:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-11752.
+- official SGS page: https://www.bcb.gov.br/estatisticas/sgs.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.11752/dados?formato=json.
+- source meaning: Indice da taxa de cambio real efetiva (IPCA), Jun/1994=100.
+- project convention remains `q_t` up = BRL real depreciation.
+- nominal exchange rate or bilateral real USD measures are documented alternatives for later measurement-equation review, not the WBS-027 baseline.
+- quarterly conversion remains future Gate 1b work; no dataset was generated or saved in WBS-027.
 ```
 
 ---
