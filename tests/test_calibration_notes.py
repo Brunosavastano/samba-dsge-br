@@ -2,6 +2,7 @@ import csv
 from io import StringIO
 import re
 from pathlib import Path
+import hashlib
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -9,6 +10,8 @@ NOTES = ROOT / "docs" / "03_calibration_notes.md"
 REGISTRY = ROOT / "docs" / "01_equation_registry.md"
 BLOCKERS = ROOT / "docs" / "calibration_blockers.md"
 CALIBRATION_FILE = ROOT / "model" / "samba_classic" / "calibration.m"
+WP239 = ROOT / "docs" / "references" / "bcb_wp239_samba.pdf"
+WP239_SHA256 = "8EC1FCF4CC37CEE968C4BF8D23D92DBE537F0401A25CA509BEFA84D8E0C1325E"
 PLACEHOLDER_PARAMETERS = {
     "none",
     "none_for_mvp_monetary_shock_term",
@@ -22,8 +25,15 @@ PLACEHOLDER_PARAMETERS = {
 ALLOWED_SOURCE_STATUSES = {
     "sourced_from_samba",
     "sourced_from_project_decision",
+    "estimated_not_calibrated",
     "missing_source",
+    "naming_conflict",
     "not_required_for_mvp",
+}
+BLOCKING_SOURCE_STATUSES = {
+    "estimated_not_calibrated",
+    "missing_source",
+    "naming_conflict",
 }
 
 
@@ -165,17 +175,42 @@ def test_wbs055_source_tracking_covers_registry_parameters_without_values():
     rows = _source_tracking_rows()
     by_parameter = {row["parameter"]: row for row in rows}
     required_parameters = _registry_required_parameters()
+    required_columns = {
+        "parameter",
+        "project_name",
+        "samba_name_if_different",
+        "block",
+        "role",
+        "value",
+        "source",
+        "source_location",
+        "status",
+        "notes",
+    }
 
     assert set(by_parameter) == required_parameters
     assert len(required_parameters) >= 16
 
     for parameter, row in by_parameter.items():
-        assert row["required_for_file"] == "model/samba_classic/calibration.m"
+        assert set(row) == required_columns
+        assert row["project_name"] == parameter
         assert row["status"] in ALLOWED_SOURCE_STATUSES
-        assert row["value"] == ""
-        assert row["source"] == ""
-        assert row["source_location"] == ""
-        assert row["source_to_check"] != ""
+        assert row["notes"] != ""
+
+
+def test_wbs055_source_status_counts_match_wp239_review():
+    rows = _source_tracking_rows()
+    counts = {status: 0 for status in ALLOWED_SOURCE_STATUSES}
+
+    for row in rows:
+        counts[row["status"]] += 1
+
+    assert counts["sourced_from_samba"] == 2
+    assert counts["estimated_not_calibrated"] == 9
+    assert counts["missing_source"] == 2
+    assert counts["naming_conflict"] == 3
+    assert counts["sourced_from_project_decision"] == 0
+    assert counts["not_required_for_mvp"] == 0
 
 
 def test_wbs055_has_no_approved_numeric_values_without_source():
@@ -184,18 +219,28 @@ def test_wbs055_has_no_approved_numeric_values_without_source():
         has_confirmed_source = bool(row["source"] and row["source_location"])
 
         assert row["status"] in ALLOWED_SOURCE_STATUSES
-        assert not has_numeric_value or has_confirmed_source
+        if row["status"] in {"sourced_from_samba", "sourced_from_project_decision"}:
+            assert has_numeric_value
+            assert has_confirmed_source
+        else:
+            assert row["value"] == ""
+
+
+def test_wp239_reference_is_local_and_hash_locked():
+    assert WP239.exists()
+    digest = hashlib.sha256(WP239.read_bytes()).hexdigest().upper()
+    assert digest == WP239_SHA256
 
 
 def test_calibration_file_blocked_while_sources_are_missing():
-    missing = [
+    blocking = [
         row["parameter"]
         for row in _source_tracking_rows()
-        if row["status"] == "missing_source"
+        if row["status"] in BLOCKING_SOURCE_STATUSES
     ]
     blockers = BLOCKERS.read_text(encoding="utf-8")
 
-    assert missing
+    assert blocking
     assert "BLOCKED_CALIBRATION_SOURCES" in blockers
     assert "rho_a" in blockers
     assert "rho_admin" in blockers

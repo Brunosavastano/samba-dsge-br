@@ -8,13 +8,13 @@ Current PR/WBS: WBS-055 blocked.
 Blocked WBS: WBS-055 / PR11.
 Last completed task: WBS-054 model directory structure.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: source calibration values from SAMBA/public references.
-Blockers: MVP-required parameters have `missing_source`; `rho_a` versus `rho_admin` naming is unresolved; see `docs/calibration_blockers.md`.
-Required user action: locate numeric calibration values in SAMBA/public documentation or approve project decisions with source locators.
-Files changed: `docs/03_calibration_notes.md`, `docs/calibration_sourcing_plan.md`, `docs/calibration_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_calibration_notes.py`.
-Tests run: `python -m pytest` - 63 passed; `git diff --check`; `model/samba_classic/calibration.m` absent.
+Next safe task: resolve remaining WBS-055 source blockers from `docs/calibration_sourcing_plan.md`.
+Blockers: WP239 supplies 2 calibrated values, 9 parameters appear only as estimated/posterior values, 2 parameters remain missing, and 3 registry mappings are naming conflicts; see `docs/calibration_blockers.md`.
+Required user action: source `sp_ss` and `alpha_a_target`, decide treatment for estimated WP239 parameters, and resolve `phi_y_sp`, `rho_a`, and `alpha_a_m` mappings before `calibration.m`.
+Files changed: `docs/references/bcb_wp239_samba.pdf`, `docs/03_calibration_notes.md`, `docs/calibration_sourcing_plan.md`, `docs/calibration_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_calibration_notes.py`.
+Tests run: `python -m pytest` - 65 passed; `git diff --check`; `model/samba_classic/calibration.m` absent.
 Commit hash: pending until commit.
-Safe to continue: false for `calibration.m`. Do not create `calibration.m`, `.mod`, `.inc`, fake outputs, estimation, Redux, or sovereign extension while any MVP-required parameter has `missing_source`.
+Safe to continue: false for `calibration.m`. Do not create `calibration.m`, `.mod`, `.inc`, fake outputs, estimation, Redux, or sovereign extension while any parameter has `missing_source`, `estimated_not_calibrated` without approved MVP treatment, or `naming_conflict`.
 
 Visual status:
 
@@ -32,7 +32,7 @@ Progress metric: 58/86 WBS complete, approximately 67% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 1/11 | blocked | WBS-055 needs sourced calibration values and rho_a/rho_admin resolution |
+| PR 11 Dynare calibrated model | 054..064 | 1/11 | blocked | WBS-055 needs 2 missing sources, 9 estimated-parameter treatments, and 3 naming conflicts resolved |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
@@ -48,7 +48,7 @@ Gate view:
 | Gate 1b | approved | `docs/gate1b_approval_record.md` |
 | Gate 2a | complete | `docs/00a_literature_map.md` |
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
-| Gate 3 | blocked | WBS-054 structure exists; WBS-055 blocked by calibration sources |
+| Gate 3 | blocked | WBS-054 structure exists; WBS-055 blocked by calibration sources and registry mappings |
 | Gate 4 | not started | no identification outputs |
 | Gate 5a/5b | not started | no estimation outputs |
 | Gate 6 | not started | no validation/backtesting outputs |
