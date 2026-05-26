@@ -113,6 +113,7 @@ def test_selic_source_is_verified_for_wbs026():
     assert selic["gate_status"] == "Gate 1b source verified"
     assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json" in text
     assert "Selic over SGS 11 is a documented alternative" in text
+    assert "interest-rate transformation contract is defined in WBS-032" in text
     assert "no data was extracted or saved in WBS-026" in text
 
 
@@ -275,5 +276,25 @@ def test_wbs031_inflation_transformation_contract_forbids_simple_average():
     assert "data_created: false" in text
     assert "pipeline_created: false" in text
     assert "quarterly transformation contract is defined in WBS-031" in text
+    assert not (ROOT / "data").exists()
+    assert not (ROOT / "src" / "data_pipeline").exists()
+
+
+def test_wbs032_interest_rate_transformation_contract_is_documented():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+
+    assert "### 5.2 WBS-032 interest-rate transformation contract" in text
+    assert "status: contract_defined_no_data_created" in text
+    assert "baseline_source: BCB-SGS-432" in text
+    assert "raw_unit_expected: annual_percent_rate" in text
+    assert "quarterly_level_rule" in text
+    assert "arithmetic_average(raw_annual_percent_rate_observations_in_quarter)" in text
+    assert "effective_quarterly_rule" in text
+    assert "(1 + quarterly_policy_rate / 100)^(1 / 4) - 1" in text
+    assert "selic_over_alternative" in text
+    assert "output_unit_for_dataset_contract: annual_percent_rate" in text
+    assert "data_created: false" in text
+    assert "pipeline_created: false" in text
+    assert "interest-rate transformation contract is defined in WBS-032" in text
     assert not (ROOT / "data").exists()
     assert not (ROOT / "src" / "data_pipeline").exists()

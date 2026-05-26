@@ -119,7 +119,7 @@ WBS-026 br_selic:
 - official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json.
 - source meaning: Meta Selic definida pelo Copom, baseline observable for the policy rate `r`.
 - Selic over SGS 11 is a documented alternative for later measurement-equation review, not the WBS-026 baseline.
-- quarterly average or effective-rate transformation remains future Gate 1b/WBS-032 work; no data was extracted or saved in WBS-026.
+- interest-rate transformation contract is defined in WBS-032; no data was extracted or saved in WBS-026.
 
 WBS-027 br_real_exchange_rate:
 - source: Banco Central do Brasil SGS.
@@ -262,6 +262,26 @@ missing_month_rule: "quarter is invalid until all required monthly observations 
 output_unit_for_dataset_contract: decimal_rate
 model_scaling: "percent or annualized scaling remains a measurement-equation choice, not a data-source change"
 pi_target_scope: "pi_target is deterministic/exogenous in the calibrated MVP and is not transformed by WBS-031 until its source is pinned"
+data_created: false
+pipeline_created: false
+```
+
+### 5.2 WBS-032 interest-rate transformation contract
+
+```yaml
+wbs: WBS-032
+status: contract_defined_no_data_created
+applies_to:
+  - br_selic
+baseline_source: BCB-SGS-432
+baseline_measure: Selic target level defined by Copom
+raw_unit_expected: annual_percent_rate
+quarterly_level_rule: "quarterly_policy_rate = arithmetic_average(raw_annual_percent_rate_observations_in_quarter)"
+effective_quarterly_rule: "quarterly_effective_rate = (1 + quarterly_policy_rate / 100)^(1 / 4) - 1"
+missing_observation_rule: "quarter is invalid until the required source observations for the chosen frequency are present"
+selic_over_alternative: "BCB-SGS-11 remains a documented alternative for later measurement-equation review, not the WBS-032 baseline"
+output_unit_for_dataset_contract: annual_percent_rate
+model_scaling: "deviation from steady state, annualized percent, or quarterly effective decimal remains a measurement-equation choice"
 data_created: false
 pipeline_created: false
 ```
