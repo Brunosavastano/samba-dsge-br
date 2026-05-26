@@ -3,18 +3,18 @@
 Updated: 2026-05-26
 
 Current gate: Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Current PR/WBS: WBS-020 complete.
-Last completed task: Added validation and replication-target templates with explicit template status and no-result flags.
-Next task: WBS-052 dataset generation using approved Gate 1b sources and WBS-028..032 contracts.
-Blockers: `model/`, Dynare, Redux, and sovereign extension remain blocked. WBS-052 must not invent source IDs, data, transformations, or results.
-Files changed: `docs/05_replication_targets.md`, `docs/06_model_validation.md`, `tests/test_project_structure.py`, `tests/test_validation_templates.py`, `docs/PROJECT_STATUS.md`.
-Tests run: `python -m pytest` - 49 passed; `git diff --check`; forbidden path check for `model`, `data`, and `src/data_pipeline` - all absent.
-Commit hash: `b682ba0`.
-Safe to continue: yes, but only to WBS-052 dataset generation; do not create Dynare, model files, Redux, or sovereign extension.
+Current PR/WBS: WBS-052 complete.
+Last completed task: Generated the core final-revised MVP dataset from verified Gate 1b sources.
+Next task: WBS-053 calibration notes before any `model/` or Dynare implementation.
+Blockers: `model/`, Dynare, Redux, and sovereign extension remain blocked until calibration notes and later gates.
+Files changed: `.gitignore`, `docs/02_data_dictionary.md`, `data/observables/`, `data/model_input/`, `tests/test_dataset_outputs.py`, existing tests, `docs/PROJECT_STATUS.md`.
+Tests run: `python -m pytest` - 53 passed; `git diff --check`; forbidden path check for `model` and `src/data_pipeline` - both absent.
+Commit hash: `91564ec`.
+Safe to continue: yes, but only to WBS-053 calibration notes; do not create Dynare, model files, Redux, or sovereign extension.
 
 Visual status:
 
-Progress metric: 55/86 WBS complete, approximately 64% by WBS item count. This is not effort-weighted; the remaining Dynare, estimation, and validation work is heavier than early documentation WBS.
+Progress metric: 56/86 WBS complete, approximately 65% by WBS item count. This is not effort-weighted; the remaining Dynare, estimation, and validation work is heavier than early documentation WBS.
 
 | Area / PR | WBS scope | Done | Status | Next / blocker |
 |---|---:|---:|---|---|
@@ -26,8 +26,8 @@ Progress metric: 55/86 WBS complete, approximately 64% by WBS item count. This i
 | PR 06 source verification | 024..027, 045..051 | 11/11 | complete | auxiliary TBDs remain documented |
 | PR 07 data contracts | 028..032 | 5/5 | complete | none |
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
-| PR 09 dataset generation | 052 | 0/1 | next | allowed next, no invented sources/data |
-| PR 10 calibration notes | 053 | 0/1 | todo | after dataset or explicit approval |
+| PR 09 dataset generation | 052 | 1/1 | complete | none |
+| PR 10 calibration notes | 053 | 0/1 | next | required before model implementation |
 | PR 11 Dynare calibrated model | 054..064 | 0/11 | blocked | no `model/` before calibration/runtime gates |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
