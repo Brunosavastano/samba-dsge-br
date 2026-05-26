@@ -20,16 +20,20 @@ def _csv_block_after(text: str, heading: str) -> list[dict[str, str]]:
     return list(csv.DictReader(StringIO("\n".join(rows))))
 
 
-def test_data_dictionary_skeleton_exists_and_blocks_data_extraction():
+def test_data_dictionary_gate1b_is_approved_for_core_sources_only():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
 
-    assert "gate_status: skeleton_created" in text
+    assert "gate: Gate 1b" in text
+    assert "gate_status: approved" in text
+    assert "gate1b_passed: true" in text
     assert "data_extraction_allowed: false" in text
-    assert "core_source_ids_verified: false" in text
-    assert "Gate 1b is not passed." in text
+    assert "core_source_ids_verified: true" in text
+    assert "decision_status: approved" in text
+    assert "approved_by: Bruno" in text
+    assert "Gate 1b is passed for core source ID verification only." in text
 
 
-def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
+def test_data_dictionary_uses_no_tbd_source_ids_for_core_sources_after_gate1b():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
     assert "TBD-verify-in-task-WBS-024" not in text
     assert "TBD-verify-in-task-WBS-025" not in text
@@ -40,6 +44,11 @@ def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     assert "TBD-verify-in-task-WBS-047" not in text
     assert "TBD-verify-in-task-WBS-048" not in text
     assert "TBD-verify-in-task-WBS-049" not in text
+
+    rows = _csv_block_after(text, "## 3. Core sources required for Gate 1b")
+    assert len(rows) == 9
+    assert all(row["source_status"] == "verified" for row in rows)
+    assert all("TBD" not in row["source_id"] for row in rows)
 
 
 def test_data_dictionary_declares_required_metadata_fields():

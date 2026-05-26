@@ -16,6 +16,7 @@ def test_required_bootstrap_files_exist():
         "docs/08_implementation_plan.md",
         "docs/00b_modeling_decisions.md",
         "docs/gate0_approval_record.md",
+        "docs/gate1b_approval_record.md",
         "config/sample.yaml",
         "config/environment.yaml",
         "models/registry.json",
