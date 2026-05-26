@@ -32,7 +32,6 @@ def test_data_dictionary_skeleton_exists_and_blocks_data_extraction():
 def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
     expected = [
-        "TBD-verify-in-task-WBS-046",
         "TBD-verify-in-task-WBS-047",
         "TBD-verify-in-task-WBS-048",
         "TBD-verify-in-task-WBS-049",
@@ -45,6 +44,7 @@ def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     assert "TBD-verify-in-task-WBS-026" not in text
     assert "TBD-verify-in-task-WBS-027" not in text
     assert "TBD-verify-in-task-WBS-045" not in text
+    assert "TBD-verify-in-task-WBS-046" not in text
 
 
 def test_data_dictionary_declares_required_metadata_fields():
@@ -142,3 +142,19 @@ def test_private_consumption_source_is_verified_for_wbs045():
     assert "category 93404 Despesa de consumo das familias" in text
     assert "https://sidra.ibge.gov.br/tabela/1621" in text
     assert "no data was extracted or saved in WBS-045" in text
+
+
+def test_investment_source_is_verified_for_wbs046():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 3. Core sources required for Gate 1b")
+    by_series = {row["series_id"]: row for row in rows}
+    investment = by_series["br_investment"]
+
+    assert investment["source"] == "IBGE SIDRA Contas Nacionais Trimestrais"
+    assert investment["source_id"] == "IBGE-SIDRA-CNT-1621-v584-c11255-93406-n1-1"
+    assert investment["source_status"] == "verified"
+    assert investment["wbs"] == "WBS-046"
+    assert investment["gate_status"] == "Gate 1b source verified"
+    assert "category 93406 Formacao bruta de capital fixo" in text
+    assert "https://sidra.ibge.gov.br/tabela/1621" in text
+    assert "no data was extracted or saved in WBS-046" in text
