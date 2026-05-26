@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT and FISC entries partial
+**Status:** Gate 2b MON EXT FISC and ADMIN entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,8 +11,8 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-037
-gate_status: fiscal_block_registered
+wbs: WBS-038
+gate_status: administered_prices_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
@@ -20,13 +20,14 @@ source_memory_allowed: false
 monetary_block_registered: true
 external_block_registered: true
 fiscal_block_registered: true
+administered_prices_registered: true
 core_blocks_registered: false
-registry_version: 0.4.0-fisc
+registry_version: 0.5.0-admin
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Monetary-policy, external-block, and fiscal-block entries are registered through WBS-037.
+Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, and administered-prices entries are registered through WBS-038.
 
 ---
 
@@ -71,7 +72,7 @@ namespace,block,source_map_id,next_wbs,status
 EQ-MON,MON,LM-MON-001,WBS-035,registered_partial
 EQ-EXT,EXT,LM-EXT-001,WBS-036,registered_partial
 EQ-FISC,FISC,LM-FISC-001,WBS-037,registered_partial
-EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,ready_for_registry_entry
+EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_partial
 EQ-HH,HH,LM-HH-001,WBS-039,ready_for_registry_entry
 EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,ready_for_registry_entry
 EQ-AGG,AGG,LM-AGG-001,WBS-041,ready_for_registry_entry
@@ -83,7 +84,7 @@ EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 
 ## 4. Registry entries
 
-WBS-035 monetary-policy, WBS-036 external-block, and WBS-037 fiscal-block entries are registered.
+WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, and WBS-038 administered-prices entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
@@ -98,4 +99,7 @@ EQ-FISC-001,FISC,Primary surplus target with debt feedback,structural,LM-FISC-00
 EQ-FISC-002,FISC,Realized primary surplus and government spending instrument,structural,LM-FISC-001,BCB_WP239,WP239 Section 2.3 Government PDF pages 33-36; Appendix C.3 PDF page 89; main equations 63 and 65-68; log-linear equations C.30 and C.33,sp|sp_lag|sp_target|g|tax_rate|y,source_located_parameters_pending_calibration,none,sp_realized_distinct_from_sp_target;government_consumption_instrument_located;source_parameters_not_invented,sourced,WBS-037,Government spending is the fiscal instrument implied by the primary-surplus rule.
 EQ-FISC-003,FISC,Public debt to GDP law of motion,identity,LM-FISC-001,BCB_WP239,WP239 Section 2.3 Government PDF pages 33-36; Appendix C.3 PDF page 89; log-linear equation C.34,b|b_lag|r_t|sp|y|pi_y|trend_growth,source_located_parameters_pending_calibration,none,b_represents_public_debt_gdp;debt_identity_located;identity_required_before_dynare,sourced,WBS-037,Debt identity must be reviewed before any model file is created.
 EQ-FISC-004,FISC,Fiscal auxiliary tax and primary surplus locators,auxiliary,LM-FISC-001,BCB_WP239,WP239 Section 2.3 Government PDF pages 35-36; Appendix C.3 PDF page 89; main equations 65-68; log-linear equation C.32,tax_rate|nominal_tax_revenue|nominal_primary_surplus,source_located_parameters_pending_calibration,none,tax_auxiliary_located;no_regime_2016_2023_in_mvp;calibration_notes_required_before_dynare,sourced,WBS-037,Auxiliary fiscal identities are source-located but not calibrated here.
+EQ-PRICE-001,ADMIN,Administered prices inflation process,structural,LM-PRICE-ADMIN-001,BCB_WP239,WP239 Section 2.5 Shocks PDF page 38; Appendix C.6 PDF page 92; administered prices shock equation C.58,pi_a|pi_a_lag|pi_target|delta_q|pi_m,rho_a|alpha_a_target|alpha_a_fx|alpha_a_m,eps_admin,admin_process_own_equation;ar1_persistence_present;pass_through_terms_declared;eps_admin_declared;not_generic_shock,sourced,WBS-038,Implements ADMIN-001 approved process; availability of pi_m and measurement remains Gate 1b work.
+EQ-PRICE-002,ADMIN,Administered prices shock locator,shock_process,LM-PRICE-ADMIN-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; administered prices shock equation C.58,admin_price_shock_state|admin_price_shock_lag,rho_admin,eps_admin,admin_shock_source_located;shock_not_substitute_for_full_process;shock_name_harmonization_deferred_to_wbs042,sourced,WBS-038,Source locator for the WP239 administered-price shock process.
+EQ-PRICE-003,ADMIN,Administered prices observable locator,measurement_draft,LM-PRICE-ADMIN-001,BCB_WP239,WP239 Table 1 PDF page 94,pi_a,none,none,table1_locator_present;measurement_deferred_to_gate1b;no_source_id_invention,sourced,WBS-038,Data source IDs and exact measurement equation remain blocked until Gate 1b.
 ```

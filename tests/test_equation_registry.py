@@ -28,7 +28,7 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: fiscal_block_registered" in text
+    assert "gate_status: administered_prices_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
@@ -136,3 +136,22 @@ def test_fiscal_registry_entries_are_complete_for_wbs037():
     assert "government_consumption_instrument_located" in by_id["EQ-FISC-002"]["tests"]
     assert "b_represents_public_debt_gdp" in by_id["EQ-FISC-003"]["tests"]
     assert "no_regime_2016_2023_in_mvp" in by_id["EQ-FISC-004"]["tests"]
+
+
+def test_administered_prices_registry_entries_are_complete_for_wbs038():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    admin_entries = [entry for entry in entries if entry["block"] == "ADMIN"]
+    by_id = {entry["equation_id"]: entry for entry in admin_entries}
+
+    assert set(by_id) == {"EQ-PRICE-001", "EQ-PRICE-002", "EQ-PRICE-003"}
+    assert all(entry["gate"] == "WBS-038" for entry in admin_entries)
+    assert "pi_a" in by_id["EQ-PRICE-001"]["variables"]
+    assert "pi_target" in by_id["EQ-PRICE-001"]["variables"]
+    assert "delta_q" in by_id["EQ-PRICE-001"]["variables"]
+    assert "pi_m" in by_id["EQ-PRICE-001"]["variables"]
+    assert "rho_a" in by_id["EQ-PRICE-001"]["parameters"]
+    assert "eps_admin" in by_id["EQ-PRICE-001"]["shocks"]
+    assert "not_generic_shock" in by_id["EQ-PRICE-001"]["tests"]
+    assert "admin_shock_source_located" in by_id["EQ-PRICE-002"]["tests"]
+    assert "measurement_deferred_to_gate1b" in by_id["EQ-PRICE-003"]["tests"]
