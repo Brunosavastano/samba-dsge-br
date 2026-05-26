@@ -35,5 +35,4 @@ def test_model_validation_template_is_not_a_result():
 
 def test_validation_templates_do_not_create_forbidden_implementation_paths():
     assert not (ROOT / "model").exists()
-    assert not (ROOT / "data").exists()
     assert not (ROOT / "src" / "data_pipeline").exists()

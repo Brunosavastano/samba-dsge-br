@@ -26,11 +26,12 @@ def test_data_dictionary_gate1b_is_approved_for_core_sources_only():
     assert "gate: Gate 1b" in text
     assert "gate_status: approved" in text
     assert "gate1b_passed: true" in text
-    assert "data_extraction_allowed: false" in text
+    assert "data_extraction_allowed: true" in text
+    assert "data_extraction_status: completed_wbs052_core_dataset" in text
     assert "core_source_ids_verified: true" in text
     assert "decision_status: approved" in text
     assert "approved_by: Bruno" in text
-    assert "Gate 1b is passed for core source ID verification only." in text
+    assert "WBS-052 generated the core final-revised dataset from verified sources only." in text
 
 
 def test_data_dictionary_uses_no_tbd_source_ids_for_core_sources_after_gate1b():
@@ -276,7 +277,6 @@ def test_wbs031_inflation_transformation_contract_forbids_simple_average():
     assert "data_created: false" in text
     assert "pipeline_created: false" in text
     assert "quarterly transformation contract is defined in WBS-031" in text
-    assert not (ROOT / "data").exists()
     assert not (ROOT / "src" / "data_pipeline").exists()
 
 
@@ -296,5 +296,4 @@ def test_wbs032_interest_rate_transformation_contract_is_documented():
     assert "data_created: false" in text
     assert "pipeline_created: false" in text
     assert "interest-rate transformation contract is defined in WBS-032" in text
-    assert not (ROOT / "data").exists()
     assert not (ROOT / "src" / "data_pipeline").exists()

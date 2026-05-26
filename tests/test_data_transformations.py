@@ -23,6 +23,5 @@ def test_wbs030_missing_policy_contract_is_documented():
     assert "pipeline_created: false" in text
 
 
-def test_wbs030_missing_policy_does_not_create_data_or_pipeline():
-    assert not (ROOT / "data").exists()
+def test_wbs030_missing_policy_does_not_create_pipeline_code():
     assert not (ROOT / "src" / "data_pipeline").exists()

@@ -42,7 +42,6 @@ def test_wbs028_frequency_validation_contract_is_documented():
     assert "missing or non-quarterly frequency_model fails validation" in text
     assert "data_created: false" in text
     assert "pipeline_created: false" in text
-    assert not (ROOT / "data").exists()
     assert not (ROOT / "src" / "data_pipeline").exists()
 
 
@@ -72,5 +71,4 @@ def test_wbs029_revision_policy_contract_is_documented():
     assert "real_time_vintage is out_of_mvp" in text
     assert "data_created: false" in text
     assert "pipeline_created: false" in text
-    assert not (ROOT / "data").exists()
     assert not (ROOT / "src" / "data_pipeline").exists()

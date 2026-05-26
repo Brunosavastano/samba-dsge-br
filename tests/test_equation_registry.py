@@ -355,4 +355,4 @@ def test_measurement_registry_entries_are_draft_for_wbs043():
     assert "q_up_means_brl_real_depreciation" in by_variable["q"]["tests"]
     assert "pi_target_deterministic_in_calibrated_mvp" in by_variable["pi_target"]["tests"]
     assert "y_gap_structural_variable_present" in by_variable["y_gap"]["tests"]
-    assert not (ROOT / "data").exists()
+    assert not (ROOT / "model").exists()
