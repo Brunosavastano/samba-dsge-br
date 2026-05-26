@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b template
+**Status:** Gate 2b MON entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,19 +11,20 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-034
-gate_status: template_created
+wbs: WBS-035
+gate_status: monetary_block_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
 source_memory_allowed: false
+monetary_block_registered: true
 core_blocks_registered: false
-registry_version: 0.1.0-template
+registry_version: 0.2.0-mon
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. This file is a template only.
+Gate 2b is not passed. Monetary-policy entries are registered for WBS-035 only.
 
 ---
 
@@ -65,7 +66,7 @@ notes,no,Short implementation notes.
 
 ```csv
 namespace,block,source_map_id,next_wbs,status
-EQ-MON,MON,LM-MON-001,WBS-035,ready_for_registry_entry
+EQ-MON,MON,LM-MON-001,WBS-035,registered_partial
 EQ-EXT,EXT,LM-EXT-001,WBS-036,ready_for_registry_entry
 EQ-FISC,FISC,LM-FISC-001,WBS-037,ready_for_registry_entry
 EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,ready_for_registry_entry
@@ -80,9 +81,11 @@ EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 
 ## 4. Registry entries
 
-No equation entries are registered in WBS-034.
+Only WBS-035 monetary-policy entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
+EQ-MON-001,MON,Forward-looking Taylor rule,structural,LM-MON-001,BCB_WP239,WP239 Section 2.3.1 PDF pages 33-34; Appendix C.3 PDF page 89; main equation 61; log-linear equation C.28,r_t|r_lag|pi_expected|pi_target|y_gap,rho_r|phi_pi|phi_y|r_ss,eps_monetary,monetary_irf_sign_timing_magnitude_benchmark;smoothing_parameter_present;target_gap_present,sourced,WBS-035,Implements MON-001 contract without Dynare syntax.
+EQ-MON-002,MON,Inflation target treatment,auxiliary,LM-MON-001,BCB_WP239,WP239 Section 2.3.1 PDF page 34; main equation 62; Appendix C.3 PDF page 89; log-linear equation C.29,pi_target,none,none,pi_target_explicit;eps_pi_target_absent_in_calibrated_mvp;deterministic_target_series_allowed,sourced,WBS-035,Implements TARGET-001 calibrated MVP treatment.
+EQ-MON-003,MON,Monetary policy shock,shock_process,LM-MON-001,BCB_WP239,WP239 Appendix C.6 PDF page 93; shock equation C.60,monetary_policy_shock_state,none_for_mvp_monetary_shock_term,eps_monetary,shock_declared;irf_response_timing_defined;shock_not_used_for_target_changes,sourced,WBS-035,Shock naming remains registry-only until WBS-042 and Dynare remains blocked.
 ```
-
