@@ -39,6 +39,35 @@ WBS-053 is limited to a calibration rationale scaffold tied to the approved Gate
 | Firms | `mc`, `m_int`, `q_k` | Marginal cost, imported intermediate input, and investment/Q terms require source-linked calibration and steady-state consistency. | pending values |
 | Aggregation | `y_gap`, `y_pot`, `nfa`, `m_int`, `pi_target`, `sp_target`, `risk` | Structural variables must map to measurement and steady-state notes before model implementation. | pending values |
 
+## WBS-055 calibration source tracking
+
+Status: `BLOCKED_CALIBRATION_SOURCES`
+
+The rows below track all MVP-required parameters currently identified from actual parameter names in `docs/01_equation_registry.md`. Placeholder entries such as `source_located_parameters_pending_calibration`, `source_located_weights_pending_calibration`, `measurement_transform_pending_gate1b`, and `std_pending_calibration` are not treated as parameter names.
+
+`source_to_check` is not a confirmed source for a numeric value. It is only the likely project/SAMBA reference location to inspect before sourcing a value.
+
+| parameter | block | role | required_for_file | value | source | source_location | status | source_to_check |
+|---|---|---|---|---|---|---|---|---|
+| rho_r | MON | Taylor-rule interest-rate smoothing | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-MON-001 and EQ-MON-001 locators |
+| phi_pi | MON | Taylor-rule inflation response | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-MON-001 and EQ-MON-001 locators |
+| phi_y | MON | Taylor-rule output-gap response | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-MON-001 and EQ-MON-001 locators |
+| r_ss | MON | Policy-rate steady-state term | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-MON-001 and EQ-MON-001 locators |
+| psi_nfa | EXT | NFA/debt-elastic risk-premium sensitivity | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-EXT-001 and EQ-EXT-001 locators |
+| nfa_ss | EXT | NFA steady-state anchor | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-EXT-001 and EQ-EXT-001 locators |
+| rho_risk | EXT | Risk-premium AR(1) persistence | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-EXT-001 and EQ-EXT-002 locators |
+| rho_sp_target | FISC | Primary-surplus target persistence | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-FISC-001 and EQ-FISC-001 locators |
+| phi_b | FISC | Debt/GDP feedback in fiscal target rule | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-FISC-001 and EQ-FISC-001 locators |
+| phi_y_sp | FISC | Output-gap feedback in fiscal target rule | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-FISC-001 and EQ-FISC-001 locators |
+| sp_ss | FISC | Primary-surplus target steady-state term | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-FISC-001 and EQ-FISC-001 locators |
+| rho_a | ADMIN | Administered-price inflation process persistence | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-PRICE-ADMIN-001 and EQ-PRICE-001 locators |
+| alpha_a_target | ADMIN | Inflation-target pass-through in administered prices | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-PRICE-ADMIN-001 and EQ-PRICE-001 locators |
+| alpha_a_fx | ADMIN | FX pass-through in administered prices | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-PRICE-ADMIN-001 and EQ-PRICE-001 locators |
+| alpha_a_m | ADMIN | Imported-inflation pass-through in administered prices | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-PRICE-ADMIN-001 and EQ-PRICE-001 locators |
+| rho_admin | ADMIN | Administered-price shock persistence | model/samba_classic/calibration.m |  |  |  | missing_source | BCB_WP239 via LM-PRICE-ADMIN-001 and EQ-PRICE-002 locators |
+
+Naming blocker: `rho_a` and `rho_admin` both relate to administered-price persistence and nearby C.58 locators. They must be verified as distinct parameters or reconciled before `calibration.m` is created.
+
 ## Shock Standard Deviation Scaffold
 
 The registry declares shock names, but shock standard deviations remain pending calibration. This includes `eps_monetary`, `eps_fiscal_g`, `eps_sp_target`, `eps_tax`, `eps_tfp`, `eps_pref`, `eps_investment`, `eps_price_free`, `eps_admin`, `eps_wage`, `eps_import_price`, `eps_risk`, `eps_foreign_y`, `eps_foreign_r`, and `eps_foreign_pi`.

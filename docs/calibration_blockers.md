@@ -1,12 +1,13 @@
 # Calibration Blockers
 
-Status: `BLOCKED_CALIBRATION_VALUES`
+Status: `BLOCKED_CALIBRATION_SOURCES`
 Blocked scope: `WBS-055 / PR11 calibration.m`
-Reason: `docs/03_calibration_notes.md` has `calibration_values_approved: false` and no numeric values.
-Missing MON values/rationale: `rho_r`, `phi_pi`, `phi_y`, `r_ss`; needed by Taylor-rule calibration; no approved default in docs.
-Missing EXT values/rationale: `psi_nfa`, `nfa_ss`, `rho_risk`; needed by external closure/risk calibration; no approved default in docs.
-Missing FISC values/rationale: `rho_sp_target`, `phi_b`, `phi_y_sp`, `sp_ss`; needed by fiscal target rule; no approved default in docs.
-Missing ADMIN values/rationale: `rho_a`, `alpha_a_target`, `alpha_a_fx`, `alpha_a_m`, `rho_admin`; needed by administered-price process; no approved default in docs.
-Missing HH/FIRM values/rationale: `habit`, `lambda`, `q_k`, `wn`, `mc`, `m_int`; needed by household/firm calibration scaffolds; no approved default in docs.
-Missing shock std values/rationale: `eps_monetary`, `eps_fiscal_g`, `eps_sp_target`, `eps_tax`, `eps_tfp`, `eps_pref`, `eps_investment`, `eps_price_free`, `eps_admin`, `eps_wage`, `eps_import_price`, `eps_risk`, `eps_foreign_y`, `eps_foreign_r`, `eps_foreign_pi`.
-Do not create `model/samba_classic/calibration.m` until Bruno approves numeric values and rationale in `docs/03_calibration_notes.md`.
+Reason: calibration values must be sourced from SAMBA/public documentation, not defaults or memory.
+Missing source count: 16 MVP-required parameters currently identified in `docs/01_equation_registry.md`.
+Missing MON sources: `rho_r`, `phi_pi`, `phi_y`, `r_ss`.
+Missing EXT sources: `psi_nfa`, `nfa_ss`, `rho_risk`.
+Missing FISC sources: `rho_sp_target`, `phi_b`, `phi_y_sp`, `sp_ss`.
+Missing ADMIN sources: `rho_a`, `alpha_a_target`, `alpha_a_fx`, `alpha_a_m`, `rho_admin`.
+Ambiguity blocker: verify whether `rho_a` and `rho_admin` are distinct administered-price parameters or duplicate names.
+`source_to_check` references in `docs/03_calibration_notes.md` are not confirmed numeric sources.
+Do not create `model/samba_classic/calibration.m` until `missing_source` count is zero and the `rho_a`/`rho_admin` ambiguity is resolved.
