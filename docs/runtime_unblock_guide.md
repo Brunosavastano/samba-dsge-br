@@ -2,11 +2,11 @@
 
 ## Current Blocker
 
-Status: `BLOCKED_BY_RUNTIME`
+Status: `UNBLOCKED_FOR_WBS_054`
 
 Blocked scope: `WBS-054 / PR11`.
 
-The next planned task creates `model/samba_classic/`, but Dynare implementation must not start until a valid Dynare runtime path is available and verified.
+The next planned task creates `model/samba_classic/`. Runtime is now available through Octave 11.1.0 and Dynare 7.0.
 
 ## Required Runtime Options
 
@@ -14,13 +14,13 @@ Option A: Octave + Dynare.
 
 Option B: MATLAB + Dynare.
 
-Recommended minimum path: Option A, unless the project will standardize on MATLAB.
+Recommended minimum path: Option A, now installed and verified.
 
 ## What Must Be Installed Or Added To PATH
 
-- `dynare` command must resolve from the project shell.
-- Either `octave` or `matlab` must resolve from the project shell.
-- If Dynare is installed but not on PATH, expose its executable path before continuing.
+- `dynare` command resolves from the project shell through a user PATH wrapper.
+- `octave` command resolves from the project shell.
+- Dynare is loaded in Octave through `C:\Users\bruno\.octaverc`.
 
 ## Verification Commands After Installation
 
@@ -33,9 +33,8 @@ octave --version
 matlab -batch "disp(version)"
 ```
 
-At least one of `octave` or `matlab` must be available, and `dynare --version` must succeed.
+At least one of `octave` or `matlab` must be available, and `dynare --version` must succeed. This is satisfied by Octave 11.1.0 and Dynare 7.0.
 
 ## What Codex Should Do After Runtime Is Available
 
-Re-run runtime verification, update `docs/runtime_verification.md`, then continue to WBS-054 only if the runtime gate passes. Do not create `.mod`, `.m`, `.inc`, fake outputs, estimation files, Redux, or sovereign extension as part of the unblock step.
-
+Continue to WBS-054 only. Do not create `.mod`, `.m`, `.inc`, fake outputs, estimation files, Redux, or sovereign extension as part of WBS-054.

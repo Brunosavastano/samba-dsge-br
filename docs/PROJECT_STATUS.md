@@ -3,17 +3,18 @@
 Updated: 2026-05-26
 
 Current gate: Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: BLOCKED_BY_RUNTIME.
+Execution status: READY_FOR_WBS_054.
 Current PR/WBS: WBS-053 complete.
-Blocked WBS: WBS-054 / PR11.
+Blocked WBS: none for WBS-054 structure only.
 Last completed task: WBS-053 calibration notes.
+Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
 Next task after unblock: WBS-054 model directory structure.
-Blockers: `model/`, `.mod`, Dynare execution, calibration values, steady-state values, estimation, Redux, and sovereign extension remain blocked.
-Required user action: install or expose Dynare plus Octave or MATLAB runtime in PATH.
+Blockers: `.mod`, Dynare model execution, calibration values, steady-state values, estimation, Redux, and sovereign extension remain blocked.
+Required user action: none for WBS-054.
 Files changed: `docs/runtime_unblock_guide.md`, `docs/runtime_verification.md`, `docs/PROJECT_STATUS.md`.
-Tests run: `python -m pytest` - 57 passed; `git diff --check`.
+Tests run: runtime commands passed for Python, Dynare, and Octave; MATLAB unavailable; `python -m pytest` - 57 passed; `git diff --check`.
 Commit hash: pending until commit.
-Safe to continue: false. The next WBS creates `model/samba_classic/`, and `docs/runtime_verification.md` records Dynare, Octave, and MATLAB as unavailable.
+Safe to continue: true for WBS-054 structure only. Do not create `.mod`, `.m`, `.inc`, fake outputs, estimation, Redux, or sovereign extension.
 
 Visual status:
 
@@ -31,7 +32,7 @@ Progress metric: 57/86 WBS complete, approximately 66% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 0/11 | BLOCKED_BY_RUNTIME | install or expose Dynare plus Octave/MATLAB |
+| PR 11 Dynare calibrated model | 054..064 | 0/11 | next | WBS-054 structure only; `.mod` still blocked |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
@@ -47,7 +48,7 @@ Gate view:
 | Gate 1b | approved | `docs/gate1b_approval_record.md` |
 | Gate 2a | complete | `docs/00a_literature_map.md` |
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
-| Gate 3 | blocked | no `model/` or `.mod` files; runtime unavailable |
+| Gate 3 | ready to start | runtime available; no `model/` or `.mod` files yet |
 | Gate 4 | not started | no identification outputs |
 | Gate 5a/5b | not started | no estimation outputs |
 | Gate 6 | not started | no validation/backtesting outputs |
