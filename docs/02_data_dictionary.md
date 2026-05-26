@@ -110,7 +110,7 @@ WBS-025 br_ipca_headline:
 - official table URL: https://sidra.ibge.gov.br/tabela/1737.
 - metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1737/metadados.
 - source meaning: table 1737 IPCA serie historica; variable 63 IPCA variacao mensal; N1 Brasil.
-- quarterly transformation remains future Gate 1b work; no data was extracted or saved in WBS-025.
+- quarterly transformation contract is defined in WBS-031; no data was extracted or saved in WBS-025.
 
 WBS-026 br_selic:
 - source: Banco Central do Brasil SGS.
@@ -197,7 +197,7 @@ WBS-050 br_ipca_free:
 - official dataset URL: https://dadosabertos.bcb.gov.br/dataset/11428-indice-nacional-de-precos-ao-consumidor---amplo-ipca---itens-livres.
 - official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.11428/dados?formato=json.
 - source meaning: IPCA itens livres, variacao percentual mensal.
-- quarterly transformation remains future Gate 1b/WBS-031 work; no data was extracted or saved in WBS-050.
+- quarterly transformation contract is defined in WBS-031; no data was extracted or saved in WBS-050.
 
 WBS-050 br_ipca_administered:
 - source: Banco Central do Brasil SGS.
@@ -205,7 +205,7 @@ WBS-050 br_ipca_administered:
 - official dataset URL: https://dadosabertos.bcb.gov.br/dataset/4449-indice-nacional-de-precos-ao-consumidor-amplo-ipca---precos-monitorados---total.
 - official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.4449/dados?formato=json.
 - source meaning: IPCA precos monitorados/administrados total, variacao percentual mensal.
-- quarterly transformation remains future Gate 1b/WBS-031 work; no data was extracted or saved in WBS-050.
+- quarterly transformation contract is defined in WBS-031; no data was extracted or saved in WBS-050.
 
 WBS-051 br_import_price_inflation:
 - source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
@@ -243,6 +243,27 @@ WBS-051 br_output_gap:
 - Expectations: average or end-of-quarter rule must be defined before estimation.
 - Real activity: seasonally adjusted real series when appropriate.
 - `y_gap_t` is structural in the MVP; measurement equation is future Gate 1/2 work.
+```
+
+### 5.1 WBS-031 inflation transformation contract
+
+```yaml
+wbs: WBS-031
+status: contract_defined_no_data_created
+applies_to:
+  - br_ipca_headline
+  - br_ipca_free
+  - br_ipca_administered
+  - br_import_price_inflation_when_source_is_pinned
+monthly_percent_input_rule: "quarterly_rate = product(1 + monthly_percent / 100) - 1"
+index_input_rule: "quarterly_log_change = log(index_last_month_of_quarter) - log(index_last_month_previous_quarter)"
+simple_average_for_quarterly_inflation: forbidden
+missing_month_rule: "quarter is invalid until all required monthly observations are present"
+output_unit_for_dataset_contract: decimal_rate
+model_scaling: "percent or annualized scaling remains a measurement-equation choice, not a data-source change"
+pi_target_scope: "pi_target is deterministic/exogenous in the calibrated MVP and is not transformed by WBS-031 until its source is pinned"
+data_created: false
+pipeline_created: false
 ```
 
 ---

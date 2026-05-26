@@ -96,7 +96,7 @@ def test_headline_ipca_source_is_verified_for_wbs025():
     assert ipca["wbs"] == "WBS-025"
     assert ipca["gate_status"] == "Gate 1b source verified"
     assert "https://sidra.ibge.gov.br/tabela/1737" in text
-    assert "quarterly transformation remains future Gate 1b work" in text
+    assert "quarterly transformation contract is defined in WBS-031" in text
     assert "no data was extracted or saved in WBS-025" in text
 
 
@@ -259,3 +259,21 @@ def test_wbs051_auxiliary_sources_remain_explicitly_deferred():
     assert "risk_t has an AR(1) structural process" in text
     assert "y_gap_t is structural in the MVP" in text
     assert "no data was extracted or saved in WBS-051" in text
+
+
+def test_wbs031_inflation_transformation_contract_forbids_simple_average():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+
+    assert "### 5.1 WBS-031 inflation transformation contract" in text
+    assert "status: contract_defined_no_data_created" in text
+    assert "monthly_percent_input_rule" in text
+    assert "product(1 + monthly_percent / 100) - 1" in text
+    assert "index_input_rule" in text
+    assert "log(index_last_month_of_quarter) - log(index_last_month_previous_quarter)" in text
+    assert "simple_average_for_quarterly_inflation: forbidden" in text
+    assert "output_unit_for_dataset_contract: decimal_rate" in text
+    assert "data_created: false" in text
+    assert "pipeline_created: false" in text
+    assert "quarterly transformation contract is defined in WBS-031" in text
+    assert not (ROOT / "data").exists()
+    assert not (ROOT / "src" / "data_pipeline").exists()
