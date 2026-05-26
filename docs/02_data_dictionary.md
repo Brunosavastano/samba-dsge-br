@@ -174,12 +174,32 @@ These planned observables do not unblock Gate 1b while any core source remains `
 
 ```csv
 series_id,variable,description,source,source_id,source_status,revision_policy,frequency_model,wbs,gate_status
-br_ipca_free,pi_f,Inflacao de precos livres,TBD,TBD-verify-in-task-WBS-050,tbd,final_revised,quarterly,WBS-050,Gate 1a skeleton
-br_ipca_administered,pi_a,Inflacao de precos administrados,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
+br_ipca_free,pi_f,Inflacao de precos livres,Banco Central do Brasil SGS,BCB-SGS-11428,verified,final_revised,quarterly,WBS-050,Gate 1b source verified
+br_ipca_administered,pi_a,Inflacao de precos administrados monitorados,Banco Central do Brasil SGS,BCB-SGS-4449,verified,final_revised,quarterly,WBS-050,Gate 1b source verified
 br_import_price_inflation,pi_m,Inflacao de importados,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
 br_inflation_target,pi_target,Meta de inflacao,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
 br_risk_premium,risk,Premio de risco domestico if needed for estimation,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
 br_output_gap,y_gap,Hiato do produto measurement candidate,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
+```
+
+### 4.1 Verified auxiliary source notes
+
+```text
+WBS-050 br_ipca_free:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-11428.
+- official dataset URL: https://dadosabertos.bcb.gov.br/dataset/11428-indice-nacional-de-precos-ao-consumidor---amplo-ipca---itens-livres.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.11428/dados?formato=json.
+- source meaning: IPCA itens livres, variacao percentual mensal.
+- quarterly transformation remains future Gate 1b/WBS-031 work; no data was extracted or saved in WBS-050.
+
+WBS-050 br_ipca_administered:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-4449.
+- official dataset URL: https://dadosabertos.bcb.gov.br/dataset/4449-indice-nacional-de-precos-ao-consumidor-amplo-ipca---precos-monitorados---total.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.4449/dados?formato=json.
+- source meaning: IPCA precos monitorados/administrados total, variacao percentual mensal.
+- quarterly transformation remains future Gate 1b/WBS-031 work; no data was extracted or saved in WBS-050.
 ```
 
 ---

@@ -201,3 +201,25 @@ def test_imports_source_is_verified_for_wbs049():
     assert "category 93408 Importacao de bens e servicos (-)" in text
     assert "https://sidra.ibge.gov.br/tabela/1621" in text
     assert "no data was extracted or saved in WBS-049" in text
+
+
+def test_free_and_administered_ipca_sources_are_verified_for_wbs050():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 4. Additional planned MVP observables")
+    by_series = {row["series_id"]: row for row in rows}
+    free = by_series["br_ipca_free"]
+    administered = by_series["br_ipca_administered"]
+
+    assert free["source"] == "Banco Central do Brasil SGS"
+    assert free["source_id"] == "BCB-SGS-11428"
+    assert free["source_status"] == "verified"
+    assert free["wbs"] == "WBS-050"
+    assert free["gate_status"] == "Gate 1b source verified"
+    assert administered["source"] == "Banco Central do Brasil SGS"
+    assert administered["source_id"] == "BCB-SGS-4449"
+    assert administered["source_status"] == "verified"
+    assert administered["wbs"] == "WBS-050"
+    assert administered["gate_status"] == "Gate 1b source verified"
+    assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11428/dados?formato=json" in text
+    assert "https://api.bcb.gov.br/dados/serie/bcdata.sgs.4449/dados?formato=json" in text
+    assert "no data was extracted or saved in WBS-050" in text
