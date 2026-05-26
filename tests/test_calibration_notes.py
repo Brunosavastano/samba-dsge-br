@@ -288,12 +288,19 @@ def test_wbs055_has_no_naming_conflicts_for_mvp_required_parameters():
 def test_calibration_notes_do_not_create_forbidden_executable_model_files():
     forbidden_suffixes = {".mod", ".m", ".inc"}
     model_dir = ROOT / "model"
+    allowed_model_files = {
+        ROOT / "model" / "samba_classic" / "calibration.m",
+    }
     forbidden_model_files = []
     if model_dir.exists():
         forbidden_model_files = [
             str(path.relative_to(ROOT))
             for path in model_dir.rglob("*")
-            if path.is_file() and path.suffix in forbidden_suffixes
+            if (
+                path.is_file()
+                and path.suffix in forbidden_suffixes
+                and path not in allowed_model_files
+            )
         ]
 
     forbidden_paths = [

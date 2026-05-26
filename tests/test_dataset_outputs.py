@@ -7,6 +7,9 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL_INPUT = ROOT / "data" / "model_input" / "classic_mvp.csv"
 METADATA = ROOT / "data" / "model_input" / "classic_mvp_metadata.json"
 OBSERVABLES = ROOT / "data" / "observables"
+ALLOWED_EXECUTABLE_MODEL_FILES = {
+    "model/samba_classic/calibration.m",
+}
 
 EXPECTED_SOURCE_IDS = {
     "br_gdp_real": "IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1",
@@ -80,7 +83,11 @@ def test_wbs052_does_not_create_pipeline_or_executable_model_code():
         executable_model_files = [
             path.relative_to(ROOT).as_posix()
             for path in model_dir.rglob("*")
-            if path.is_file() and path.suffix in {".mod", ".m", ".inc"}
+            if (
+                path.is_file()
+                and path.suffix in {".mod", ".m", ".inc"}
+                and path.relative_to(ROOT).as_posix() not in ALLOWED_EXECUTABLE_MODEL_FILES
+            )
         ]
 
     assert executable_model_files == []

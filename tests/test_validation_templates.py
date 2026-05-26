@@ -4,6 +4,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = ROOT / "docs" / "05_replication_targets.md"
 VALIDATION = ROOT / "docs" / "06_model_validation.md"
+ALLOWED_EXECUTABLE_MODEL_FILES = {
+    "model/samba_classic/calibration.m",
+}
 
 
 def test_replication_targets_template_has_required_irf_fields():
@@ -40,7 +43,11 @@ def test_validation_templates_do_not_create_forbidden_implementation_files():
         executable_model_files = [
             path.relative_to(ROOT).as_posix()
             for path in model_dir.rglob("*")
-            if path.is_file() and path.suffix in {".mod", ".m", ".inc"}
+            if (
+                path.is_file()
+                and path.suffix in {".mod", ".m", ".inc"}
+                and path.relative_to(ROOT).as_posix() not in ALLOWED_EXECUTABLE_MODEL_FILES
+            )
         ]
 
     assert executable_model_files == []

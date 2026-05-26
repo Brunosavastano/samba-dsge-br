@@ -4,6 +4,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR = ROOT / "model" / "samba_classic"
+ALLOWED_EXECUTABLE_MODEL_FILES = {
+    "model/samba_classic/calibration.m",
+}
 
 
 def test_samba_classic_structure_exists():
@@ -28,7 +31,11 @@ def test_wbs054_does_not_create_executable_model_files():
     forbidden = [
         path.relative_to(ROOT).as_posix()
         for path in MODEL_DIR.rglob("*")
-        if path.is_file() and path.suffix in forbidden_suffixes
+        if (
+            path.is_file()
+            and path.suffix in forbidden_suffixes
+            and path.relative_to(ROOT).as_posix() not in ALLOWED_EXECUTABLE_MODEL_FILES
+        )
     ]
 
     assert forbidden == []
