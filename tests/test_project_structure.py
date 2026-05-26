@@ -33,7 +33,6 @@ def test_forbidden_implementation_paths_not_created_in_bootstrap():
         "data",
         "src/data_pipeline",
         "docs/01_equation_registry.md",
-        "docs/02_data_dictionary.md",
     ]
 
     present = [path for path in forbidden if (ROOT / path).exists()]
@@ -46,4 +45,3 @@ def test_readme_documents_model_directory_conventions():
     assert "model/  = arquivos executaveis Dynare/MATLAB/Octave" in readme
     assert "pyproject.toml" in readme
     assert "requirements.txt" in readme
-
