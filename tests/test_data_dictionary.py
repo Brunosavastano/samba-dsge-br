@@ -31,12 +31,6 @@ def test_data_dictionary_skeleton_exists_and_blocks_data_extraction():
 
 def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     text = DATA_DICTIONARY.read_text(encoding="utf-8")
-    expected = [
-        "TBD-verify-in-task-WBS-049",
-    ]
-
-    missing = [placeholder for placeholder in expected if placeholder not in text]
-    assert missing == []
     assert "TBD-verify-in-task-WBS-024" not in text
     assert "TBD-verify-in-task-WBS-025" not in text
     assert "TBD-verify-in-task-WBS-026" not in text
@@ -45,6 +39,7 @@ def test_data_dictionary_uses_tbd_source_ids_for_core_sources():
     assert "TBD-verify-in-task-WBS-046" not in text
     assert "TBD-verify-in-task-WBS-047" not in text
     assert "TBD-verify-in-task-WBS-048" not in text
+    assert "TBD-verify-in-task-WBS-049" not in text
 
 
 def test_data_dictionary_declares_required_metadata_fields():
@@ -190,3 +185,19 @@ def test_exports_source_is_verified_for_wbs048():
     assert "category 93407 Exportacao de bens e servicos" in text
     assert "https://sidra.ibge.gov.br/tabela/1621" in text
     assert "no data was extracted or saved in WBS-048" in text
+
+
+def test_imports_source_is_verified_for_wbs049():
+    text = DATA_DICTIONARY.read_text(encoding="utf-8")
+    rows = _csv_block_after(text, "## 3. Core sources required for Gate 1b")
+    by_series = {row["series_id"]: row for row in rows}
+    imports = by_series["br_imports"]
+
+    assert imports["source"] == "IBGE SIDRA Contas Nacionais Trimestrais"
+    assert imports["source_id"] == "IBGE-SIDRA-CNT-1621-v584-c11255-93408-n1-1"
+    assert imports["source_status"] == "verified"
+    assert imports["wbs"] == "WBS-049"
+    assert imports["gate_status"] == "Gate 1b source verified"
+    assert "category 93408 Importacao de bens e servicos (-)" in text
+    assert "https://sidra.ibge.gov.br/tabela/1621" in text
+    assert "no data was extracted or saved in WBS-049" in text
