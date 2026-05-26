@@ -5,12 +5,12 @@ Updated: 2026-05-26
 Current gate: Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
 Current PR/WBS: WBS-030 complete.
 Last completed task: Added missing-policy validation contract/tests to forbid silent missing values and default interpolation.
-Next task: WBS-052 dataset generation using approved Gate 1b sources and WBS-028..032 contracts.
-Blockers: `model/`, Dynare, Redux, and sovereign extension remain blocked. WBS-052 must not invent source IDs, data, transformations, or results.
+Next task: WBS-020 validation templates, then WBS-052 dataset generation.
+Blockers: WBS-052 should wait until the open WBS-020 bootstrap item is closed. `model/`, Dynare, Redux, and sovereign extension remain blocked.
 Files changed: `docs/02_data_dictionary.md`, `tests/test_data_transformations.py`, `docs/PROJECT_STATUS.md`.
 Tests run: `python -m pytest` - 46 passed; `git diff --check`; forbidden path check for `model`, `data`, and `src/data_pipeline` - all absent.
 Commit hash: `a52cee9`.
-Safe to continue: yes, but only to WBS-052 dataset generation; do not create Dynare, model files, Redux, or sovereign extension.
+Safe to continue: yes, but only to WBS-020 validation templates; do not generate datasets, Dynare, model files, Redux, or sovereign extension.
 
 Visual status:
 
@@ -20,13 +20,13 @@ Progress metric: 54/86 WBS complete, approximately 63% by WBS item count. This i
 |---|---:|---:|---|---|
 | Preflight + baseline | PRE-000, 000 | 2/2 | complete | none |
 | Gate 0 decisions/configs | 001..009.5 | 11/11 | complete | none |
-| PR 03 repo bootstrap | 010..020 | 10/11 | mostly complete | WBS-020 validation templates still open |
+| PR 03 repo bootstrap | 010..020 | 10/11 | next | WBS-020 validation templates still open |
 | PR 04 data dictionary skeleton | 021..023 | 3/3 | complete | none |
 | PR 05 literature map | 033A | 1/1 | complete | none |
 | PR 06 source verification | 024..027, 045..051 | 11/11 | complete | auxiliary TBDs remain documented |
 | PR 07 data contracts | 028..032 | 5/5 | complete | none |
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
-| PR 09 dataset generation | 052 | 0/1 | next | allowed next, no invented sources/data |
+| PR 09 dataset generation | 052 | 0/1 | queued | after WBS-020, no invented sources/data |
 | PR 10 calibration notes | 053 | 0/1 | todo | after dataset or explicit approval |
 | PR 11 Dynare calibrated model | 054..064 | 0/11 | blocked | no `model/` before calibration/runtime gates |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
