@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT FISC and ADMIN entries partial
+**Status:** Gate 2b MON EXT FISC ADMIN and HH entries partial
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,8 +11,8 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-038
-gate_status: administered_prices_registered
+wbs: WBS-039
+gate_status: household_block_registered
 gate2b_passed: false
 dynare_allowed: false
 model_file_allowed: false
@@ -21,13 +21,14 @@ monetary_block_registered: true
 external_block_registered: true
 fiscal_block_registered: true
 administered_prices_registered: true
+household_block_registered: true
 core_blocks_registered: false
-registry_version: 0.5.0-admin
+registry_version: 0.6.0-hh
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, and administered-prices entries are registered through WBS-038.
+Gate 2b is not passed. Monetary-policy, external-block, fiscal-block, administered-prices, and household entries are registered through WBS-039.
 
 ---
 
@@ -73,7 +74,7 @@ EQ-MON,MON,LM-MON-001,WBS-035,registered_partial
 EQ-EXT,EXT,LM-EXT-001,WBS-036,registered_partial
 EQ-FISC,FISC,LM-FISC-001,WBS-037,registered_partial
 EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_partial
-EQ-HH,HH,LM-HH-001,WBS-039,ready_for_registry_entry
+EQ-HH,HH,LM-HH-001,WBS-039,registered_partial
 EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,ready_for_registry_entry
 EQ-AGG,AGG,LM-AGG-001,WBS-041,ready_for_registry_entry
 EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,ready_for_registry_entry
@@ -84,7 +85,7 @@ EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_until_gate1b
 
 ## 4. Registry entries
 
-WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, and WBS-038 administered-prices entries are registered.
+WBS-035 monetary-policy, WBS-036 external-block, WBS-037 fiscal-block, WBS-038 administered-prices, and WBS-039 household entries are registered.
 
 ```csv
 equation_id,block,title,equation_type,source_map_id,source_reference_id,source_locator,variables,parameters,shocks,tests,status,gate,notes
@@ -102,4 +103,8 @@ EQ-FISC-004,FISC,Fiscal auxiliary tax and primary surplus locators,auxiliary,LM-
 EQ-PRICE-001,ADMIN,Administered prices inflation process,structural,LM-PRICE-ADMIN-001,BCB_WP239,WP239 Section 2.5 Shocks PDF page 38; Appendix C.6 PDF page 92; administered prices shock equation C.58,pi_a|pi_a_lag|pi_target|delta_q|pi_m,rho_a|alpha_a_target|alpha_a_fx|alpha_a_m,eps_admin,admin_process_own_equation;ar1_persistence_present;pass_through_terms_declared;eps_admin_declared;not_generic_shock,sourced,WBS-038,Implements ADMIN-001 approved process; availability of pi_m and measurement remains Gate 1b work.
 EQ-PRICE-002,ADMIN,Administered prices shock locator,shock_process,LM-PRICE-ADMIN-001,BCB_WP239,WP239 Appendix C.6 PDF page 92; administered prices shock equation C.58,admin_price_shock_state|admin_price_shock_lag,rho_admin,eps_admin,admin_shock_source_located;shock_not_substitute_for_full_process;shock_name_harmonization_deferred_to_wbs042,sourced,WBS-038,Source locator for the WP239 administered-price shock process.
 EQ-PRICE-003,ADMIN,Administered prices observable locator,measurement_draft,LM-PRICE-ADMIN-001,BCB_WP239,WP239 Table 1 PDF page 94,pi_a,none,none,table1_locator_present;measurement_deferred_to_gate1b;no_source_id_invention,sourced,WBS-038,Data source IDs and exact measurement equation remain blocked until Gate 1b.
+EQ-HH-001,HH,Optimizing household intertemporal conditions,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1.1 Optimizing Households PDF pages 11-17; Appendix C.1 PDF pages 84-86; main equations 1-15; log-linear equations C.1-C.10,c|c_lag|lambda|r_t|pi_expected|q_k|i|k,source_located_parameters_pending_calibration,preference_shock,lambda_mapped;q_k_mapped;euler_locator_present;parameters_not_calibrated_here,sourced,WBS-039,No formula is copied; exact calibration remains future work.
+EQ-HH-002,HH,Consumption habit contract,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1.1 Optimizing Households PDF pages 11-17; Appendix C.1 PDF pages 84-86,c|c_lag|habit_state|lambda,source_located_parameters_pending_calibration,preference_shock,consumption_habit_locator_present;habit_state_mapped;measurement_deferred_to_gate1b,sourced,WBS-039,Consumption-habit implementation details remain registry-to-Dynare work after Gate 2b.
+EQ-HH-003,HH,Labor supply and real wage contract,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1 Households PDF page 10; Section 2.1.1 PDF pages 11-17; Appendix C.1 PDF pages 84-86,labor|wn|lambda|wage_markup,source_located_parameters_pending_calibration,wage_markup_shock,wn_mapped;labor_supply_locator_present;variables_mapped,sourced,WBS-039,Nominal wage setting details remain source-located for later registry entries if needed.
+EQ-HH-004,HH,Rule-of-thumb household contract,structural,LM-HH-001,BCB_WP239,WP239 Section 2.1.2 Rule-of-Thumb Households PDF page 18; Appendix C.1 PDF pages 84-86,c_rt|labor_rt|wn|tax_rate|transfers,source_located_parameters_pending_calibration,none,rule_of_thumb_locator_present;consumption_labor_variables_mapped;parameters_not_invented,sourced,WBS-039,Rule-of-thumb household variables are mapped without choosing calibration values.
 ```

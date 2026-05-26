@@ -28,7 +28,7 @@ def _registry_entries(text: str) -> list[dict[str, str]]:
 def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: administered_prices_registered" in text
+    assert "gate_status: household_block_registered" in text
     assert "gate2b_passed: false" in text
     assert "dynare_allowed: false" in text
     assert "core_blocks_registered: false" in text
@@ -155,3 +155,21 @@ def test_administered_prices_registry_entries_are_complete_for_wbs038():
     assert "not_generic_shock" in by_id["EQ-PRICE-001"]["tests"]
     assert "admin_shock_source_located" in by_id["EQ-PRICE-002"]["tests"]
     assert "measurement_deferred_to_gate1b" in by_id["EQ-PRICE-003"]["tests"]
+
+
+def test_household_registry_entries_are_complete_for_wbs039():
+    text = REGISTRY.read_text(encoding="utf-8")
+    entries = _registry_entries(text)
+    hh_entries = [entry for entry in entries if entry["block"] == "HH"]
+    by_id = {entry["equation_id"]: entry for entry in hh_entries}
+
+    assert set(by_id) == {"EQ-HH-001", "EQ-HH-002", "EQ-HH-003", "EQ-HH-004"}
+    assert all(entry["gate"] == "WBS-039" for entry in hh_entries)
+    assert "lambda" in by_id["EQ-HH-001"]["variables"]
+    assert "q_k" in by_id["EQ-HH-001"]["variables"]
+    assert "euler_locator_present" in by_id["EQ-HH-001"]["tests"]
+    assert "habit_state" in by_id["EQ-HH-002"]["variables"]
+    assert "consumption_habit_locator_present" in by_id["EQ-HH-002"]["tests"]
+    assert "wn" in by_id["EQ-HH-003"]["variables"]
+    assert "labor_supply_locator_present" in by_id["EQ-HH-003"]["tests"]
+    assert "rule_of_thumb_locator_present" in by_id["EQ-HH-004"]["tests"]
