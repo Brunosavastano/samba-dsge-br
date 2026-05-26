@@ -286,6 +286,20 @@ data_created: false
 pipeline_created: false
 ```
 
+### 5.3 WBS-028 quarterly frequency validation contract
+
+```yaml
+wbs: WBS-028
+status: validation_contract_defined_no_data_created
+frequency_model_required: quarterly
+applies_to: all_planned_observables
+validation_rule: "every observable row must declare frequency_model = quarterly before dataset generation"
+raw_frequency_policy: "monthly, daily, or irregular raw sources require explicit quarterly conversion before WBS-052"
+failure_condition: "missing or non-quarterly frequency_model fails validation"
+data_created: false
+pipeline_created: false
+```
+
 ---
 
 ## 6. Gate 1b acceptance
