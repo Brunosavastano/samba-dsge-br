@@ -38,15 +38,18 @@ def _pipe_tokens(value: str) -> set[str]:
     return {token for token in value.split("|") if token}
 
 
-def test_equation_registry_exists_and_blocks_dynare_until_gate2b():
+def test_equation_registry_gate2b_is_approved_but_blocks_dynare_until_calibration():
     text = REGISTRY.read_text(encoding="utf-8")
 
-    assert "gate_status: measurement_draft_registered" in text
-    assert "gate2b_passed: false" in text
+    assert "gate_status: approved" in text
+    assert "gate2b_passed: true" in text
     assert "dynare_allowed: false" in text
-    assert "core_blocks_registered: false" in text
+    assert "core_blocks_registered: true" in text
+    assert "decision_status: approved" in text
+    assert "approved_by: Bruno" in text
     assert "measurement_draft_registered: true" in text
-    assert "Gate 2b is not passed." in text
+    assert "Gate 2b is passed for the minimum viable equation registry." in text
+    assert "Runtime verification and calibration notes are required" in text
     assert not (ROOT / "model").exists()
 
 

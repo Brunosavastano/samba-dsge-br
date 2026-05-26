@@ -1,7 +1,7 @@
 # Equation Registry - samba-dsge-br
 
 **Documento:** `docs/01_equation_registry.md`
-**Status:** Gate 2b MON EXT FISC ADMIN HH FIRM AGG SHOCK and MEAS draft entries partial
+**Status:** Gate 2b approved for minimum viable equation registry
 **Fonte canonica:** `docs/00a_literature_map.md`
 **Criado em:** 2026-05-26
 
@@ -11,11 +11,13 @@
 
 ```yaml
 gate: Gate 2b
-wbs: WBS-043
-gate_status: measurement_draft_registered
-gate2b_passed: false
+wbs: WBS-044
+gate_status: approved
+gate2b_passed: true
 dynare_allowed: false
 model_file_allowed: false
+dynare_blocker: "Runtime verification and calibration notes are required before model implementation."
+model_file_blocker: "No model/ files before calibration notes and the next implementation gate."
 source_memory_allowed: false
 monetary_block_registered: true
 external_block_registered: true
@@ -26,13 +28,17 @@ firm_block_registered: true
 aggregation_block_registered: true
 shock_block_registered: true
 measurement_draft_registered: true
-core_blocks_registered: false
-registry_version: 0.10.0-meas
+core_blocks_registered: true
+decision_status: approved
+approved_by: Bruno
+approval_date: 2026-05-26
+approval_basis: "Objective Gate 2b checklist authorized by Bruno: core blocks, variables, shocks, parameters, tests, and statuses are versioned and sourced."
+registry_version: 0.11.0-gate2b
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
 
-Gate 2b is not passed. Registry entries are registered through WBS-043.
+Gate 2b is passed for the minimum viable equation registry. No Dynare, model file, calibration value, dataset, or result is approved by this gate update.
 
 ---
 
@@ -42,8 +48,8 @@ Gate 2b is not passed. Registry entries are registered through WBS-043.
 - Do not register equations from memory.
 - Every future equation entry must point to `docs/00a_literature_map.md`.
 - Equation numbers may be used as locators, but formulas are entered only in the relevant WBS.
-- Measurement equations remain draft until Gate 1b source IDs are verified.
-- Dynare and `model/` files remain blocked until Gate 2b passes.
+- Measurement equations remain draft until dataset generation and observables implementation finalize the measurement transforms.
+- Dynare and `model/` files remain blocked until runtime verification and calibration notes are complete.
 ```
 
 ---
@@ -74,15 +80,15 @@ notes,no,Short implementation notes.
 
 ```csv
 namespace,block,source_map_id,next_wbs,status
-EQ-MON,MON,LM-MON-001,WBS-035,registered_partial
-EQ-EXT,EXT,LM-EXT-001,WBS-036,registered_partial
-EQ-FISC,FISC,LM-FISC-001,WBS-037,registered_partial
-EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_partial
-EQ-HH,HH,LM-HH-001,WBS-039,registered_partial
-EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,registered_partial
-EQ-AGG,AGG,LM-AGG-001,WBS-041,registered_partial
-EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,registered_partial
-EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_registered_until_gate1b
+EQ-MON,MON,LM-MON-001,WBS-035,registered_minimum_viable
+EQ-EXT,EXT,LM-EXT-001,WBS-036,registered_minimum_viable
+EQ-FISC,FISC,LM-FISC-001,WBS-037,registered_minimum_viable
+EQ-PRICE,ADMIN,LM-PRICE-ADMIN-001,WBS-038,registered_minimum_viable
+EQ-HH,HH,LM-HH-001,WBS-039,registered_minimum_viable
+EQ-FIRM,FIRM,LM-FIRM-001,WBS-040,registered_minimum_viable
+EQ-AGG,AGG,LM-AGG-001,WBS-041,registered_minimum_viable
+EQ-SHOCK,SHOCK,LM-SHOCK-001,WBS-042,registered_minimum_viable
+EQ-MEAS,MEAS,LM-MEAS-001,WBS-043,draft_registered_after_gate1b
 ```
 
 ---
