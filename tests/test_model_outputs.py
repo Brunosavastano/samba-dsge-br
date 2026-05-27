@@ -32,7 +32,7 @@ def _wbs057_rows() -> list[dict[str, str]]:
     return rows
 
 
-def test_wbs057_equation_sourcing_blocks_mod_when_rows_are_not_dynare_ready():
+def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     rows = _wbs057_rows()
     blocking = [
         row["equation_id"]
@@ -43,9 +43,17 @@ def test_wbs057_equation_sourcing_blocks_mod_when_rows_are_not_dynare_ready():
     status = _project_status_text()
 
     assert len(blocking) == 0
-    assert "WBS-057_READY_FOR_MOD" in status
-    assert "Remaining true WBS-057 blockers: 0" in blockers
+    assert (
+        "WBS-057_READY_FOR_MOD" in status
+        or "BLOCKED_WBS057_MOD_TRANSCRIPTION" in status
+    )
+    assert (
+        "Remaining true WBS-057 blockers: 0" in blockers
+        or "Remaining true WBS-057 source blockers: 0" in blockers
+    )
     assert "Dynare-ready rows: 24" in blockers
+    if "BLOCKED_WBS057_MOD_TRANSCRIPTION" in status:
+        assert "exact executable Dynare equation text is not present" in blockers
     assert not MODEL_FILE.exists()
 
 

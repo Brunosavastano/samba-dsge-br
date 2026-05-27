@@ -3,19 +3,19 @@
 Updated: 2026-05-26
 
 Current gate: Gate 3 started; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: WBS-057_READY_FOR_MOD.
-Current PR/WBS: WBS-057 / PR11 equation sourcing complete; `samba_classic.mod` not started.
-Blocked WBS: none for WBS-057 sourcing.
+Execution status: BLOCKED_WBS057_MOD_TRANSCRIPTION.
+Current PR/WBS: WBS-057b / PR11 `samba_classic.mod` implementation blocked before file creation.
+Blocked WBS: WBS-057b.
 Previous blocking status: BLOCKED_WBS057_HUMAN_FORMULA_REVIEW.
-Last completed task: WBS-056 sourced steady_state.m.
+Last completed task: WBS-057 source/mapping review for `.mod` rows.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: WBS-057b create `samba_classic.mod` from sourced WBS-057 rows only.
-Blockers: none remaining for WBS-057 sourcing. `EQ-AGG-004` is not required as a separate WBS-057 `.mod` equation: `y_gap` enters through `EQ-MON-001`, while `y_pot` and output-gap measurement/reporting remain outside WBS-057. Dynare-ready rows: 24. Remaining true WBS-057 blockers: 0. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0.
-Required user action: authorize WBS-057b `.mod` creation if desired; do not create shocks/observables yet.
-Files changed: `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `docs/01_equation_registry.md`, `docs/PROJECT_STATUS.md`, `tests/test_model_outputs.py`.
-Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed; forbidden model artifact check - no `.mod`, `.inc`, outputs, data, estimation, Redux, or sovereign files created.
-Commit hash: pending for final WBS-057 blocker resolution.
-Safe to continue: true for WBS-057b `.mod` only. Do not create `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
+Next safe task: transcribe exact WP239 Appendix C formulas into WBS-057b implementation inputs, then create `.mod` only from those exact formulas.
+Blockers: WBS-057 sourcing/mapping is complete, but `docs/wbs057_equation_sourcing.md` records source locations and registry mappings rather than exact executable Dynare equation text. Creating `samba_classic.mod` now would require inventing or silently interpreting equations. Dynare-ready rows by source/mapping: 24. Remaining true source blockers: 0. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0.
+Required user action: approve exact formula transcription from WP239 Appendix C/Tables 2-3 into the WBS-057b `.mod` implementation, or provide an approved machine-readable equation source.
+Files changed: `docs/PROJECT_STATUS.md`, `docs/wbs057_blockers.md`, `tests/test_model_outputs.py`.
+Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed.
+Commit hash: pending for WBS-057b blocker update.
+Safe to continue: false for `.mod` creation until exact executable formulas are transcribed and reviewed. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
 
 Visual status:
 
@@ -33,7 +33,7 @@ Progress metric: 60/86 WBS complete, approximately 70% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 3/11 | ready for WBS-057b | WBS-057 sourcing complete; next create `.mod`; 11 shock rows deferred to WBS-058 |
+| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked at WBS-057b | source/mapping complete, but exact executable Dynare formulas are not yet transcribed |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
@@ -49,7 +49,7 @@ Gate view:
 | Gate 1b | approved | `docs/gate1b_approval_record.md` |
 | Gate 2a | complete | `docs/00a_literature_map.md` |
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
-| Gate 3 | in progress | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, and WBS-057 sourcing complete; next WBS-057b `.mod` |
+| Gate 3 | in progress | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, and WBS-057 sourcing complete; WBS-057b blocked on exact executable formula transcription |
 | Gate 4 | not started | no identification outputs |
 | Gate 5a/5b | not started | no estimation outputs |
 | Gate 6 | not started | no validation/backtesting outputs |

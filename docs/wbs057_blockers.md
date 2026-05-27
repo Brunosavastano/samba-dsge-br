@@ -1,8 +1,8 @@
 # WBS-057 Blockers
 
-Status: `WBS-057_READY_FOR_MOD`
+Status: `BLOCKED_WBS057_MOD_TRANSCRIPTION`
 
-WBS-057 is ready for `model/samba_classic/samba_classic.mod`.
+WBS-057 source/mapping review is complete, but `model/samba_classic/samba_classic.mod` must not be created until exact executable Dynare equations are transcribed from approved sources.
 
 WP239 local reference: available at `docs/references/bcb_wp239_samba.pdf`.
 
@@ -10,7 +10,9 @@ Dynare-ready rows: 24.
 
 Resolved to Dynare-ready in this pass: 15.
 
-Remaining true WBS-057 blockers: 0.
+Remaining true WBS-057 source blockers: 0.
+
+Remaining WBS-057b implementation blocker: exact executable Dynare equation text is not present in the project docs. The sourcing table records WP239 locations and registry mappings, but not the final equation text needed to create `.mod` without interpretation.
 
 Deferred to WBS-058 `shocks.inc`: 11 rows (`EQ-SHOCK-003`, `EQ-SHOCK-005`..`EQ-SHOCK-009`, `EQ-SHOCK-011`..`EQ-SHOCK-012`, `EQ-SHOCK-014`..`EQ-SHOCK-016`).
 
@@ -26,8 +28,8 @@ Still missing in sources: none after the WP239 Appendix C and Tables 2/3 pass.
 
 Duplicate or not-required rows must not be implemented twice: `EQ-SHOCK-001`, `EQ-SHOCK-002`, `EQ-SHOCK-004`, `EQ-SHOCK-010`, `EQ-SHOCK-013`, `EQ-SHOCK-017`, `EQ-PRICE-003`, and `EQ-MEAS-001..EQ-MEAS-015`.
 
-WBS-057b can proceed. This file does not create or authorize `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign work.
+WBS-057b cannot proceed to file creation until exact formulas are transcribed/reviewed. This file does not create or authorize `samba_classic.mod`, `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign work.
 
-Next task: WBS-057b create `samba_classic.mod` using only rows marked Dynare-ready or explicitly not required for WBS-057.
+Next task: transcribe exact WP239 Appendix C formulas and Tables 2/3 parameter mappings into approved WBS-057b implementation inputs, then create `samba_classic.mod` only from that exact material.
 
 Do not create `samba_classic.mod`, `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign extension while this status holds.
