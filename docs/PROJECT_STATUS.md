@@ -3,18 +3,19 @@
 Updated: 2026-05-26
 
 Current gate: Gate 3 started; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: BLOCKED_WBS057_EQUATION_SOURCES.
-Current PR/WBS: WBS-057 / PR11 blocked before `samba_classic.mod`.
+Execution status: WBS057_GATE3_RECOVERY_PLAN_CREATED.
+Current PR/WBS: WBS-057 / PR11 recovery plan created; `samba_classic.mod` not started.
 Blocked WBS: WBS-057 / PR11.
+Previous blocking status: BLOCKED_WBS057_EQUATION_SOURCES.
 Last completed task: WBS-056 sourced steady_state.m.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: extract and record exact WBS-057 equation formulas from WP239 Appendix C / approved project docs.
-Blockers: `docs/wbs057_equation_sourcing.md` records 34 MVP-required rows with `missing_formula`; `samba_classic.mod` would require inventing fiscal, household, firm, aggregation, administered-price, and shock-process equations.
-Required user action: authorize exact formula extraction into WBS-057 sourcing, or provide a source-transcribed equation list for review.
-Files changed: `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_model_structure.py`, `tests/test_validation_templates.py`, `tests/test_dataset_outputs.py`, `tests/test_calibration_notes.py`, `tests/test_model_outputs.py`.
+Next safe task: review `docs/wbs057_gate3_recovery_plan_brief.md`.
+Blockers: `docs/wbs057_equation_sourcing.md` records 34 MVP-required rows with `missing_formula`; recovery plan documents the path from WBS-057 through Gate 3 without creating model files.
+Required user action: review the recovery plan brief, then authorize exact WP239 Appendix C formula extraction for WBS-057 only.
+Files changed: `docs/wbs057_gate3_recovery_plan.md`, `docs/wbs057_gate3_recovery_plan_brief.md`, `docs/PROJECT_STATUS.md`.
 Tests run: `python -m pytest` - 73 passed; `git diff --check` - passed.
-Commit hash: pending until commit.
-Safe to continue: false for `samba_classic.mod` until exact formulas are source-recorded. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
+Commit hash: previous pushed blocker commit `7ae6cf6`; recovery-plan commit pending.
+Safe to continue: false until recovery plan is reviewed. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
 
 Visual status:
 
