@@ -1,13 +1,22 @@
+import re
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 TARGETS = ROOT / "docs" / "05_replication_targets.md"
 VALIDATION = ROOT / "docs" / "06_model_validation.md"
-ALLOWED_EXECUTABLE_MODEL_FILES = {
-    "model/samba_classic/calibration.m",
-    "model/samba_classic/steady_state.m",
-}
+
+
+def _allowed_executable_model_files() -> set[str]:
+    text = PROJECT_STATUS.read_text(encoding="utf-8")
+    allowed = {
+        "model/samba_classic/calibration.m",
+        "model/samba_classic/steady_state.m",
+    }
+    if re.search(r"Execution status: WBS-057_COMPLETE", text):
+        allowed.add("model/samba_classic/samba_classic.mod")
+    return allowed
 
 
 def test_replication_targets_template_has_required_irf_fields():
@@ -47,7 +56,7 @@ def test_validation_templates_do_not_create_forbidden_implementation_files():
             if (
                 path.is_file()
                 and path.suffix in {".mod", ".m", ".inc"}
-                and path.relative_to(ROOT).as_posix() not in ALLOWED_EXECUTABLE_MODEL_FILES
+                and path.relative_to(ROOT).as_posix() not in _allowed_executable_model_files()
             )
         ]
 

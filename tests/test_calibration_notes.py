@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 NOTES = ROOT / "docs" / "03_calibration_notes.md"
 REGISTRY = ROOT / "docs" / "01_equation_registry.md"
 BLOCKERS = ROOT / "docs" / "calibration_blockers.md"
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 CALIBRATION_FILE = ROOT / "model" / "samba_classic" / "calibration.m"
 WP239 = ROOT / "docs" / "references" / "bcb_wp239_samba.pdf"
 WP239_SHA256 = "8EC1FCF4CC37CEE968C4BF8D23D92DBE537F0401A25CA509BEFA84D8E0C1325E"
@@ -87,6 +88,17 @@ def _source_tracking_rows() -> list[dict[str, str]]:
         rows.append(dict(zip(header, cells)))
 
     return rows
+
+
+def _allowed_executable_model_files() -> set[Path]:
+    text = PROJECT_STATUS.read_text(encoding="utf-8")
+    allowed = {
+        ROOT / "model" / "samba_classic" / "calibration.m",
+        ROOT / "model" / "samba_classic" / "steady_state.m",
+    }
+    if re.search(r"Execution status: WBS-057_COMPLETE", text):
+        allowed.add(ROOT / "model" / "samba_classic" / "samba_classic.mod")
+    return allowed
 
 
 def test_calibration_notes_contract_flags():
@@ -288,10 +300,6 @@ def test_wbs055_has_no_naming_conflicts_for_mvp_required_parameters():
 def test_calibration_notes_do_not_create_forbidden_executable_model_files():
     forbidden_suffixes = {".mod", ".m", ".inc"}
     model_dir = ROOT / "model"
-    allowed_model_files = {
-        ROOT / "model" / "samba_classic" / "calibration.m",
-        ROOT / "model" / "samba_classic" / "steady_state.m",
-    }
     forbidden_model_files = []
     if model_dir.exists():
         forbidden_model_files = [
@@ -300,7 +308,7 @@ def test_calibration_notes_do_not_create_forbidden_executable_model_files():
             if (
                 path.is_file()
                 and path.suffix in forbidden_suffixes
-                and path not in allowed_model_files
+                and path not in _allowed_executable_model_files()
             )
         ]
 

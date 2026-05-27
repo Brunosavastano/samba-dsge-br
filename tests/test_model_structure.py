@@ -1,13 +1,22 @@
 import json
+import re
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR = ROOT / "model" / "samba_classic"
-ALLOWED_EXECUTABLE_MODEL_FILES = {
-    "model/samba_classic/calibration.m",
-    "model/samba_classic/steady_state.m",
-}
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
+
+
+def _allowed_executable_model_files() -> set[str]:
+    text = PROJECT_STATUS.read_text(encoding="utf-8")
+    allowed = {
+        "model/samba_classic/calibration.m",
+        "model/samba_classic/steady_state.m",
+    }
+    if re.search(r"Execution status: WBS-057_COMPLETE", text):
+        allowed.add("model/samba_classic/samba_classic.mod")
+    return allowed
 
 
 def test_samba_classic_structure_exists():
@@ -35,7 +44,7 @@ def test_wbs054_does_not_create_executable_model_files():
         if (
             path.is_file()
             and path.suffix in forbidden_suffixes
-            and path.relative_to(ROOT).as_posix() not in ALLOWED_EXECUTABLE_MODEL_FILES
+            and path.relative_to(ROOT).as_posix() not in _allowed_executable_model_files()
         )
     ]
 

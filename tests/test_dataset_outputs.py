@@ -1,16 +1,25 @@
 import csv
 import json
+import re
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 MODEL_INPUT = ROOT / "data" / "model_input" / "classic_mvp.csv"
 METADATA = ROOT / "data" / "model_input" / "classic_mvp_metadata.json"
 OBSERVABLES = ROOT / "data" / "observables"
-ALLOWED_EXECUTABLE_MODEL_FILES = {
-    "model/samba_classic/calibration.m",
-    "model/samba_classic/steady_state.m",
-}
+
+
+def _allowed_executable_model_files() -> set[str]:
+    text = PROJECT_STATUS.read_text(encoding="utf-8")
+    allowed = {
+        "model/samba_classic/calibration.m",
+        "model/samba_classic/steady_state.m",
+    }
+    if re.search(r"Execution status: WBS-057_COMPLETE", text):
+        allowed.add("model/samba_classic/samba_classic.mod")
+    return allowed
 
 EXPECTED_SOURCE_IDS = {
     "br_gdp_real": "IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1",
@@ -87,7 +96,7 @@ def test_wbs052_does_not_create_pipeline_or_executable_model_code():
             if (
                 path.is_file()
                 and path.suffix in {".mod", ".m", ".inc"}
-                and path.relative_to(ROOT).as_posix() not in ALLOWED_EXECUTABLE_MODEL_FILES
+                and path.relative_to(ROOT).as_posix() not in _allowed_executable_model_files()
             )
         ]
 
