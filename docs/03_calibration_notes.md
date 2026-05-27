@@ -83,6 +83,52 @@ Future steady-state notes must cover at least `y`, `c`, `i`, `g`, `x`, `m`, `q`,
 
 Only WBS-055 sourced entries such as `r_ss` and `nfa_ss` are approved for the next `calibration.m` task. The broader steady-state system remains pending.
 
+## Approved MVP steady-state assignments
+
+Status: `WBS-056_READY_FOR_STEADY_STATE_M_BLOCKED_BY_TEST_CONTRACT`
+
+Zero steady states below apply only to log-linear deviation variables and shock states. They do not assign economic levels for debt, NFA, inflation targets, interest rates, or risk premia. Nonzero level anchors must have explicit SAMBA sources.
+
+| variable | value_or_expression | status | source | source_location | rationale | usable_in_steady_state_m |
+|---|---|---|---|---|---|---|
+| abs | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | docs/00b_modeling_decisions.md TREND-001; registry EQ-AGG-002 log-linear C.37-C.39 | Absorption is represented as a log-linear deviation in the MVP registry. | true |
+| b | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | docs/00b_modeling_decisions.md TREND-001; registry EQ-FISC-001 C.31 and EQ-FISC-003 C.34 | Debt/GDP model variable is a log-linear deviation; level is not assigned to `b`. | true |
+| b_ss | 2.00 | sourced_from_samba | BCB_WP239 | Table 2 calibrated parameters, PDF page 96 / printed page 95, net government debt-to-GDP ratio | Debt/GDP level anchor is sourced, not inferred. | true |
+| c | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-HH-001/EQ-AGG-001 log-linear locators | Consumption is represented as a log-linear deviation. | true |
+| c_rt | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-HH-004 | Rule-of-thumb consumption is represented as a log-linear deviation. | true |
+| delta_q | 0 | zero_by_loglinear_convention | Gate0 EXT-001; BCB_WP239 | registry EQ-EXT-004 | Exchange-rate change is a deviation/change term; steady-state change is zero. | true |
+| g | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FISC-002/EQ-AGG-001 | Government consumption is represented as a log-linear deviation. | true |
+| i | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-HH-001/EQ-FIRM-003/EQ-AGG-001 | Investment is represented as a log-linear deviation. | true |
+| k | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-HH-001/EQ-FIRM-001/EQ-FIRM-003 | Capital is represented as a log-linear deviation. | true |
+| labor | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-HH-003/EQ-FIRM-001 | Labor is represented as a log-linear deviation. | true |
+| labor_rt | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-HH-004 | Rule-of-thumb labor is represented as a log-linear deviation. | true |
+| lambda | 0 | zero_by_loglinear_convention | Gate0 STRUCT-001; BCB_WP239 | registry EQ-HH-001/EQ-HH-002 | Marginal utility/multiplier variable is represented as a log-linear deviation. | true |
+| m | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-AGG-002/EQ-AGG-003 | Imports are represented as a log-linear deviation. | true |
+| m_int | 0 | zero_by_loglinear_convention | Gate0 STRUCT-001; BCB_WP239 | registry EQ-FIRM-004/EQ-AGG-001 | Imported intermediate input is represented as a log-linear deviation. | true |
+| mc | 0 | zero_by_loglinear_convention | Gate0 STRUCT-001; BCB_WP239 | registry EQ-FIRM-001/EQ-FIRM-002/EQ-PRICE-001 | Marginal cost is represented as a log-linear deviation. | true |
+| nfa | 0 | zero_by_loglinear_convention | Gate0 EXT-001; BCB_WP239 | registry EQ-EXT-001/EQ-EXT-003/EQ-AGG-002 | NFA model variable is a deviation around `nfa_ss`; level is not assigned to `nfa`. | true |
+| nx | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-EXT-003/EQ-AGG-002 | Net exports are represented as a log-linear deviation. | true |
+| pi | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FIRM-002 | Inflation variable is represented as a deviation. | true |
+| pi_a | 0 | zero_by_loglinear_convention | Gate0 ADMIN-001; BCB_WP239 | registry EQ-PRICE-001/EQ-PRICE-003 | Administered inflation is represented as a deviation/process state. | true |
+| pi_target | 0 | zero_by_loglinear_convention | Gate0 TARGET-001; BCB_WP239 | docs/00b_modeling_decisions.md TARGET-001; registry EQ-MON-002 C.29 | Inflation target enters as deterministic/exogenous deviation; no target level is invented. | true |
+| pi_y | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FISC-003/EQ-AGG-003 | GDP-deflator inflation is represented as a deviation. | true |
+| q | 0 | zero_by_loglinear_convention | Gate0 EXT-001; BCB_WP239 | registry EQ-EXT-001/EQ-EXT-004/EQ-AGG-002 | Real exchange rate is represented as a log-linear deviation. | true |
+| q_k | 0 | zero_by_loglinear_convention | Gate0 STRUCT-001; BCB_WP239 | registry EQ-HH-001/EQ-FIRM-003 | Tobins Q is represented as a log-linear deviation. | true |
+| q_y | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-AGG-003 | GDP deflator relative price term is represented as a deviation. | true |
+| r_t | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-MON-001 C.28 and EQ-EXT-001 | Policy-rate model variable is represented as a deviation; level is held in `r_ss`. | true |
+| r_star | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-EXT-001 | Foreign interest-rate variable is represented as a deviation. | true |
+| risk | 0 | zero_by_loglinear_convention | Gate0 EXT-001; BCB_WP239 | registry EQ-EXT-002 C.50 and EQ-SHOCK-013 | Risk-premium shock process is represented as a zero-mean AR(1) deviation. | true |
+| sp | 0 | zero_by_loglinear_convention | Gate0 FISC-001; BCB_WP239 | registry EQ-FISC-002 C.30 | Realized primary surplus is represented as a deviation, not a level. | true |
+| sp_target | 0 | zero_by_loglinear_convention | Gate0 FISC-001; BCB_WP239 | registry EQ-FISC-001 C.31 and EQ-SHOCK-004 | Primary-surplus target is represented as a deviation. | true |
+| tax_rate | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FISC-004 C.32 and EQ-SHOCK-005 | Tax-rate process is represented as a deviation. | true |
+| technology | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FIRM-001 | Technology enters as a deviation state in the log-linear MVP. | true |
+| trend_growth | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FISC-003/EQ-AGG-004 | Trend-growth term is represented as a deviation from deterministic trend. | true |
+| wn | 0 | zero_by_loglinear_convention | Gate0 STRUCT-001; BCB_WP239 | registry EQ-HH-003/EQ-HH-004 | Real wage is represented as a log-linear deviation. | true |
+| x | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-AGG-001/EQ-AGG-002/EQ-AGG-003 | Exports are represented as a log-linear deviation. | true |
+| y | 0 | zero_by_loglinear_convention | Gate0 TREND-001; BCB_WP239 | registry EQ-FISC-002/EQ-FIRM-001/EQ-AGG-003/EQ-AGG-004 | Output is represented as a log-linear deviation. | true |
+| y_gap | 0 | zero_by_loglinear_convention | Gate0 MON-001; Gate0 OBS-001 | docs/00b_modeling_decisions.md MON-001 and OBS-001; registry EQ-MON-001/EQ-AGG-004 | Output gap is a structural gap variable; deterministic steady state is zero. | true |
+| y_pot | 0 | zero_by_loglinear_convention | Gate0 STRUCT-001; BCB_WP239 | registry EQ-AGG-004 | Potential output component is represented as a log-linear deviation. | true |
+
 ## Before Model Implementation
 
 - Each calibrated parameter must have a source or documented rationale.

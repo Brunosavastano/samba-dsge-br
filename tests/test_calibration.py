@@ -6,6 +6,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 NOTES = ROOT / "docs" / "03_calibration_notes.md"
 CALIBRATION = ROOT / "model" / "samba_classic" / "calibration.m"
+STEADY_STATE = ROOT / "model" / "samba_classic" / "steady_state.m"
+STEADY_STATE_BLOCKERS = ROOT / "docs" / "steady_state_blockers.md"
 
 
 ASSIGNMENT_RE = re.compile(
@@ -54,6 +56,29 @@ def _calibration_assignments() -> dict[str, str]:
     return assignments
 
 
+def _steady_state_rows() -> list[dict[str, str]]:
+    text = NOTES.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    heading = lines.index("## Approved MVP steady-state assignments")
+    table_start = next(
+        idx for idx in range(heading, len(lines))
+        if lines[idx].startswith("| variable |")
+    )
+    table_lines = []
+
+    for line in lines[table_start:]:
+        if not line.startswith("|"):
+            break
+        table_lines.append(line)
+
+    header = [cell.strip() for cell in table_lines[0].strip("|").split("|")]
+    rows = []
+    for line in table_lines[2:]:
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        rows.append(dict(zip(header, cells)))
+    return rows
+
+
 def test_calibration_file_exists_and_documents_source():
     text = CALIBRATION.read_text(encoding="utf-8")
 
@@ -92,3 +117,20 @@ def test_calibration_does_not_use_legacy_or_blocked_parameters():
     }
 
     assert set(assignments).isdisjoint(forbidden)
+
+
+def test_wbs056_steady_state_sources_are_documented_without_missing_sources():
+    rows = _steady_state_rows()
+    missing = [row["variable"] for row in rows if row["status"] == "missing_source"]
+
+    assert rows
+    assert missing == []
+    assert all(row["usable_in_steady_state_m"] == "true" for row in rows)
+
+
+def test_wbs056_steady_state_file_absent_while_test_contract_blocks_it():
+    blockers = STEADY_STATE_BLOCKERS.read_text(encoding="utf-8")
+
+    assert "BLOCKED_TEST_CONTRACT_WBS056" in blockers
+    assert "Missing steady-state source count: 0" in blockers
+    assert not STEADY_STATE.exists()
