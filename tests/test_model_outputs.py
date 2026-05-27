@@ -42,9 +42,9 @@ def test_wbs057_equation_sourcing_blocks_mod_when_rows_are_not_dynare_ready():
     blockers = BLOCKERS.read_text(encoding="utf-8")
     status = _project_status_text()
 
-    assert len(blocking) == 1
-    assert "BLOCKED_WBS057_HUMAN_FORMULA_REVIEW" in status
-    assert "Remaining true WBS-057 blockers: 1" in blockers
+    assert len(blocking) == 0
+    assert "WBS-057_READY_FOR_MOD" in status
+    assert "Remaining true WBS-057 blockers: 0" in blockers
     assert "Dynare-ready rows: 24" in blockers
     assert not MODEL_FILE.exists()
 
@@ -87,6 +87,7 @@ def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
         "resolved_by_calibration_mapping",
         "not_required_for_wbs057",
         "needs_human_formula_review",
+        "deferred_to_wbs059_observables",
         "still_missing_in_sources",
     }
 
@@ -128,26 +129,32 @@ def test_wbs057_formula_extraction_counts_match_blocker_note():
         row for row in rows
         if row["wbs057_resolution"] == "resolved_parameter_weight_mapped"
     ]
-    human_review = [
+    not_required = [
         row for row in rows
-        if row["wbs057_resolution"] == "needs_human_formula_review"
+        if row["wbs057_resolution"] == "not_required_for_wbs057"
+        and row["equation_id"] == "EQ-AGG-004"
     ]
     missing = [
         row for row in rows
         if row["wbs057_resolution"] == "still_missing_in_sources"
     ]
+    human_review = [
+        row for row in rows
+        if row["wbs057_resolution"] == "needs_human_formula_review"
+    ]
 
     assert len(dynare_ready) == 24
-    assert len(blocking) == 1
+    assert len(blocking) == 0
     assert len(deferred_wbs058) == 11
     assert len(deferred_wbs059_from_unresolved_27) == 0
     assert len(resolved_weights) == 15
-    assert len(human_review) == 1
+    assert len(not_required) == 1
+    assert len(human_review) == 0
     assert len(missing) == 0
     assert any(
         row["equation_id"] == "EQ-AGG-004"
         and row["exact_formula_available"] == "false"
         and row["wbs057a_category"] == "true_missing_wp239_formula"
-        and row["wbs057_resolution"] == "needs_human_formula_review"
+        and row["wbs057_resolution"] == "not_required_for_wbs057"
         for row in rows
     )
