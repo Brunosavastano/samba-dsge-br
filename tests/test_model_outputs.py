@@ -1,3 +1,5 @@
+import csv
+from io import StringIO
 from pathlib import Path
 
 
@@ -32,6 +34,15 @@ def _wbs057_rows() -> list[dict[str, str]]:
     return rows
 
 
+def _wbs057_formula_rows() -> list[dict[str, str]]:
+    text = SOURCING.read_text(encoding="utf-8")
+    start = text.index("## WBS-057b exact formula transcription")
+    fenced = text.index("```csv", start)
+    body_start = text.index("\n", fenced) + 1
+    body_end = text.index("```", body_start)
+    return list(csv.DictReader(StringIO(text[body_start:body_end])))
+
+
 def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     rows = _wbs057_rows()
     blocking = [
@@ -43,18 +54,35 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     status = _project_status_text()
 
     assert len(blocking) == 0
-    assert (
-        "WBS-057_READY_FOR_MOD" in status
-        or "BLOCKED_WBS057_MOD_TRANSCRIPTION" in status
-    )
+    assert "WBS-057_READY_FOR_MOD" in status
     assert (
         "Remaining true WBS-057 blockers: 0" in blockers
         or "Remaining true WBS-057 source blockers: 0" in blockers
     )
     assert "Dynare-ready rows: 24" in blockers
-    if "BLOCKED_WBS057_MOD_TRANSCRIPTION" in status:
-        assert "exact executable Dynare equation text is not present" in blockers
+    assert "Remaining executable formula-text blockers: 0" in blockers
     assert not MODEL_FILE.exists()
+
+
+def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():
+    ready_ids = {
+        row["equation_id"]
+        for row in _wbs057_rows()
+        if row["dynare_ready"] == "true"
+    }
+    formula_rows = _wbs057_formula_rows()
+    formula_by_id = {row["equation_id"]: row for row in formula_rows}
+
+    assert set(formula_by_id) == ready_ids
+    assert len(formula_rows) == 24
+
+    for row in formula_rows:
+        assert row["formula_text_status"] == "transcribed"
+        assert row["exact_formula_text"].startswith("C.")
+        assert row["source"] != ""
+        assert row["source_location"] != ""
+        assert row["registry_mapping"] != ""
+        assert row["dynare_ready"] == "true"
 
 
 def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
