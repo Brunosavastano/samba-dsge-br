@@ -9,6 +9,7 @@ METADATA = ROOT / "data" / "model_input" / "classic_mvp_metadata.json"
 OBSERVABLES = ROOT / "data" / "observables"
 ALLOWED_EXECUTABLE_MODEL_FILES = {
     "model/samba_classic/calibration.m",
+    "model/samba_classic/steady_state.m",
 }
 
 EXPECTED_SOURCE_IDS = {

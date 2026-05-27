@@ -56,6 +56,19 @@ def _calibration_assignments() -> dict[str, str]:
     return assignments
 
 
+def _steady_state_assignments() -> dict[str, str]:
+    assignments = {}
+    for line in STEADY_STATE.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("%"):
+            continue
+        match = ASSIGNMENT_RE.match(line)
+        assert match, f"Unexpected steady_state.m line: {line}"
+        variable, value = match.groups()
+        assignments[variable] = value
+    return assignments
+
+
 def _steady_state_rows() -> list[dict[str, str]]:
     text = NOTES.read_text(encoding="utf-8")
     lines = text.splitlines()
@@ -128,9 +141,29 @@ def test_wbs056_steady_state_sources_are_documented_without_missing_sources():
     assert all(row["usable_in_steady_state_m"] == "true" for row in rows)
 
 
-def test_wbs056_steady_state_file_absent_while_test_contract_blocks_it():
-    blockers = STEADY_STATE_BLOCKERS.read_text(encoding="utf-8")
+def test_wbs056_steady_state_file_exists_and_matches_documented_assignments():
+    text = STEADY_STATE.read_text(encoding="utf-8")
+    rows = _steady_state_rows()
+    usable_rows = {
+        row["variable"]: row
+        for row in rows
+        if row["usable_in_steady_state_m"] == "true"
+    }
+    assignments = _steady_state_assignments()
 
-    assert "BLOCKED_TEST_CONTRACT_WBS056" in blockers
-    assert "Missing steady-state source count: 0" in blockers
-    assert not STEADY_STATE.exists()
+    assert "docs/03_calibration_notes.md" in text
+    assert "WBS-056" in text
+    assert set(assignments) == set(usable_rows)
+
+    for variable, value in assignments.items():
+        row = usable_rows[variable]
+        assert row["value_or_expression"] == value
+        assert row["status"] != "missing_source"
+        if value == "0":
+            assert row["status"] == "zero_by_loglinear_convention"
+        else:
+            assert row["status"] in {
+                "derived_from_calibration_parameter",
+                "sourced_from_samba",
+                "sourced_from_project_decision",
+            }

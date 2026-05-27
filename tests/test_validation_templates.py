@@ -6,6 +6,7 @@ TARGETS = ROOT / "docs" / "05_replication_targets.md"
 VALIDATION = ROOT / "docs" / "06_model_validation.md"
 ALLOWED_EXECUTABLE_MODEL_FILES = {
     "model/samba_classic/calibration.m",
+    "model/samba_classic/steady_state.m",
 }
 
 

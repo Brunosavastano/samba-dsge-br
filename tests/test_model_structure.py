@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR = ROOT / "model" / "samba_classic"
 ALLOWED_EXECUTABLE_MODEL_FILES = {
     "model/samba_classic/calibration.m",
+    "model/samba_classic/steady_state.m",
 }
 
 

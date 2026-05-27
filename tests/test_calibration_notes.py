@@ -290,6 +290,7 @@ def test_calibration_notes_do_not_create_forbidden_executable_model_files():
     model_dir = ROOT / "model"
     allowed_model_files = {
         ROOT / "model" / "samba_classic" / "calibration.m",
+        ROOT / "model" / "samba_classic" / "steady_state.m",
     }
     forbidden_model_files = []
     if model_dir.exists():
