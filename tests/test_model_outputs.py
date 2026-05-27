@@ -34,21 +34,17 @@ def _wbs057_rows() -> list[dict[str, str]]:
 
 def test_wbs057_equation_sourcing_blocks_mod_when_rows_are_not_dynare_ready():
     rows = _wbs057_rows()
-    not_ready = [
+    blocking = [
         row["equation_id"]
         for row in rows
-        if row["dynare_ready"] == "false"
-        and "Not required" not in row["notes"]
-        and "not required" not in row["notes"]
-        and "Do not implement" not in row["notes"]
-        and "Measurement equations are WBS-059" not in row["registry_mapping"]
+        if row["wbs057_blocking"] == "true"
     ]
     blockers = BLOCKERS.read_text(encoding="utf-8")
     status = _project_status_text()
 
-    assert not_ready
+    assert len(blocking) == 16
     assert "BLOCKED_WBS057_EQUATION_SOURCES" in status
-    assert "Remaining unresolved MVP-required rows: 27" in blockers
+    assert "Remaining true WBS-057 blockers: 16" in blockers
     assert "Dynare-ready rows: 9" in blockers
     assert not MODEL_FILE.exists()
 
@@ -63,14 +59,34 @@ def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
         "source",
         "source_location",
         "registry_mapping",
+        "wbs057a_category",
+        "wbs057_blocking",
+        "deferred_to_wbs058",
+        "deferred_to_wbs059",
         "dynare_ready",
         "notes",
+    }
+    valid_categories = {
+        "ready_not_reclassified",
+        "true_missing_wp239_formula",
+        "formula_available_but_mapping_missing",
+        "registry_overreach_not_required_for_mvp",
+        "belongs_to_wbs058_shocks",
+        "belongs_to_wbs059_observables",
+        "calibration_or_steady_state_dependency",
+        "notation_alias_or_duplicate",
+        "test_contract_issue",
+        "reference_extraction_issue",
     }
 
     for row in _wbs057_rows():
         assert set(row) == required_columns
         assert row["exact_formula_available"] in {"true", "false"}
         assert row["dynare_ready"] in {"true", "false"}
+        assert row["wbs057a_category"] in valid_categories
+        assert row["wbs057_blocking"] in {"true", "false"}
+        assert row["deferred_to_wbs058"] in {"true", "false"}
+        assert row["deferred_to_wbs059"] in {"true", "false"}
         assert row["source"] != ""
         assert row["source_location"] != ""
         assert row["registry_mapping"] != ""
@@ -83,20 +99,27 @@ def test_wbs057_formula_extraction_counts_match_blocker_note():
         row for row in rows
         if row["dynare_ready"] == "true"
     ]
-    unresolved = [
+    blocking = [
         row for row in rows
-        if row["dynare_ready"] == "false"
-        and row["exact_formula_available"] == "true"
-        and "Duplicate" not in row["notes"]
-        and "Not required" not in row["notes"]
-        and "not required" not in row["notes"]
-        and "Do not implement" not in row["notes"]
+        if row["wbs057_blocking"] == "true"
+    ]
+    deferred_wbs058 = [
+        row for row in rows
+        if row["deferred_to_wbs058"] == "true"
+    ]
+    deferred_wbs059_from_unresolved_27 = [
+        row for row in rows
+        if row["deferred_to_wbs059"] == "true"
+        and row["equation_id"] not in {"EQ-PRICE-003", "EQ-MEAS-001..EQ-MEAS-015"}
     ]
 
     assert len(dynare_ready) == 9
-    assert len(unresolved) == 26
+    assert len(blocking) == 16
+    assert len(deferred_wbs058) == 11
+    assert len(deferred_wbs059_from_unresolved_27) == 0
     assert any(
         row["equation_id"] == "EQ-AGG-004"
         and row["exact_formula_available"] == "false"
+        and row["wbs057a_category"] == "true_missing_wp239_formula"
         for row in rows
     )

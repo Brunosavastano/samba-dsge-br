@@ -4,17 +4,17 @@ Updated: 2026-05-26
 
 Current gate: Gate 3 started; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
 Execution status: BLOCKED_WBS057_EQUATION_SOURCES.
-Current PR/WBS: WBS-057 / PR11 formula extraction updated; `samba_classic.mod` not started.
+Current PR/WBS: WBS-057a / PR11 mapping blocker classification updated; `samba_classic.mod` not started.
 Blocked WBS: WBS-057 / PR11.
 Previous blocking status: BLOCKED_WBS057_EQUATION_SOURCES.
 Last completed task: WBS-056 sourced steady_state.m.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: resolve the 27 remaining WBS-057 mapping/calibration blockers before creating `.mod`.
-Blockers: `docs/wbs057_equation_sourcing.md` now records WP239 formula availability and Dynare readiness. Dynare-ready rows: 9. Remaining unresolved MVP-required rows: 27. `EQ-AGG-004` still lacks an exact output-gap/potential-output formula.
-Required user action: authorize resolving WBS-057 mapping/calibration blockers from WP239 Appendix C and Tables 2/3; do not create `.mod` yet.
-Files changed: `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `docs/01_equation_registry.md`, `docs/PROJECT_STATUS.md`, `tests/test_model_outputs.py`.
-Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed.
-Commit hash: previous pushed recovery-plan commit `8cff145`; formula-extraction commit pending.
+Next safe task: resolve the 16 remaining true WBS-057 mapping/calibration blockers before creating `.mod`.
+Blockers: `docs/wbs057_equation_sourcing.md` now separates true WBS-057 blockers from WBS-058 shock rows and WBS-059 observable rows. Dynare-ready rows: 9. Remaining true WBS-057 blockers: 16. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0. `EQ-AGG-004` still lacks an exact output-gap/potential-output formula.
+Required user action: authorize resolving the 16 true WBS-057 blockers from WP239 Appendix C and Tables 2/3; do not create `.mod` yet.
+Files changed: `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_model_outputs.py`.
+Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed; `model/samba_classic/` artifact check - no `.mod` or `.inc` created.
+Commit hash: pending for WBS-057a classification update.
 Safe to continue: false for `.mod`. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
 
 Visual status:
@@ -33,7 +33,7 @@ Progress metric: 60/86 WBS complete, approximately 70% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked | WBS-057 has 27 unresolved mapping/calibration blockers before `.mod` |
+| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked | WBS-057 has 16 true mapping/calibration blockers before `.mod`; 11 shock rows deferred to WBS-058 |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
@@ -49,7 +49,7 @@ Gate view:
 | Gate 1b | approved | `docs/gate1b_approval_record.md` |
 | Gate 2a | complete | `docs/00a_literature_map.md` |
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
-| Gate 3 | blocked | WBS-054 structure, WBS-055 `calibration.m`, and WBS-056 `steady_state.m` complete; WBS-057 has unresolved mapping/calibration blockers |
+| Gate 3 | blocked | WBS-054 structure, WBS-055 `calibration.m`, and WBS-056 `steady_state.m` complete; WBS-057 has 16 true mapping/calibration blockers |
 | Gate 4 | not started | no identification outputs |
 | Gate 5a/5b | not started | no estimation outputs |
 | Gate 6 | not started | no validation/backtesting outputs |
