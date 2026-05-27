@@ -2,53 +2,57 @@
 
 Status: `BLOCKED_WBS057_EQUATION_SOURCES`
 
-Policy: WBS-057 may create `model/samba_classic/samba_classic.mod` only after each MVP-required model equation has an exact formula sourced from WP239 Appendix C or an approved project decision. Registry locators alone are not exact formulas.
+Scope: formula extraction and readiness classification for WBS-057 only. This file does not authorize `samba_classic.mod`, `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign work.
 
-| equation_id | block | source | source_location | status | usable_in_samba_classic_mod | notes |
-|---|---|---|---|---|---|---|
-| EQ-MON-001 | MON | approved project decision; BCB_WP239 locator | docs/00b_modeling_decisions.md MON-001; WP239 C.28 locator | sourced_project_decision | true | Taylor rule form is explicitly approved. |
-| EQ-MON-002 | MON | approved project decision | docs/00b_modeling_decisions.md TARGET-001 | sourced_project_decision | true | `pi_target` is deterministic/exogenous; no target shock in calibrated MVP. |
-| EQ-MON-003 | MON | BCB_WP239 locator | WP239 C.60 locator | missing_formula | false | Monetary shock equation is located but exact Dynare-ready formula is not recorded. |
-| EQ-EXT-001 | EXT | approved project decision; BCB_WP239 locator | docs/00b_modeling_decisions.md EXT-001; WP239 C.37-C.47 locators | sourced_project_decision | true | UIP/NFA closure form is explicitly approved. |
-| EQ-EXT-002 | EXT | approved project decision | docs/00b_modeling_decisions.md EXT-001 | sourced_project_decision | true | Risk AR(1) is explicitly approved. |
-| EQ-EXT-003 | EXT | BCB_WP239 locator | WP239 equations 78-80; C.37-C.39 locators | missing_formula | false | NFA law and external accounting are located but not recorded as exact formulas. |
-| EQ-EXT-004 | EXT | approved project decision | docs/00b_modeling_decisions.md EXT-001 | loglinear_convention | true | Sign convention only; not a separate model equation. |
-| EQ-FISC-001 | FISC | BCB_WP239 locator | WP239 equation 64; C.31 locator | missing_formula | false | Exact WP239 C.31 formula must be recorded; SPEC formula conflicts with later registry taxonomy. |
-| EQ-FISC-002 | FISC | BCB_WP239 locator | WP239 equations 63 and 65-68; C.30 and C.33 locators | missing_formula | false | Realized surplus/government spending equations are not recorded exactly. |
-| EQ-FISC-003 | FISC | BCB_WP239 locator | WP239 C.34 locator | missing_formula | false | Debt law of motion is located but not recorded exactly. |
-| EQ-FISC-004 | FISC | BCB_WP239 locator | WP239 C.32 locator | missing_formula | false | Fiscal auxiliary identities are not recorded exactly. |
-| EQ-PRICE-001 | ADMIN | BCB_WP239 locator | WP239 C.58 and Table 3 locators | missing_formula | false | Administered-price formula must use canonical `rho_admin`, `alpha_a_fx`, `alpha_a_mc`; exact formula is not recorded. |
-| EQ-PRICE-002 | ADMIN | BCB_WP239 locator | WP239 C.58 locator | missing_formula | false | Shock-process formula is located but not recorded exactly. |
-| EQ-PRICE-003 | ADMIN | BCB_WP239 locator | WP239 Table 1 locator | not_required_for_mvp | false | Measurement/observable row; WBS-059 owns observables. |
-| EQ-HH-001 | HH | BCB_WP239 locator | WP239 C.1-C.10 locators | missing_formula | false | Intertemporal household equations are located but not recorded exactly. |
-| EQ-HH-002 | HH | BCB_WP239 locator | WP239 C.1-C.10 locators | missing_formula | false | Habit equation details are not recorded exactly. |
-| EQ-HH-003 | HH | BCB_WP239 locator | WP239 C.1-C.10 locators | missing_formula | false | Labor/real-wage equation details are not recorded exactly. |
-| EQ-HH-004 | HH | BCB_WP239 locator | WP239 rule-of-thumb household locators | missing_formula | false | Rule-of-thumb household equations are not recorded exactly. |
-| EQ-FIRM-001 | FIRM | BCB_WP239 locator | WP239 C.11-C.27 locators | missing_formula | false | Production/marginal-cost equations are located but not recorded exactly. |
-| EQ-FIRM-002 | FIRM | BCB_WP239 locator | WP239 C.11-C.27 locators | missing_formula | false | Phillips/markup equations are not recorded exactly. |
-| EQ-FIRM-003 | FIRM | BCB_WP239 locator | WP239 C.11-C.27 locators | missing_formula | false | Investment/Tobin's Q equations are not recorded exactly. |
-| EQ-FIRM-004 | FIRM | BCB_WP239 locator | WP239 C.11-C.27 locators | missing_formula | false | Imported input equations are not recorded exactly. |
-| EQ-AGG-001 | AGG | BCB_WP239 locator | WP239 C.35-C.36 locators | missing_formula | false | Final goods market-clearing identities are not recorded exactly. |
-| EQ-AGG-002 | AGG | BCB_WP239 locator | WP239 C.37-C.39 locators | missing_formula | false | Absorption/net-export accounting identities are not recorded exactly. |
-| EQ-AGG-003 | AGG | BCB_WP239 locator | WP239 C.40-C.42 locators | missing_formula | false | GDP/GDP-deflator identities are not recorded exactly. |
-| EQ-AGG-004 | AGG | BCB_WP239 locator; approved project decision | WP239 aggregation locators; STRUCT-001 | missing_formula | false | Output-gap/potential-output accounting needs exact formula before `.mod`. |
-| EQ-SHOCK-001 | SHOCK | BCB_WP239 locator | WP239 C.60 locator | missing_formula | false | Shock process located, exact formula not recorded. |
-| EQ-SHOCK-002 | SHOCK | approved project decision | docs/00b_modeling_decisions.md TARGET-001 | not_required_for_mvp | false | Inflation-target shock is off in calibrated MVP. |
-| EQ-SHOCK-003 | SHOCK | BCB_WP239 locator | WP239 C.61 locator | missing_formula | false | Shock process located, exact formula not recorded. |
-| EQ-SHOCK-004 | SHOCK | BCB_WP239 locator | WP239 C.31 locator | missing_formula | false | Primary-surplus-target shock source is located but formula not recorded. |
-| EQ-SHOCK-005 | SHOCK | BCB_WP239 locator | WP239 C.32 locator | missing_formula | false | Tax shock source is located but formula not recorded. |
-| EQ-SHOCK-006 | SHOCK | BCB_WP239 locator | WP239 C.51-C.52 locators | missing_formula | false | Technology shock process formulas are not recorded exactly. |
-| EQ-SHOCK-007 | SHOCK | BCB_WP239 locator | WP239 C.48 locator | missing_formula | false | Preference shock formula is not recorded exactly. |
-| EQ-SHOCK-008 | SHOCK | BCB_WP239 locator | WP239 C.53 locator | missing_formula | false | Investment shock formula is not recorded exactly. |
-| EQ-SHOCK-009 | SHOCK | BCB_WP239 locator | WP239 C.57 locator | missing_formula | false | Free-price markup shock formula is not recorded exactly. |
-| EQ-SHOCK-010 | SHOCK | BCB_WP239 locator | WP239 C.58 locator | missing_formula | false | Administered-price shock formula is not recorded exactly. |
-| EQ-SHOCK-011 | SHOCK | BCB_WP239 locator | WP239 C.56 locator | missing_formula | false | Wage-markup shock formula is not recorded exactly. |
-| EQ-SHOCK-012 | SHOCK | BCB_WP239 locator | WP239 C.44 locator | missing_formula | false | Import-price shock formula is not recorded exactly. |
-| EQ-SHOCK-013 | SHOCK | approved project decision | docs/00b_modeling_decisions.md EXT-001 | sourced_project_decision | true | Risk AR(1) duplicates EQ-EXT-002 concept. |
-| EQ-SHOCK-014 | SHOCK | BCB_WP239 locator | WP239 C.43 locator | missing_formula | false | Foreign-output shock formula is not recorded exactly. |
-| EQ-SHOCK-015 | SHOCK | BCB_WP239 locator | WP239 C.47 locator | missing_formula | false | Foreign-interest shock formula is not recorded exactly. |
-| EQ-SHOCK-016 | SHOCK | BCB_WP239 locator | WP239 C.45 locator | missing_formula | false | Foreign-inflation shock formula is not recorded exactly. |
-| EQ-SHOCK-017 | SHOCK | registry deferred | source locator pending | not_required_for_mvp | false | Commodity shock remains deferred/out of MVP. |
-| EQ-MEAS-001..EQ-MEAS-015 | MEAS | registry draft | WBS-043 measurement drafts | not_required_for_mvp | false | Measurement equations are WBS-059/observables work, not WBS-057. |
+Reference checked: `docs/references/bcb_wp239_samba.pdf`, official BCB WP239 PDF already present locally.
 
-Current result: `samba_classic.mod` remains blocked because MVP-required rows still have `missing_formula`.
+Extraction result: WP239 Appendix C formula locators are available for most model blocks, but several rows are still not Dynare-ready because registry mappings, parameter mappings, calibrated weights, or the output-gap/potential-output formula are unresolved.
+
+| equation_id | block | project_equation_name | wp239_reference | exact_formula_available | source | source_location | registry_mapping | dynare_ready | notes |
+|---|---|---|---|---|---|---|---|---|---|
+| EQ-MON-001 | MON | Forward-looking Taylor rule | C.28 | true | BCB_WP239; project decision | Appendix C.3, PDF page 89; docs/00b MON-001 | `r_t,r_lag,pi_expected,pi_target,y_gap`; `rho_r,phi_pi,phi_y,r_ss`; `eps_monetary` | true | Formula is approved by project decision and source-located in WP239. |
+| EQ-MON-002 | MON | Inflation target treatment | C.29 | true | BCB_WP239; project decision | Appendix C.3, PDF page 89; docs/00b TARGET-001 | `pi_target`; no MVP target shock | true | Deterministic/exogenous target treatment is ready; no `eps_pi_target` in MVP. |
+| EQ-MON-003 | MON | Monetary policy shock | C.60 | true | BCB_WP239 | Appendix C.6, PDF page 93 | `monetary_policy_shock_state`; `eps_monetary`; no persistence parameter in MVP registry | true | Exact shock process is available; variance remains WBS-058. |
+| EQ-EXT-001 | EXT | UIP with NFA debt-elastic risk premium | C.37-C.47 | true | BCB_WP239; project decision | Appendix C.4-C.5, PDF pages 90-91; docs/00b EXT-001 | `q,delta_q_expected,r_t,pi_expected,r_star,pi_star,nfa,risk`; `psi_nfa,nfa_ss` | true | UIP baseline is project-approved; broader external accounting remains separate. |
+| EQ-EXT-002 | EXT | Risk premium AR(1) process | C.50 | true | BCB_WP239; project decision | Appendix C.6, PDF page 92; docs/00b EXT-001 | `risk,risk_lag`; `rho_risk`; `eps_risk` | true | Risk AR(1) is source-located and calibrated. |
+| EQ-EXT-003 | EXT | NFA law of motion and external accounting | C.37-C.39; equations 78-80 | true | BCB_WP239 | Appendix C.4, PDF page 90 | Registry still has `source_located_parameters_pending_calibration` and unmapped accounting weights | false | Formula exists, but Dynare mapping needs exact parameters/weights and project variable mapping. |
+| EQ-EXT-004 | EXT | Real exchange rate sign convention | C.37-C.47 context | true | BCB_WP239; project decision | Appendix C.4-C.5; docs/00b EXT-001 | `q,delta_q`; no parameters | true | Convention row; no separate equation should be added. |
+| EQ-FISC-001 | FISC | Primary surplus target with debt feedback | C.31 | true | BCB_WP239 | Appendix C.3, PDF page 89 | `sp_target,sp_target_lag,b,b_ss`; `rho_sp_target,phi_b`; `eps_sp_target` | true | WP239 C.31 aligns with registry taxonomy; no output-gap term. |
+| EQ-FISC-002 | FISC | Realized primary surplus and government spending instrument | C.30; C.33 | true | BCB_WP239 | Appendix C.3, PDF page 89 | Registry still has `source_located_parameters_pending_calibration` and unmapped fiscal parameters | false | Formula exists, but parameter/variable mapping is incomplete. |
+| EQ-FISC-003 | FISC | Public debt-to-GDP law of motion | C.34 | true | BCB_WP239 | Appendix C.3, PDF page 89 | Registry still has `source_located_parameters_pending_calibration` | false | Debt identity formula exists; coefficients and mapping must be documented before `.mod`. |
+| EQ-FISC-004 | FISC | Fiscal auxiliary tax and primary surplus locators | C.32 | true | BCB_WP239 | Appendix C.3, PDF page 89 | Registry still has `source_located_parameters_pending_calibration` | false | Tax-rate process formula exists, but persistence/shock mapping is not calibrated for WBS-057. |
+| EQ-PRICE-001 | ADMIN | Administered prices rule and inflation equation | C.22-C.23; C.58 context | true | BCB_WP239 | Appendix C.2, PDF page 88; Appendix C.6, PDF page 92 | `pi_a,admin_price_shock_state,delta_q,mc`; `rho_admin,alpha_a_fx,alpha_a_mc`; `eps_admin` | true | Registry locator corrected to separate price rule from C.58 shock process. |
+| EQ-PRICE-002 | ADMIN | Administered prices shock process | C.58 | true | BCB_WP239 | Appendix C.6, PDF page 92 | `admin_price_shock_state,admin_price_shock_lag`; `rho_admin`; `eps_admin` | true | Shock process formula is source-located and calibrated; variance remains WBS-058. |
+| EQ-PRICE-003 | ADMIN | Administered prices observable locator | Table 1 | false | BCB_WP239 | Table 1, PDF page 94 | Measurement row; WBS-059 owns observables | false | Not required for WBS-057 `.mod`. |
+| EQ-HH-001 | HH | Optimizing household intertemporal conditions | C.1-C.10 | true | BCB_WP239 | Appendix C.1, PDF pages 84-86 | Registry still has `source_located_parameters_pending_calibration` | false | Formula block exists, but preference/habit/investment parameter mapping is incomplete. |
+| EQ-HH-002 | HH | Consumption habit contract | C.1-C.10 | true | BCB_WP239 | Appendix C.1, PDF pages 84-86 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but habit-state mapping and parameter sourcing are incomplete. |
+| EQ-HH-003 | HH | Labor supply and real wage contract | C.10-C.13 context | true | BCB_WP239 | Appendix C.1-C.2, PDF pages 86-87 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but wage/labor parameters and shock mapping are incomplete. |
+| EQ-HH-004 | HH | Rule-of-thumb household contract | C.1-C.10 context | true | BCB_WP239 | Appendix C.1, PDF pages 84-86 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but transfers/rule-of-thumb mapping is incomplete. |
+| EQ-FIRM-001 | FIRM | Production and marginal cost contract | C.11-C.17 | true | BCB_WP239 | Appendix C.2, PDF pages 86-87 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but sectoral production and cost-share mapping is incomplete. |
+| EQ-FIRM-002 | FIRM | Price Phillips curve and markup contract | C.14-C.21; C.24-C.27 | true | BCB_WP239 | Appendix C.2, PDF pages 86-88 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but price-rigidity and markup mappings are incomplete. |
+| EQ-FIRM-003 | FIRM | Investment and Tobin's Q contract | C.4-C.9; C.11 | true | BCB_WP239 | Appendix C.1-C.2, PDF pages 85-86 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but investment-adjustment and capital mappings are incomplete. |
+| EQ-FIRM-004 | FIRM | Imported intermediate inputs contract | C.16-C.17; C.38 | true | BCB_WP239 | Appendix C.2-C.4, PDF pages 87 and 90 | Registry still has `source_located_parameters_pending_calibration` | false | Formula exists, but imported-input demand and relative-price mappings are incomplete. |
+| EQ-AGG-001 | AGG | Final goods market clearing | C.35-C.36 | true | BCB_WP239 | Appendix C.4, PDF page 90 | Registry still has `source_located_weights_pending_calibration` | false | Formula exists, but sector weights are not mapped/calibrated. |
+| EQ-AGG-002 | AGG | Absorption and net exports accounting | C.37-C.39 | true | BCB_WP239 | Appendix C.4, PDF page 90 | Registry still has `source_located_weights_pending_calibration` | false | Formula exists, but accounting weights and NFA link mappings are incomplete. |
+| EQ-AGG-003 | AGG | Real GDP and GDP deflator identities | C.40-C.42 | true | BCB_WP239 | Appendix C.5, PDF page 91 | Registry still has `source_located_weights_pending_calibration` | false | Formula exists, but GDP and deflator weights are not mapped/calibrated. |
+| EQ-AGG-004 | AGG | Output gap and potential output accounting | Section 2.6; C.40-C.42 context | false | BCB_WP239; project decision | Section 2.6 and Appendix C.4-C.5 locators | `y,y_pot,y_gap,trend_growth`; formula not yet explicit | false | Exact output-gap/potential-output equation is still missing from project docs. |
+| EQ-SHOCK-001 | SHOCK | Monetary policy innovation | C.60 | true | BCB_WP239 | Appendix C.6, PDF page 93 | Duplicate of EQ-MON-003 shock process | false | Do not implement twice in `.mod`; keep as registry/test linkage. |
+| EQ-SHOCK-002 | SHOCK | Inflation target innovation disabled | C.29 context | false | Project decision | docs/00b TARGET-001 | `eps_pi_target` disabled in calibrated MVP | false | Not required for WBS-057 `.mod`. |
+| EQ-SHOCK-003 | SHOCK | Fiscal government spending innovation | C.61 | true | BCB_WP239 | Appendix C.6, PDF page 93 | Depends on unresolved EQ-FISC-002 government-spending mapping | false | Formula exists, but linked fiscal instrument mapping is incomplete. |
+| EQ-SHOCK-004 | SHOCK | Primary surplus target innovation | C.31 | true | BCB_WP239 | Appendix C.3, PDF page 89 | Duplicate/linkage for EQ-FISC-001 | false | Do not implement as separate duplicate equation. |
+| EQ-SHOCK-005 | SHOCK | Tax rate innovation | C.32 | true | BCB_WP239 | Appendix C.3, PDF page 89 | Depends on unresolved EQ-FISC-004 tax-rate mapping | false | Formula exists, but linked tax-rate process mapping is incomplete. |
+| EQ-SHOCK-006 | SHOCK | Technology innovation | C.51-C.52 | true | BCB_WP239 | Appendix C.6, PDF pages 91-92 | Persistence parameters remain unsourced for WBS-057 calibration | false | Formula exists, but AR parameters are not in `calibration.m`. |
+| EQ-SHOCK-007 | SHOCK | Preference innovation | C.48 | true | BCB_WP239 | Appendix C.6, PDF page 91 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-008 | SHOCK | Investment innovation | C.53 | true | BCB_WP239 | Appendix C.6, PDF page 92 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-009 | SHOCK | Free-price markup innovation | C.57 | true | BCB_WP239 | Appendix C.6, PDF page 92 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-010 | SHOCK | Administered-price innovation | C.58 | true | BCB_WP239 | Appendix C.6, PDF page 92 | Duplicate/linkage for EQ-PRICE-002 | false | Do not implement as separate duplicate equation. |
+| EQ-SHOCK-011 | SHOCK | Wage markup innovation | C.56 | true | BCB_WP239 | Appendix C.6, PDF page 92 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-012 | SHOCK | Import price innovation | C.44 | true | BCB_WP239 | Appendix C.5, PDF page 91 | Foreign/import price mapping remains unresolved | false | Formula exists, but linked price block mapping is incomplete. |
+| EQ-SHOCK-013 | SHOCK | Risk premium innovation | C.50 | true | BCB_WP239; project decision | Appendix C.6, PDF page 92; docs/00b EXT-001 | Duplicate/linkage for EQ-EXT-002 | false | Do not implement twice; use EQ-EXT-002 for risk AR(1). |
+| EQ-SHOCK-014 | SHOCK | Foreign output innovation | C.43 | true | BCB_WP239 | Appendix C.5, PDF page 91 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-015 | SHOCK | Foreign interest rate innovation | C.47 | true | BCB_WP239 | Appendix C.5, PDF page 91 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-016 | SHOCK | Foreign inflation innovation | C.45 | true | BCB_WP239 | Appendix C.5, PDF page 91 | Persistence parameter remains unsourced for WBS-057 calibration | false | Formula exists, but AR parameter is not in `calibration.m`. |
+| EQ-SHOCK-017 | SHOCK | Commodity innovation deferred | no verified WP239 locator | false | Registry deferred | SPEC-only placeholder | Deferred; not enabled for MVP | false | Not required for WBS-057 `.mod`. |
+| EQ-MEAS-001..EQ-MEAS-015 | MEAS | Measurement equations | Table 1 and WBS-043 drafts | false | Registry draft | WBS-043 measurement drafts | Measurement equations are WBS-059/observables work | false | Not required for WBS-057 `.mod`. |
+
+Current result: `samba_classic.mod` remains blocked. Dynare-ready rows: 9. Remaining unresolved MVP-required rows: 27.

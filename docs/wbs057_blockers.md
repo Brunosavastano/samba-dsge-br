@@ -4,14 +4,19 @@ Status: `BLOCKED_WBS057_EQUATION_SOURCES`
 
 WBS-057 remains blocked before `model/samba_classic/samba_classic.mod`.
 
-Missing exact formula count: 34.
+WP239 local reference: available at `docs/references/bcb_wp239_samba.pdf`.
 
-Usable rows currently documented: MON Taylor rule, deterministic target treatment, UIP closure, risk AR(1), exchange-rate sign convention, and duplicate risk-shock mapping.
+Dynare-ready rows: 9.
 
-Main missing blocks: fiscal identities, administered-price WP239 formula, household equations, firm equations, aggregation identities, and most shock processes.
+Remaining unresolved MVP-required rows: 27.
 
-Reason: registry and literature map provide verified locators, but not exact Dynare-ready formulas for all MVP-required equations.
+Exact formula still unavailable: `EQ-AGG-004` output-gap/potential-output accounting.
+
+Formula available but mapping/calibration incomplete:
+`EQ-EXT-003`; `EQ-FISC-002`..`EQ-FISC-004`; `EQ-HH-001`..`EQ-HH-004`; `EQ-FIRM-001`..`EQ-FIRM-004`; `EQ-AGG-001`..`EQ-AGG-003`; `EQ-SHOCK-003`; `EQ-SHOCK-005`..`EQ-SHOCK-009`; `EQ-SHOCK-011`..`EQ-SHOCK-012`; `EQ-SHOCK-014`..`EQ-SHOCK-016`.
+
+Duplicate or not-required rows must not be implemented twice: `EQ-SHOCK-001`, `EQ-SHOCK-002`, `EQ-SHOCK-004`, `EQ-SHOCK-010`, `EQ-SHOCK-013`, `EQ-SHOCK-017`, `EQ-PRICE-003`, and `EQ-MEAS-001..EQ-MEAS-015`.
+
+Next source to check: WP239 Appendix C plus Table 2/Table 3 for every unresolved parameter or weight needed by those formulas.
 
 Do not create `samba_classic.mod`, `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign extension while this status holds.
-
-Exact next action: extract and record exact formulas from WP239 Appendix C into WBS-057 sourcing, then re-evaluate `.mod` readiness.
