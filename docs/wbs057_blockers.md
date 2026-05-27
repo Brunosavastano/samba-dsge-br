@@ -4,6 +4,12 @@ Status: `BLOCKED_WBS057_MOD_TRANSCRIPTION`
 
 WBS-057 source/mapping review is complete, but `model/samba_classic/samba_classic.mod` must not be created until exact executable Dynare equations are transcribed from approved sources.
 
+Blocker classification: missing_formula_text.
+
+Not a mechanical test-contract blocker.
+
+Not a subjective macro-judgment blocker.
+
 WP239 local reference: available at `docs/references/bcb_wp239_samba.pdf`.
 
 Dynare-ready rows: 24.
@@ -12,7 +18,7 @@ Resolved to Dynare-ready in this pass: 15.
 
 Remaining true WBS-057 source blockers: 0.
 
-Remaining WBS-057b implementation blocker: exact executable Dynare equation text is not present in the project docs. The sourcing table records WP239 locations and registry mappings, but not the final equation text needed to create `.mod` without interpretation.
+Remaining WBS-057b implementation blocker: exact executable Dynare equation text is not present in the project docs. The sourcing table records WP239 locations and registry mappings, but not the final equation text needed to create `.mod` without interpretation. Remaining executable formula-text blockers: 1 WBS-level blocker.
 
 Deferred to WBS-058 `shocks.inc`: 11 rows (`EQ-SHOCK-003`, `EQ-SHOCK-005`..`EQ-SHOCK-009`, `EQ-SHOCK-011`..`EQ-SHOCK-012`, `EQ-SHOCK-014`..`EQ-SHOCK-016`).
 

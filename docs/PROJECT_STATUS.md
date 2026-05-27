@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-05-26
+Updated: 2026-05-27
 
 Current gate: Gate 3 started; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
 Execution status: BLOCKED_WBS057_MOD_TRANSCRIPTION.
@@ -9,12 +9,13 @@ Blocked WBS: WBS-057b.
 Previous blocking status: BLOCKED_WBS057_HUMAN_FORMULA_REVIEW.
 Last completed task: WBS-057 source/mapping review for `.mod` rows.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: transcribe exact WP239 Appendix C formulas into WBS-057b implementation inputs, then create `.mod` only from those exact formulas.
-Blockers: WBS-057 sourcing/mapping is complete, but `docs/wbs057_equation_sourcing.md` records source locations and registry mappings rather than exact executable Dynare equation text. Creating `samba_classic.mod` now would require inventing or silently interpreting equations. Dynare-ready rows by source/mapping: 24. Remaining true source blockers: 0. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0.
-Required user action: approve exact formula transcription from WP239 Appendix C/Tables 2-3 into the WBS-057b `.mod` implementation, or provide an approved machine-readable equation source.
-Files changed: `docs/PROJECT_STATUS.md`, `docs/wbs057_blockers.md`, `tests/test_model_outputs.py`.
+Next safe task: transcribe exact WP239 Appendix C formulas into WBS-057b implementation inputs; do not create `.mod` in the same step unless every equation is explicitly transcribed and mapped.
+Blocker classification: missing_formula_text, not a test-contract issue and not a subjective macro judgment.
+Blockers: WBS-057 sourcing/mapping is complete, but `docs/wbs057_equation_sourcing.md` records source locations and registry mappings rather than exact executable Dynare equation text. Creating `samba_classic.mod` now would require inventing or silently interpreting equations. Dynare-ready rows by source/mapping: 24. Remaining true source blockers: 0. Remaining executable formula-text blockers: 1 WBS-level blocker. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0.
+Required user action: run the exact formula-transcription task from WP239 Appendix C/Tables 2-3 or provide an approved machine-readable equation source.
+Files changed: `docs/PROJECT_STATUS.md`, `docs/wbs057_blockers.md`.
 Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed.
-Commit hash: pending for WBS-057b blocker update.
+Commit hash: pending for blocker classification update.
 Safe to continue: false for `.mod` creation until exact executable formulas are transcribed and reviewed. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
 
 Visual status:
@@ -33,7 +34,7 @@ Progress metric: 60/86 WBS complete, approximately 70% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked at WBS-057b | source/mapping complete, but exact executable Dynare formulas are not yet transcribed |
+| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked at WBS-057b | missing executable formula text; source/mapping complete |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
