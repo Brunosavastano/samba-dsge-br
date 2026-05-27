@@ -4,17 +4,17 @@ Updated: 2026-05-26
 
 Current gate: Gate 3 started; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
 Execution status: BLOCKED_WBS057_EQUATION_SOURCES.
-Current PR/WBS: WBS-057a / PR11 mapping blocker classification updated; `samba_classic.mod` not started.
+Current PR/WBS: WBS-057 / PR11 true blocker source review updated; `samba_classic.mod` not started.
 Blocked WBS: WBS-057 / PR11.
 Previous blocking status: BLOCKED_WBS057_EQUATION_SOURCES.
 Last completed task: WBS-056 sourced steady_state.m.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: resolve the 16 remaining true WBS-057 mapping/calibration blockers before creating `.mod`.
-Blockers: `docs/wbs057_equation_sourcing.md` now separates true WBS-057 blockers from WBS-058 shock rows and WBS-059 observable rows. Dynare-ready rows: 9. Remaining true WBS-057 blockers: 16. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0. `EQ-AGG-004` still lacks an exact output-gap/potential-output formula.
-Required user action: authorize resolving the 16 true WBS-057 blockers from WP239 Appendix C and Tables 2/3; do not create `.mod` yet.
+Next safe task: manually transcribe exact WP239 Appendix C formulas and convert Tables 2/3 entries into approved project calibration names for the 16 true WBS-057 blockers.
+Blockers: `docs/wbs057_equation_sourcing.md` now records WBS-057 resolution status for each true blocker. Dynare-ready rows: 9. Resolved to Dynare-ready in this pass: 0. Remaining true WBS-057 blockers: 16. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0. `EQ-AGG-004` still lacks an exact output-gap/potential-output formula.
+Required user action: authorize manual extraction/transcription of the 16 remaining WBS-057 formula and parameter/weight mappings; do not create `.mod` yet.
 Files changed: `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_model_outputs.py`.
-Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed; `model/samba_classic/` artifact check - no `.mod` or `.inc` created.
-Commit hash: pending for WBS-057a classification update.
+Tests run: `python -m pytest` - 74 passed; `git diff --check` - passed; forbidden model artifact check - no `.mod`, `.inc`, outputs, data, estimation, Redux, or sovereign files created.
+Commit hash: pending for WBS-057 true blocker review.
 Safe to continue: false for `.mod`. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
 
 Visual status:

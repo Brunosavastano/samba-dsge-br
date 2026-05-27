@@ -60,6 +60,7 @@ def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
         "source_location",
         "registry_mapping",
         "wbs057a_category",
+        "wbs057_resolution",
         "wbs057_blocking",
         "deferred_to_wbs058",
         "deferred_to_wbs059",
@@ -78,12 +79,23 @@ def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
         "test_contract_issue",
         "reference_extraction_issue",
     }
+    valid_resolutions = {
+        "not_applicable",
+        "resolved_exact_formula_mapped",
+        "resolved_by_registry_mapping",
+        "resolved_by_calibration_or_steady_state_mapping",
+        "not_required_for_wbs057",
+        "still_missing_exact_formula",
+        "still_missing_parameter_or_weight",
+        "requires_manual_researcher_extraction",
+    }
 
     for row in _wbs057_rows():
         assert set(row) == required_columns
         assert row["exact_formula_available"] in {"true", "false"}
         assert row["dynare_ready"] in {"true", "false"}
         assert row["wbs057a_category"] in valid_categories
+        assert row["wbs057_resolution"] in valid_resolutions
         assert row["wbs057_blocking"] in {"true", "false"}
         assert row["deferred_to_wbs058"] in {"true", "false"}
         assert row["deferred_to_wbs059"] in {"true", "false"}
@@ -112,11 +124,21 @@ def test_wbs057_formula_extraction_counts_match_blocker_note():
         if row["deferred_to_wbs059"] == "true"
         and row["equation_id"] not in {"EQ-PRICE-003", "EQ-MEAS-001..EQ-MEAS-015"}
     ]
+    missing_weights = [
+        row for row in rows
+        if row["wbs057_resolution"] == "still_missing_parameter_or_weight"
+    ]
+    missing_formula = [
+        row for row in rows
+        if row["wbs057_resolution"] == "still_missing_exact_formula"
+    ]
 
     assert len(dynare_ready) == 9
     assert len(blocking) == 16
     assert len(deferred_wbs058) == 11
     assert len(deferred_wbs059_from_unresolved_27) == 0
+    assert len(missing_weights) == 15
+    assert len(missing_formula) == 1
     assert any(
         row["equation_id"] == "EQ-AGG-004"
         and row["exact_formula_available"] == "false"
