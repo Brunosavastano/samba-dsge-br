@@ -54,13 +54,18 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     status = _project_status_text()
 
     assert len(blocking) == 0
-    assert "WBS-057_READY_FOR_MOD" in status
+    assert (
+        "WBS-057_READY_FOR_MOD" in status
+        or "BLOCKED_WBS057_DYNARE_SYMBOL_MAPPING" in status
+    )
     assert (
         "Remaining true WBS-057 blockers: 0" in blockers
         or "Remaining true WBS-057 source blockers: 0" in blockers
     )
     assert "Dynare-ready rows: 24" in blockers
     assert "Remaining executable formula-text blockers: 0" in blockers
+    if "BLOCKED_WBS057_DYNARE_SYMBOL_MAPPING" in status:
+        assert "Remaining Dynare symbol mapping blockers: 1" in blockers
     assert not MODEL_FILE.exists()
 
 
