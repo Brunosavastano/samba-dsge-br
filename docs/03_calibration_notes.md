@@ -71,6 +71,24 @@ Posterior means below are allowed as MVP baseline assignments only because the p
 
 Naming blockers are resolved for WBS-055: legacy `rho_a`, `phi_y_sp`, `sp_ss`, `alpha_a_target`, and `alpha_a_m` are tracked as not required for the classic WP239 MVP, while `rho_admin` and `alpha_a_mc` are the canonical sourced names.
 
+## WBS-057 formula parameter and weight mappings
+
+Status: `sourced_for_wbs057_formula_mapping`
+
+These mappings are sourced from WP239 Appendix C and Tables 2/3 for equation mapping only. They do not update `model/samba_classic/calibration.m` and are not claimed as final empirical replication.
+
+| mapping_group | project_names_and_values | source_location | used_by | mapping_status |
+|---|---|---|---|---|
+| expenditure shares | `share_c_y=0.62`; `share_g_y=0.20`; `share_i_y=0.17`; `share_x_y=0.13`; `share_m_y=0.12`; `tax_share_T=0.35`; `share_rule_thumb_c=0.40` | BCB_WP239 Table 2, PDF page 95 / printed page 94 | EQ-FISC-002; EQ-FISC-004; EQ-HH-002; EQ-HH-004; EQ-AGG-001; EQ-AGG-002; EQ-AGG-003 | sourced_for_wbs057_mapping |
+| preference and trend parameters | `beta_tilde=0.989`; `eta_labor_inverse_elasticity=1.00`; `gross_bgp_growth=1.009`; `habit_persistence=0.74`; `intertemporal_eos_inverse=1.30` | BCB_WP239 Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | EQ-HH-001; EQ-HH-002; EQ-HH-003; EQ-FIRM-003; EQ-FISC-003 | sourced_for_wbs057_mapping |
+| production and elasticity parameters | `eps_wage_eos=3`; `eps_input_c=11`; `eps_input_i=11`; `eps_input_g=11`; `eps_input_x=11`; `eps_imported_goods=11`; `capital_income_share=0.448`; `production_labor_share=0.8`; `capital_depreciation=0.015` | BCB_WP239 Table 2, PDF page 95 / printed page 94 | EQ-HH-003; EQ-FIRM-001; EQ-FIRM-002; EQ-FIRM-003; EQ-FIRM-004 | sourced_for_wbs057_mapping |
+| sectoral domestic-cost weights | `domestic_cost_weight_c=0.8418`; `domestic_cost_weight_i=0.79`; `domestic_cost_weight_g=1.00`; `domestic_cost_weight_x=0.9` | BCB_WP239 Table 2, PDF page 95 / printed page 94 | EQ-FIRM-001; EQ-FIRM-002; EQ-FIRM-003; EQ-FIRM-004 | sourced_for_wbs057_mapping |
+| external financing shares | `external_financing_share_c=0.5`; `external_financing_share_i=0.5`; `external_financing_share_x=0.5` | BCB_WP239 Table 2, PDF page 95 / printed page 94 | EQ-EXT-003 | sourced_for_wbs057_mapping |
+| debt and external steady-state anchors | `nfa_ss=-0.68`; `b_ss=2.00`; `external_debt_lom_adjustment=0.0397`; `domestic_debt_lom_adjustment=0.53`; `pi_target_gross_ss=1.011`; `foreign_inflation_gross_ss=1.0064`; `foreign_rate_gross_ss=1.0074`; `country_risk_gross_ss=1.014` | BCB_WP239 Table 2, PDF page 96 / printed page 95 | EQ-EXT-003; EQ-FISC-003; EQ-AGG-002 | sourced_for_wbs057_mapping |
+| imported-input and adjustment parameters | `domestic_imported_eos_c=1.09`; `domestic_imported_eos_i=0.83`; `domestic_imported_eos_x=0.95`; `brazil_exports_row_inputs_eos=0.66`; `investment_adjustment_cost=3.42`; `imports_adjustment_cost_c=0.76`; `imports_adjustment_cost_i=1.97`; `imports_adjustment_cost_x=3.12` | BCB_WP239 Table 3, PDF page 97 / printed page 96 | EQ-FIRM-003; EQ-FIRM-004 | sourced_for_wbs057_mapping |
+| nominal rigidity parameters | `calvo_free_price=0.74`; `calvo_government_price=0.47`; `calvo_investment_price=0.65`; `calvo_export_price=0.77`; `calvo_import_price=0.64`; `calvo_wage=0.75`; `free_price_indexation=0.33`; `government_price_indexation=0.49`; `import_price_indexation=0.65`; `investment_price_indexation=0.55`; `export_price_indexation=0.35`; `wage_indexation=0.49` | BCB_WP239 Table 3, PDF page 97 / printed page 96 | EQ-HH-003; EQ-FIRM-002; EQ-FIRM-004 | sourced_for_wbs057_mapping |
+| fiscal and auxiliary process parameters | `fiscal_surplus_reaction=0.49`; `fiscal_surplus_target_coeff=0.41`; `tax_rate_persistence=0.80`; `domestic_risk_premium_persistence=0.85`; `risk_premium_investor_aversion_coeff=0.03` | BCB_WP239 Tables 2/3, PDF pages 96 and 98 / printed pages 95 and 97 | EQ-FISC-002; EQ-FISC-004; EQ-HH-001; EQ-FIRM-003 | sourced_for_wbs057_mapping |
+
 ## Shock Standard Deviation Scaffold
 
 The registry declares shock names, but shock standard deviations remain pending calibration. This includes `eps_monetary`, `eps_fiscal_g`, `eps_sp_target`, `eps_tax`, `eps_tfp`, `eps_pref`, `eps_investment`, `eps_price_free`, `eps_admin`, `eps_wage`, `eps_import_price`, `eps_risk`, `eps_foreign_y`, `eps_foreign_r`, and `eps_foreign_pi`.

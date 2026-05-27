@@ -42,10 +42,10 @@ def test_wbs057_equation_sourcing_blocks_mod_when_rows_are_not_dynare_ready():
     blockers = BLOCKERS.read_text(encoding="utf-8")
     status = _project_status_text()
 
-    assert len(blocking) == 16
-    assert "BLOCKED_WBS057_EQUATION_SOURCES" in status
-    assert "Remaining true WBS-057 blockers: 16" in blockers
-    assert "Dynare-ready rows: 9" in blockers
+    assert len(blocking) == 1
+    assert "BLOCKED_WBS057_HUMAN_FORMULA_REVIEW" in status
+    assert "Remaining true WBS-057 blockers: 1" in blockers
+    assert "Dynare-ready rows: 24" in blockers
     assert not MODEL_FILE.exists()
 
 
@@ -82,12 +82,12 @@ def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
     valid_resolutions = {
         "not_applicable",
         "resolved_exact_formula_mapped",
+        "resolved_parameter_weight_mapped",
         "resolved_by_registry_mapping",
-        "resolved_by_calibration_or_steady_state_mapping",
+        "resolved_by_calibration_mapping",
         "not_required_for_wbs057",
-        "still_missing_exact_formula",
-        "still_missing_parameter_or_weight",
-        "requires_manual_researcher_extraction",
+        "needs_human_formula_review",
+        "still_missing_in_sources",
     }
 
     for row in _wbs057_rows():
@@ -124,24 +124,30 @@ def test_wbs057_formula_extraction_counts_match_blocker_note():
         if row["deferred_to_wbs059"] == "true"
         and row["equation_id"] not in {"EQ-PRICE-003", "EQ-MEAS-001..EQ-MEAS-015"}
     ]
-    missing_weights = [
+    resolved_weights = [
         row for row in rows
-        if row["wbs057_resolution"] == "still_missing_parameter_or_weight"
+        if row["wbs057_resolution"] == "resolved_parameter_weight_mapped"
     ]
-    missing_formula = [
+    human_review = [
         row for row in rows
-        if row["wbs057_resolution"] == "still_missing_exact_formula"
+        if row["wbs057_resolution"] == "needs_human_formula_review"
+    ]
+    missing = [
+        row for row in rows
+        if row["wbs057_resolution"] == "still_missing_in_sources"
     ]
 
-    assert len(dynare_ready) == 9
-    assert len(blocking) == 16
+    assert len(dynare_ready) == 24
+    assert len(blocking) == 1
     assert len(deferred_wbs058) == 11
     assert len(deferred_wbs059_from_unresolved_27) == 0
-    assert len(missing_weights) == 15
-    assert len(missing_formula) == 1
+    assert len(resolved_weights) == 15
+    assert len(human_review) == 1
+    assert len(missing) == 0
     assert any(
         row["equation_id"] == "EQ-AGG-004"
         and row["exact_formula_available"] == "false"
         and row["wbs057a_category"] == "true_missing_wp239_formula"
+        and row["wbs057_resolution"] == "needs_human_formula_review"
         for row in rows
     )
