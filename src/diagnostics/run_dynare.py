@@ -22,6 +22,7 @@ REQUIRED_MODEL_FILES = (
     "shocks.inc",
     "observables.inc",
 )
+IRF_HORIZON = 20
 
 
 def repo_root() -> Path:
@@ -182,6 +183,11 @@ def run_dynare(
         if mode == "bk":
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write("\nsteady;\ncheck;\n")
+        if mode == "irfs":
+            with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
+                handle.write(
+                    f"\nstoch_simul(order=1, irf={IRF_HORIZON}, nograph, noprint);\n"
+                )
 
         command = build_dynare_command(dynare_path)
         started = time.monotonic()
@@ -208,6 +214,15 @@ def run_dynare(
             else {}
         )
         bk = _parse_bk(completed.stdout) if mode == "bk" else {}
+        irfs = (
+            {
+                "irf_horizon": IRF_HORIZON,
+                "irf_restrictions_evaluated": False,
+                "persistent_outputs_created": False,
+            }
+            if mode == "irfs"
+            else {}
+        )
         status = "passed" if completed.returncode == 0 else "failed"
         returncode = completed.returncode
         if mode == "residuals" and completed.returncode == 0:
@@ -242,6 +257,7 @@ def run_dynare(
             "residual_tolerance": residual_tolerance if mode == "residuals" else None,
             **residuals,
             **bk,
+            **irfs,
             "stdout_tail": _tail(completed.stdout),
             "stderr_tail": _tail(completed.stderr),
         }
@@ -253,7 +269,7 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("smoke", "residuals", "bk"), default="smoke")
+    parser.add_argument("--mode", choices=("smoke", "residuals", "bk", "irfs"), default="smoke")
     parser.add_argument("--dynare", default="dynare")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     parser.add_argument("--residual-tolerance", type=float, default=1e-8)
