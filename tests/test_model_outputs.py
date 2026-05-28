@@ -25,7 +25,29 @@ FORBIDDEN_GENERATED_PATHS = {
     ROOT / "model" / "samba_classic" / "samba_classic.log",
     ROOT / "model" / "samba_classic" / "samba_classic",
     ROOT / "model" / "samba_classic" / "+samba_classic",
+    ROOT / "outputs" / "posterior",
+    ROOT / "outputs" / "backtesting",
+    ROOT / "outputs" / "identification",
 }
+FORBIDDEN_TRACKED_PATH_PREFIXES = (
+    "estimation/",
+    "model/samba_redux/",
+    "model/sovereign_extension/",
+    "outputs/backtesting/",
+    "outputs/identification/",
+    "outputs/posterior/",
+)
+FORBIDDEN_TRACKED_EXACT_PATHS = {
+    "model/samba_classic/priors.inc",
+}
+FORBIDDEN_TRACKED_DYNARE_SUFFIXES = (
+    ".log",
+    "_dynamic.m",
+    "_static.m",
+    "_set_auxiliary_variables.m",
+    "_results.mat",
+    "_mode.mat",
+)
 
 
 def _project_status_text() -> str:
@@ -328,6 +350,57 @@ def test_wbs062_bk_wrapper_passes_only_after_wbs062_completed():
     assert summary["bk_order_condition_verified"] is True
     assert summary["bk_rank_condition_verified"] is True
     assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+
+
+def test_wbs064_gate3_report_records_current_wrapper_evidence_without_dynare_clutter():
+    execution_status = _execution_status()
+    if "WBS-064_COMPLETED" not in execution_status:
+        return
+
+    report = ROOT / "docs" / "wbs064_mvp_calibrated_report.md"
+    user_report = ROOT / "outputs" / "reports" / "mvp_calibrated_report.md"
+    assert report.exists()
+    assert user_report.exists()
+    text = report.read_text(encoding="utf-8")
+
+    assert "Parse/smoke" in text
+    assert "36 equations" in text
+    assert "max absolute residual 0.0" in text
+    assert "26 eigenvalues" in text
+    assert "26 forward-looking variables" in text
+    assert "5 targets" in text
+    assert "0 failed" in text
+    assert "No Bayesian estimation yet." in text
+    assert "No posterior outputs." in text
+    assert "No backtesting outputs." in text
+    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+
+
+def test_no_generated_dynare_clutter_or_future_phase_artifacts_are_tracked():
+    completed = subprocess.run(
+        ["git", "ls-files"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    tracked = completed.stdout.splitlines()
+    forbidden = [
+        path for path in tracked
+        if (
+            path in FORBIDDEN_TRACKED_EXACT_PATHS
+            or path.startswith(FORBIDDEN_TRACKED_PATH_PREFIXES)
+            or (
+                path.startswith("model/samba_classic/")
+                and path.endswith(FORBIDDEN_TRACKED_DYNARE_SUFFIXES)
+            )
+        )
+    ]
+    assert forbidden == []
 
 
 def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():
