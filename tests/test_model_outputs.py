@@ -43,6 +43,15 @@ def _wbs057_formula_rows() -> list[dict[str, str]]:
     return list(csv.DictReader(StringIO(text[body_start:body_end])))
 
 
+def _wbs057_symbol_rows() -> list[dict[str, str]]:
+    text = SOURCING.read_text(encoding="utf-8")
+    start = text.index("## WBS-057b Dynare symbol mapping")
+    fenced = text.index("```csv", start)
+    body_start = text.index("\n", fenced) + 1
+    body_end = text.index("```", body_start)
+    return list(csv.DictReader(StringIO(text[body_start:body_end])))
+
+
 def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     rows = _wbs057_rows()
     blocking = [
@@ -56,16 +65,16 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     assert len(blocking) == 0
     assert (
         "WBS-057_READY_FOR_MOD" in status
-        or "BLOCKED_WBS057_DYNARE_SYMBOL_MAPPING" in status
+        or "BLOCKED_WBS057_SYMBOL_MAPPING" in status
     )
     assert (
         "Remaining true WBS-057 blockers: 0" in blockers
-        or "Remaining true WBS-057 source blockers: 0" in blockers
+        or "Remaining true WBS-057 source blockers: 0" in SOURCING.read_text(encoding="utf-8")
     )
-    assert "Dynare-ready rows: 24" in blockers
-    assert "Remaining executable formula-text blockers: 0" in blockers
-    if "BLOCKED_WBS057_DYNARE_SYMBOL_MAPPING" in status:
-        assert "Remaining Dynare symbol mapping blockers: 1" in blockers
+    assert "Dynare-ready rows by source/formula status: 24" in SOURCING.read_text(encoding="utf-8")
+    assert "Remaining executable formula-text blockers: 0" in SOURCING.read_text(encoding="utf-8")
+    if "BLOCKED_WBS057_SYMBOL_MAPPING" in status:
+        assert "Remaining unresolved symbol rows: 26" in blockers
     assert not MODEL_FILE.exists()
 
 
@@ -88,6 +97,49 @@ def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():
         assert row["source_location"] != ""
         assert row["registry_mapping"] != ""
         assert row["dynare_ready"] == "true"
+
+
+def test_wbs057b_symbol_mapping_records_unresolved_symbols():
+    rows = _wbs057_symbol_rows()
+    allowed_statuses = {
+        "mapped_to_registry",
+        "mapped_to_calibration",
+        "mapped_to_steady_state",
+        "alias_resolved",
+        "not_required_for_wbs057",
+        "missing_canonical_name",
+        "missing_sourced_value",
+        "ambiguous_symbol",
+    }
+    unresolved_statuses = {
+        "missing_canonical_name",
+        "missing_sourced_value",
+        "ambiguous_symbol",
+    }
+    mapped_statuses = allowed_statuses - unresolved_statuses
+    unresolved = [
+        row for row in rows
+        if row["mapping_status"] in unresolved_statuses
+    ]
+
+    assert len(rows) == 33
+    assert len(unresolved) == 26
+    for row in rows:
+        assert row["wp239_symbol"] != ""
+        assert row["economic_meaning"] != ""
+        assert row["type"] in {
+            "endogenous",
+            "parameter",
+            "shock",
+            "steady_state_assignment",
+            "alias",
+        }
+        assert row["source_location"] != ""
+        assert row["used_in_equation_ids"] != ""
+        assert row["mapping_status"] in allowed_statuses
+        if row["mapping_status"] in mapped_statuses:
+            assert row["canonical_project_name"] != ""
+            assert row["dynare_name"] != ""
 
 
 def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():
