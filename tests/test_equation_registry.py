@@ -8,6 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "docs" / "01_equation_registry.md"
 LITERATURE_MAP = ROOT / "docs" / "00a_literature_map.md"
 DATA_DICTIONARY = ROOT / "docs" / "02_data_dictionary.md"
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
+MODEL_FILE = ROOT / "model" / "samba_classic" / "samba_classic.mod"
 
 
 def _csv_block_after(text: str, heading: str) -> list[str]:
@@ -38,6 +40,12 @@ def _pipe_tokens(value: str) -> set[str]:
     return {token for token in value.split("|") if token}
 
 
+def _wbs057_completed() -> bool:
+    return "Execution status: WBS-057_COMPLETED" in PROJECT_STATUS.read_text(
+        encoding="utf-8"
+    )
+
+
 def test_equation_registry_gate2b_is_approved_but_blocks_dynare_until_calibration():
     text = REGISTRY.read_text(encoding="utf-8")
 
@@ -50,7 +58,8 @@ def test_equation_registry_gate2b_is_approved_but_blocks_dynare_until_calibratio
     assert "measurement_draft_registered: true" in text
     assert "Gate 2b is passed for the minimum viable equation registry." in text
     assert "Runtime verification and calibration notes are required" in text
-    assert not list((ROOT / "model").rglob("*.mod")) if (ROOT / "model").exists() else True
+    if (ROOT / "model").exists() and not _wbs057_completed():
+        assert not list((ROOT / "model").rglob("*.mod"))
 
 
 def test_equation_registry_declares_required_entry_fields():
@@ -365,14 +374,14 @@ def test_measurement_registry_entries_are_draft_for_wbs043():
     assert "q_up_means_brl_real_depreciation" in by_variable["q"]["tests"]
     assert "pi_target_deterministic_in_calibrated_mvp" in by_variable["pi_target"]["tests"]
     assert "y_gap_structural_variable_present" in by_variable["y_gap"]["tests"]
-    assert not list((ROOT / "model").rglob("*.mod")) if (ROOT / "model").exists() else True
+    if (ROOT / "model").exists() and not _wbs057_completed():
+        assert not list((ROOT / "model").rglob("*.mod"))
 
 
-def test_wbs057b_symbol_mappings_are_registered_without_model_files():
+def test_wbs057b_symbol_mappings_are_registered_for_model_phase():
     text = REGISTRY.read_text(encoding="utf-8")
     rows = _csv_dicts_after(text, "## 5. WBS-057b Dynare symbol mappings")
     by_symbol = {row["wp239_symbol"]: row for row in rows}
-    model_file = ROOT / "model" / "samba_classic" / "samba_classic.mod"
     allowed_statuses = {
         "mapped_to_registry",
         "mapped_to_calibration",
@@ -397,4 +406,4 @@ def test_wbs057b_symbol_mappings_are_registered_without_model_files():
         row["mapping_status"] == "deferred_to_wbs058_shocks"
         for row in rows
     ) == 7
-    assert not model_file.exists()
+    assert MODEL_FILE.exists() == _wbs057_completed()

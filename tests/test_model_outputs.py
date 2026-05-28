@@ -8,6 +8,11 @@ STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 SOURCING = ROOT / "docs" / "wbs057_equation_sourcing.md"
 BLOCKERS = ROOT / "docs" / "wbs057_blockers.md"
 MODEL_FILE = ROOT / "model" / "samba_classic" / "samba_classic.mod"
+FORBIDDEN_WBS057_FILES = {
+    ROOT / "model" / "samba_classic" / "shocks.inc",
+    ROOT / "model" / "samba_classic" / "observables.inc",
+    ROOT / "model" / "samba_classic" / "priors.inc",
+}
 
 
 def _project_status_text() -> str:
@@ -68,7 +73,8 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
 
     assert len(blocking) == 0
     assert (
-        "WBS-057_READY_FOR_MOD" in execution_status
+        "WBS-057_COMPLETED" in execution_status
+        or "WBS-057_READY_FOR_MOD" in execution_status
         or "BLOCKED_WBS057_SYMBOL_MAPPING" in execution_status
     )
     assert (
@@ -81,7 +87,49 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
         assert "Remaining WBS-057 symbol blockers: 2" in blockers
     if "WBS-057_READY_FOR_MOD" in execution_status:
         assert "Remaining WBS-057 symbol blockers: 0" in blockers
-    assert not MODEL_FILE.exists()
+        assert not MODEL_FILE.exists()
+    if "WBS-057_COMPLETED" in execution_status:
+        assert MODEL_FILE.exists()
+        assert "Dynare parse: passed" in blockers
+    assert all(not path.exists() for path in FORBIDDEN_WBS057_FILES)
+
+
+def test_wbs057_mod_shell_uses_sourced_inputs_without_future_artifacts():
+    status = _project_status_text()
+    execution_status = next(
+        line for line in status.splitlines()
+        if line.startswith("Execution status:")
+    )
+    if "WBS-057_COMPLETED" not in execution_status:
+        return
+
+    text = MODEL_FILE.read_text(encoding="utf-8")
+    required_markers = [
+        "docs/wbs057_equation_sourcing.md",
+        '@#include "calibration.m"',
+        "model(linear);",
+        "EQ-MON-001",
+        "EQ-EXT-003",
+        "EQ-FISC-003",
+        "EQ-PRICE-001",
+        "EQ-HH-001",
+        "EQ-FIRM-002",
+        "EQ-AGG-003",
+    ]
+    forbidden_markers = [
+        "shocks;",
+        "varobs",
+        "estimation",
+        "stoch_simul",
+        '@#include "shocks.inc"',
+        '@#include "observables.inc"',
+        '@#include "priors.inc"',
+    ]
+
+    for marker in required_markers:
+        assert marker in text
+    for marker in forbidden_markers:
+        assert marker not in text
 
 
 def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():

@@ -3,6 +3,13 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
+
+
+def _wbs057_completed() -> bool:
+    return "Execution status: WBS-057_COMPLETED" in PROJECT_STATUS.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_registry_json_is_valid_and_minimal_schema_present():
@@ -40,5 +47,4 @@ def test_registry_keeps_metadata_separate_from_executable_model_files():
     assert registry["status"] == "planned"
     assert registry["dynare_file"].startswith("model/")
     assert "metadata only" in registry["notes"]
-    assert not (ROOT / registry["dynare_file"]).exists()
-
+    assert (ROOT / registry["dynare_file"]).exists() == _wbs057_completed()
