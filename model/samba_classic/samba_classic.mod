@@ -208,6 +208,8 @@ model(linear);
   pi_y = pi + q_y - q_y(-1);
 end;
 
+@#include "shocks.inc"
+
 initval;
   r_t = 0;
   z_r = 0;

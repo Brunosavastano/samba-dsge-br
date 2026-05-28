@@ -99,6 +99,8 @@ def _allowed_executable_model_files() -> set[Path]:
     }
     if re.search(r"Execution status: WBS-057_COMPLETE", text):
         allowed.add(ROOT / "model" / "samba_classic" / "samba_classic.mod")
+    if re.search(r"Execution status: .*WBS-058_COMPLETED", text):
+        allowed.add(ROOT / "model" / "samba_classic" / "shocks.inc")
     return allowed
 
 

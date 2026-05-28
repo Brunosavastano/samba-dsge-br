@@ -93,11 +93,34 @@ These mappings are sourced from WP239 Appendix C and Tables 2/3 for equation map
 | nominal rigidity parameters | `calvo_free_price=0.74`; `calvo_government_price=0.47`; `calvo_investment_price=0.65`; `calvo_export_price=0.77`; `calvo_import_price=0.64`; `calvo_wage=0.75`; `free_price_indexation=0.33`; `government_price_indexation=0.49`; `import_price_indexation=0.65`; `investment_price_indexation=0.55`; `export_price_indexation=0.35`; `wage_indexation=0.49` | BCB_WP239 Table 3, PDF page 97 / printed page 96 | EQ-HH-003; EQ-FIRM-002; EQ-FIRM-004 | sourced_for_wbs057_mapping |
 | fiscal and auxiliary process parameters | `fiscal_surplus_reaction=0.49`; `fiscal_surplus_target_coeff=0.41`; `tax_rate_persistence=0.80`; `domestic_risk_premium_persistence=0.85`; `risk_premium_investor_aversion_coeff=0.03` | BCB_WP239 Tables 2/3, PDF pages 96 and 98 / printed pages 95 and 97 | EQ-FISC-002; EQ-FISC-004; EQ-HH-001; EQ-FIRM-003 | sourced_for_wbs057_mapping |
 
-## Shock Standard Deviation Scaffold
+## WBS-058 shock standard deviation assignments
 
-The registry declares shock names, but shock standard deviations remain pending calibration. This includes `eps_monetary`, `eps_fiscal_g`, `eps_sp_target`, `eps_tax`, `eps_tfp`, `eps_pref`, `eps_investment`, `eps_price_free`, `eps_admin`, `eps_wage`, `eps_import_price`, `eps_risk`, `eps_foreign_y`, `eps_foreign_r`, and `eps_foreign_pi`.
+Status: `sourced_from_samba_posterior_mean_for_shock_stderr`
 
-`eps_pi_target` is documented only as a future-phase shock and remains off in the calibrated MVP.
+The following WP239 Table 3, p. 98 posterior means are used as Dynare `stderr` values for current WBS-058 shock declarations. These are standard deviations, not squared variances, and are not observed macro data.
+
+| wp239_symbol | dynare_shock_name | value | source | source_location | status | usable_in_shocks_inc |
+|---|---|---:|---|---|---|---|
+| epsilon_B | risk_dom | 0.57 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_I | z_i | 3.54 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_C | z_c | 8.80 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_A | eps_admin | 1.40 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_P | z_p | 0.79 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_PiC | pi | 0.14 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_W | z_w | 1.38 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Z | z_z | 0.17 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Q | z_q | 0.80 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Bstar | eps_risk | 0.38 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_G | z_g | 1.73 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_T | eps_tax | 0.48 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Sbar | eps_sp_target | 0.29 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_R | eps_monetary | 0.32 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Pstar | z_px | 3.89 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Pistar | pi_star | 0.85 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_Rstar | r_star | 0.19 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+| epsilon_QMstar | q_m_star | 1.85 | BCB_WP239 | WP239 Table 3, p. 98 | sourced_from_samba_posterior_mean_for_shock_stderr | true |
+
+`eps_pi_target` is documented only as a future-phase shock and remains off in the calibrated MVP. Measurement-error standard deviations are excluded from WBS-058.
 
 ## Steady-State Scaffold
 

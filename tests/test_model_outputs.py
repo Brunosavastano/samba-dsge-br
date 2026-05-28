@@ -8,8 +8,8 @@ STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 SOURCING = ROOT / "docs" / "wbs057_equation_sourcing.md"
 BLOCKERS = ROOT / "docs" / "wbs057_blockers.md"
 MODEL_FILE = ROOT / "model" / "samba_classic" / "samba_classic.mod"
+SHOCKS_FILE = ROOT / "model" / "samba_classic" / "shocks.inc"
 FORBIDDEN_WBS057_FILES = {
-    ROOT / "model" / "samba_classic" / "shocks.inc",
     ROOT / "model" / "samba_classic" / "observables.inc",
     ROOT / "model" / "samba_classic" / "priors.inc",
 }
@@ -92,6 +92,8 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
         assert MODEL_FILE.exists()
         assert "Dynare parse: passed" in blockers
     assert all(not path.exists() for path in FORBIDDEN_WBS057_FILES)
+    if "WBS-058_COMPLETED" not in execution_status:
+        assert not SHOCKS_FILE.exists()
 
 
 def test_wbs057_mod_shell_uses_sourced_inputs_without_future_artifacts():
@@ -117,19 +119,63 @@ def test_wbs057_mod_shell_uses_sourced_inputs_without_future_artifacts():
         "EQ-AGG-003",
     ]
     forbidden_markers = [
-        "shocks;",
         "varobs",
         "estimation",
         "stoch_simul",
-        '@#include "shocks.inc"',
         '@#include "observables.inc"',
         '@#include "priors.inc"',
     ]
+    if "WBS-058_COMPLETED" not in execution_status:
+        forbidden_markers.extend(["shocks;", '@#include "shocks.inc"'])
 
     for marker in required_markers:
         assert marker in text
     for marker in forbidden_markers:
         assert marker not in text
+
+
+def test_wbs058_shocks_include_uses_wp239_stderr_values_only_after_wbs058():
+    status = _project_status_text()
+    execution_status = next(
+        line for line in status.splitlines()
+        if line.startswith("Execution status:")
+    )
+    if "WBS-058_COMPLETED" not in execution_status:
+        return
+
+    assert SHOCKS_FILE.exists()
+    text = SHOCKS_FILE.read_text(encoding="utf-8")
+    model_text = MODEL_FILE.read_text(encoding="utf-8")
+    expected = {
+        "risk_dom": "0.57",
+        "z_i": "3.54",
+        "z_c": "8.80",
+        "eps_admin": "1.40",
+        "z_p": "0.79",
+        "pi": "0.14",
+        "z_w": "1.38",
+        "z_z": "0.17",
+        "z_q": "0.80",
+        "eps_risk": "0.38",
+        "z_g": "1.73",
+        "eps_tax": "0.48",
+        "eps_sp_target": "0.29",
+        "eps_monetary": "0.32",
+        "z_px": "3.89",
+        "pi_star": "0.85",
+        "r_star": "0.19",
+        "q_m_star": "1.85",
+    }
+
+    assert "WP239 Table 3, p. 98" in text
+    assert "shocks;" in text
+    assert '@#include "shocks.inc"' in model_text
+    assert "varobs" not in text
+    assert "estimation" not in text
+    assert "stoch_simul" not in text
+    for shock, stderr in expected.items():
+        assert f"var {shock};" in text
+        assert f"stderr {stderr};" in text
 
 
 def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():

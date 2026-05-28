@@ -1,19 +1,11 @@
 # WBS-058 Blockers
 
-Status: `BLOCKED_WBS058_SHOCK_STD_VALUES`
+Status: `WBS-058_COMPLETED`
 
-WBS-058 remains blocked. `model/samba_classic/shocks.inc` was not created.
+Remaining WBS-058 blockers: 0.
 
-Required sourced standard deviations or variances are missing for:
+`model/samba_classic/shocks.inc` was created using assistant-verified WP239 Table 3, p. 98 posterior means as Dynare `stderr` values.
 
-- `eps_monetary`
-- `eps_risk`
-- `eps_sp_target`
-- `eps_tax`
-- `eps_admin`
+Measurement-error standard deviations from WP239 Table 3 are not used in WBS-058.
 
-Deferred WBS-058 shock-state processes also lack sourced standard deviations: `z_q`, `z_c`, `z_z`, `z_i`, `z_d`, `z_m`, and `z_p`.
-
-Exact source needed: WP239/SAMBA public reference or approved project document with numeric standard deviation or variance values for each WBS-058 shock declaration.
-
-Next action: source shock standard deviations before creating `shocks.inc`.
+Next task: WBS-059 `observables.inc`.
