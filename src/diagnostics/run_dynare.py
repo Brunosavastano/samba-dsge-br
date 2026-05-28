@@ -93,6 +93,9 @@ def _run_command(
 RESIDUAL_RE = re.compile(
     r"Equation number\s+\d+:\s+.*?:\s+([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][-+]?\d+)?|NaN|Inf|-Inf)\s*$"
 )
+BK_COUNT_RE = re.compile(
+    r"There are\s+(\d+)\s+eigenvalue\(s\) larger than 1 in modulus for\s+(\d+)\s+forward-looking variable\(s\)\."
+)
 
 
 def _parse_residuals(stdout: str) -> dict[str, Any]:
@@ -113,6 +116,31 @@ def _parse_residuals(stdout: str) -> dict[str, Any]:
         "residual_equation_count": len(values),
         "nonfinite_residual_count": nonfinite,
         "max_abs_residual": max(finite_abs) if finite_abs else None,
+    }
+
+
+def _parse_bk(stdout: str) -> dict[str, Any]:
+    eigenvalues_larger_than_one = None
+    forward_looking_variables = None
+    for line in stdout.splitlines():
+        match = BK_COUNT_RE.search(line)
+        if match:
+            eigenvalues_larger_than_one = int(match.group(1))
+            forward_looking_variables = int(match.group(2))
+            break
+
+    order_verified = "The order condition is verified." in stdout
+    rank_verified = "The rank condition is verified." in stdout
+    order_not_verified = "The order condition is NOT verified." in stdout
+    indeterminacy = "indeterminacy" in stdout.lower()
+
+    return {
+        "eigenvalues_larger_than_one": eigenvalues_larger_than_one,
+        "forward_looking_variables": forward_looking_variables,
+        "bk_order_condition_verified": order_verified,
+        "bk_rank_condition_verified": rank_verified,
+        "bk_order_condition_not_verified": order_not_verified,
+        "bk_indeterminacy_reported": indeterminacy,
     }
 
 
@@ -150,6 +178,9 @@ def run_dynare(
         if mode == "residuals":
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write("\nresid;\n")
+        if mode == "bk":
+            with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
+                handle.write("\nsteady;\ncheck;\n")
 
         command = build_dynare_command(dynare_path)
         started = time.monotonic()
@@ -175,6 +206,7 @@ def run_dynare(
             if mode == "residuals"
             else {}
         )
+        bk = _parse_bk(completed.stdout) if mode == "bk" else {}
         status = "passed" if completed.returncode == 0 else "failed"
         returncode = completed.returncode
         if mode == "residuals" and completed.returncode == 0:
@@ -187,6 +219,15 @@ def run_dynare(
             )
             status = "passed" if residuals_pass else "failed"
             returncode = 0 if residuals_pass else 1
+        if mode == "bk" and completed.returncode == 0:
+            bk_pass = (
+                bk["bk_order_condition_verified"]
+                and bk["bk_rank_condition_verified"]
+                and not bk["bk_order_condition_not_verified"]
+                and not bk["bk_indeterminacy_reported"]
+            )
+            status = "passed" if bk_pass else "failed"
+            returncode = 0 if bk_pass else 1
 
         return {
             "mode": mode,
@@ -199,6 +240,7 @@ def run_dynare(
             "elapsed_seconds": elapsed,
             "residual_tolerance": residual_tolerance if mode == "residuals" else None,
             **residuals,
+            **bk,
             "stdout_tail": _tail(completed.stdout),
             "stderr_tail": _tail(completed.stderr),
         }
@@ -210,7 +252,7 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("smoke", "residuals"), default="smoke")
+    parser.add_argument("--mode", choices=("smoke", "residuals", "bk"), default="smoke")
     parser.add_argument("--dynare", default="dynare")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     parser.add_argument("--residual-tolerance", type=float, default=1e-8)

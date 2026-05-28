@@ -251,6 +251,14 @@ def test_wbs060_dynare_wrapper_exists_and_constructs_smoke_command_after_wbs060(
         "nonfinite_residual_count": 0,
         "max_abs_residual": 0.0,
     }
+    bk_summary = wrapper._parse_bk(
+        "There are 26 eigenvalue(s) larger than 1 in modulus for 28 forward-looking variable(s).\n"
+        "The order condition is NOT verified.\n"
+    )
+    assert bk_summary["eigenvalues_larger_than_one"] == 26
+    assert bk_summary["forward_looking_variables"] == 28
+    assert bk_summary["bk_order_condition_not_verified"] is True
+    assert bk_summary["bk_order_condition_verified"] is False
     assert set(wrapper.REQUIRED_MODEL_FILES) == {
         "samba_classic.mod",
         "calibration.m",
@@ -282,6 +290,32 @@ def test_wbs060_dynare_wrapper_smoke_runs_in_temp_without_repo_outputs_after_wbs
     assert summary["status"] == "passed"
     assert summary["working_directory"] == "temporary"
     assert summary["returncode"] == 0
+    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+
+
+def test_wbs062_bk_wrapper_passes_only_after_wbs062_completed():
+    execution_status = _execution_status()
+    if "WBS-062_COMPLETED" not in execution_status:
+        return
+    if shutil.which("dynare") is None:
+        pytest.skip("Dynare is unavailable on PATH.")
+
+    completed = subprocess.run(
+        [sys.executable, str(WRAPPER_FILE), "--mode", "bk"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=240,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["status"] == "passed"
+    assert summary["bk_order_condition_verified"] is True
+    assert summary["bk_rank_condition_verified"] is True
     assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
 
 
