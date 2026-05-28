@@ -61,11 +61,15 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     ]
     blockers = BLOCKERS.read_text(encoding="utf-8")
     status = _project_status_text()
+    execution_status = next(
+        line for line in status.splitlines()
+        if line.startswith("Execution status:")
+    )
 
     assert len(blocking) == 0
     assert (
-        "WBS-057_READY_FOR_MOD" in status
-        or "BLOCKED_WBS057_SYMBOL_MAPPING" in status
+        "WBS-057_READY_FOR_MOD" in execution_status
+        or "BLOCKED_WBS057_SYMBOL_MAPPING" in execution_status
     )
     assert (
         "Remaining true WBS-057 blockers: 0" in blockers
@@ -73,8 +77,10 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     )
     assert "Dynare-ready rows by source/formula status: 24" in SOURCING.read_text(encoding="utf-8")
     assert "Remaining executable formula-text blockers: 0" in SOURCING.read_text(encoding="utf-8")
-    if "BLOCKED_WBS057_SYMBOL_MAPPING" in status:
+    if "BLOCKED_WBS057_SYMBOL_MAPPING" in execution_status:
         assert "Remaining WBS-057 symbol blockers: 2" in blockers
+    if "WBS-057_READY_FOR_MOD" in execution_status:
+        assert "Remaining WBS-057 symbol blockers: 0" in blockers
     assert not MODEL_FILE.exists()
 
 
@@ -129,7 +135,7 @@ def test_wbs057b_symbol_mapping_records_unresolved_symbols():
         if row["mapping_status"] == "deferred_to_wbs058_shocks"
     ]
 
-    assert len(unresolved) == 2
+    assert len(unresolved) == 0
     assert len(deferred) == 7
     for row in rows:
         assert row["wp239_symbol"] != ""
@@ -151,9 +157,9 @@ def test_wbs057b_symbol_mapping_records_unresolved_symbols():
         if row["mapping_status"] in mapped_statuses:
             assert row["canonical_project_name"] != ""
             assert row["dynare_name"] != ""
-        if row["mapping_status"] == "missing_sourced_value":
-            assert row["wp239_symbol"] in {"theta_A", "chi_A"}
-            assert row["canonical_project_name"] in {"theta_admin", "chi_admin"}
+    by_symbol = {row["wp239_symbol"]: row for row in rows}
+    assert by_symbol["theta_A"]["mapping_status"] == "mapped_to_calibration"
+    assert by_symbol["chi_A"]["mapping_status"] == "mapped_to_calibration"
 
 
 def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():

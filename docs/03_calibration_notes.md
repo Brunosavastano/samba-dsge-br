@@ -68,8 +68,12 @@ Posterior means below are allowed as MVP baseline assignments only because the p
 | alpha_a_m | alpha_a_mc | alpha_a_m deprecated | ADMIN | Legacy imported-inflation pass-through in administered prices |  |  |  | not_required_for_mvp | false | WP239 Table 3 has a marginal-cost coefficient, not an imported-inflation coefficient. |
 | alpha_a_mc | alpha_a_mc | vartheta_A_2 | ADMIN | Marginal-cost coefficient in administered price rule | 0.20 | BCB_WP239 | Table 3 estimated parameters, PDF page 98 / printed page 97, administered price rule row | sourced_from_samba_posterior_mean | true | Canonical replacement for the legacy alpha_a_m imported-inflation mapping. |
 | rho_admin | rho_admin | rho_A | ADMIN | Administered-price shock persistence | 0.37 | BCB_WP239 | Table 3 estimated parameters, PDF page 98 / printed page 97, administered prices row; Appendix C.6 C.58, PDF page 92 / printed page 91 | sourced_from_samba_posterior_mean | true | Canonical administered-price AR(1) persistence for the classic MVP. |
+| theta_admin | theta_admin | theta_A | ADMIN | Fraction/probability of administered-price firms allowed to adjust according to the administered-price rule | 0.25 | BCB_WP239 | Administered-price sector, administered-price rule discussion around C.22-C.23, PDF page 29 / printed page 28 | sourced_from_samba | true | WP239 states theta_A = 1/4 because administered prices are usually allowed to change once a year; do not confuse with CPI weight omega_A. |
+| chi_admin | chi_admin | chi_A | ADMIN | Convergence parameter in administered-price rule | 0.8 | BCB_WP239 | Calibrated-parameters discussion, PDF page 49 / printed page 48 | sourced_from_samba | true | Administered-price rule convergence parameter for WBS-057. |
 
 Naming blockers are resolved for WBS-055: legacy `rho_a`, `phi_y_sp`, `sp_ss`, `alpha_a_target`, and `alpha_a_m` are tracked as not required for the classic WP239 MVP, while `rho_admin` and `alpha_a_mc` are the canonical sourced names.
+
+Administered-price CPI weight distinction: `omega_admin` maps to WP239 `omega_A` / `varpi_A`, value `0.3`, sourced from the WP239 calibrated-parameters discussion, PDF page 49 / printed page 48. It is the CPI weight of administered-price inflation and is not `theta_admin`; it is documented as sourced but not required for WBS-057 `calibration.m`.
 
 ## WBS-057 formula parameter and weight mappings
 

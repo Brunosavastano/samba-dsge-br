@@ -226,6 +226,8 @@ def test_administered_prices_registry_entries_are_complete_for_wbs038():
     assert "rho_admin" in price_parameters
     assert "alpha_a_fx" in price_parameters
     assert "alpha_a_mc" in price_parameters
+    assert "theta_admin" in price_parameters
+    assert "chi_admin" in price_parameters
     assert "rho_a" not in price_parameters
     assert "alpha_a_target" not in price_parameters
     assert "alpha_a_m" not in price_parameters
@@ -373,9 +375,9 @@ def test_wbs057b_symbol_mappings_are_registered_without_model_files():
     model_file = ROOT / "model" / "samba_classic" / "samba_classic.mod"
     allowed_statuses = {
         "mapped_to_registry",
+        "mapped_to_calibration",
         "alias_resolved",
         "deferred_to_wbs058_shocks",
-        "missing_sourced_value",
     }
 
     assert len(rows) == 26
@@ -384,14 +386,13 @@ def test_wbs057b_symbol_mappings_are_registered_without_model_files():
     assert by_symbol["piH_t"]["dynare_name"] == "pi_g|pi_i"
     assert by_symbol["vH_t"]["dynare_name"] == "v_g|v_i"
     assert by_symbol["theta_A"]["dynare_name"] == "theta_admin"
+    assert by_symbol["theta_A"]["mapping_status"] == "mapped_to_calibration"
     assert by_symbol["chi_A"]["dynare_name"] == "chi_admin"
+    assert by_symbol["chi_A"]["mapping_status"] == "mapped_to_calibration"
     assert {
         row["mapping_status"] for row in rows
     }.issubset(allowed_statuses)
-    assert sum(
-        row["mapping_status"] == "missing_sourced_value"
-        for row in rows
-    ) == 2
+    assert all(row["mapping_status"] != "missing_sourced_value" for row in rows)
     assert sum(
         row["mapping_status"] == "deferred_to_wbs058_shocks"
         for row in rows

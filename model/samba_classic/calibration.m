@@ -15,3 +15,5 @@ phi_b = 0.02;
 alpha_a_fx = 0.05;
 alpha_a_mc = 0.20;
 rho_admin = 0.37;
+theta_admin = 0.25;
+chi_admin = 0.8;

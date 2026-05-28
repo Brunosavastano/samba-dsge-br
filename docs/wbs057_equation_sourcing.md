@@ -1,6 +1,6 @@
 # WBS-057 Equation Sourcing
 
-Status: `BLOCKED_WBS057_SYMBOL_MAPPING`
+Status: `WBS-057_READY_FOR_MOD`
 
 Scope: formula extraction and readiness classification for WBS-057 only. This file does not authorize `samba_classic.mod`, `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign work.
 
@@ -93,7 +93,7 @@ EQ-AGG-003,transcribed,"C.40: y_t = sC*c_t + sI*i_t + sG*g_t + sX*x_t - sM*m_t. 
 
 ## WBS-057b Dynare symbol mapping
 
-Status: `blocked_missing_wbs057_parameter_values`.
+Status: `symbol_mapping_complete_for_wbs057`.
 
 The rows below track WP239 formula symbols whose Dynare implementation status was checked against the registry, calibration notes, `calibration.m`, and `steady_state.m`. Missing or ambiguous rows block `.mod` creation; no new symbol, alias, value, equation, or model file is introduced here.
 
@@ -130,8 +130,8 @@ vF_t,Free-price indexation rule,v_f,v_f,endogenous_aux,WP239 Appendix C.2 C.21,E
 vH_t,Sectoral indexation rule template for H=G/I,v_g|v_i,v_g|v_i,template_alias_expanded,WP239 Appendix C.2 C.19,EQ-FIRM-002,alias_resolved
 vM_t,Import-price indexation rule,v_m,v_m,endogenous_aux,WP239 Appendix C.2 C.14,EQ-FIRM-002,mapped_to_registry
 vX_t,Export-price indexation rule,v_x,v_x,endogenous_aux,WP239 Appendix C.2 C.26,EQ-FIRM-002,mapped_to_registry
-theta_A,Administered-price weight in C.22/C.23,theta_admin,theta_admin,parameter,WP239 Appendix C.2 C.22-C.23,EQ-PRICE-001,missing_sourced_value
-chi_A,Backward-looking administered-price rule weight,chi_admin,chi_admin,parameter,WP239 Appendix C.2 C.23,EQ-PRICE-001,missing_sourced_value
+theta_A,Fraction/probability of administered-price firms allowed to adjust according to the administered-price rule,theta_admin,theta_admin,parameter,WP239 administered-price sector C.22-C.23 and docs/03 WBS-055,EQ-PRICE-001,mapped_to_calibration
+chi_A,Convergence parameter in administered-price rule,chi_admin,chi_admin,parameter,WP239 calibrated-parameters discussion and docs/03 WBS-055,EQ-PRICE-001,mapped_to_calibration
 ```
 
-Current result: WBS-057b formula text is transcribed and assistant-reviewed symbol mappings have been applied. Dynare-ready rows by source/formula status: 24. WBS-057 rows resolved to Dynare-ready in the formula/weight pass: 15. Remaining true WBS-057 source blockers: 0. Remaining executable formula-text blockers: 0. Remaining WBS-057 symbol blockers: 2 parameters (`theta_admin`, `chi_admin`) missing sourced numeric values. Deferred WBS-058 equation rows: 11. Deferred WBS-058 shock-process symbol rows: 7. Deferred WBS-059 rows among the 27 unresolved items: 0.
+Current result: WBS-057b formula text is transcribed and assistant-reviewed symbol mappings have been applied. Dynare-ready rows by source/formula status: 24. WBS-057 rows resolved to Dynare-ready in the formula/weight pass: 15. Remaining true WBS-057 source blockers: 0. Remaining executable formula-text blockers: 0. Remaining WBS-057 symbol blockers: 0. Deferred WBS-058 equation rows: 11. Deferred WBS-058 shock-process symbol rows: 7. Deferred WBS-059 rows among the 27 unresolved items: 0. WBS-057 is ready for `samba_classic.mod`; this file does not create the model file.

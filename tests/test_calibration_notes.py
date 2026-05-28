@@ -24,6 +24,7 @@ PLACEHOLDER_PARAMETERS = {
     "std_pending_source_locator",
 }
 ALLOWED_SOURCE_STATUSES = {
+    "sourced_from_samba",
     "sourced_from_samba_calibration",
     "sourced_from_samba_posterior_mean",
     "sourced_from_samba_posterior_mode",
@@ -235,6 +236,7 @@ def test_wbs055_source_status_counts_match_wp239_review():
         counts[row["status"]] += 1
 
     assert counts["sourced_from_samba_calibration"] == 2
+    assert counts["sourced_from_samba"] == 2
     assert counts["sourced_from_samba_posterior_mean"] == 10
     assert counts["sourced_from_samba_posterior_mode"] == 0
     assert counts["estimated_in_samba_no_point_value_found"] == 0
@@ -255,6 +257,7 @@ def test_wbs055_has_no_approved_numeric_values_without_source():
             assert has_confirmed_source
             assert row["status"] in {
                 "sourced_from_samba_calibration",
+                "sourced_from_samba",
                 "sourced_from_samba_posterior_mean",
                 "sourced_from_samba_posterior_mode",
                 "sourced_from_project_decision",
