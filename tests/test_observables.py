@@ -5,6 +5,10 @@ from io import StringIO
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DICTIONARY = ROOT / "docs" / "02_data_dictionary.md"
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
+WBS059_SOURCING = ROOT / "docs" / "wbs059_observable_sourcing.md"
+WBS059_BLOCKERS = ROOT / "docs" / "wbs059_blockers.md"
+OBSERVABLES_INC = ROOT / "model" / "samba_classic" / "observables.inc"
 
 
 def _csv_block_after(text: str, heading: str) -> list[dict[str, str]]:
@@ -72,3 +76,19 @@ def test_wbs029_revision_policy_contract_is_documented():
     assert "data_created: false" in text
     assert "pipeline_created: false" in text
     assert not (ROOT / "src" / "data_pipeline").exists()
+
+
+def test_wbs059_blocks_observables_until_measurement_mappings_are_ready():
+    status = PROJECT_STATUS.read_text(encoding="utf-8")
+    if "BLOCKED_WBS059_MEASUREMENT_MAPPING" not in status:
+        return
+
+    sourcing = WBS059_SOURCING.read_text(encoding="utf-8")
+    blockers = WBS059_BLOCKERS.read_text(encoding="utf-8")
+
+    assert not OBSERVABLES_INC.exists()
+    assert "No observable is currently marked `usable_in_observables_inc`" in sourcing
+    assert "measurement_transform_pending_gate1b" in blockers
+    assert "BLOCKED_WBS059_MEASUREMENT_MAPPING" in blockers
+    assert "missing_mapping" in sourcing
+    assert "missing_data" in sourcing
