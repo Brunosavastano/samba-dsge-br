@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MODEL_DIR = ROOT / "model" / "samba_classic"
 PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
+DYNARE_WRAPPER = ROOT / "src" / "diagnostics" / "run_dynare.py"
 
 
 def _allowed_executable_model_files() -> set[str]:
@@ -53,3 +54,12 @@ def test_wbs054_does_not_create_executable_model_files():
     ]
 
     assert forbidden == []
+
+
+def test_wbs060_dynare_wrapper_exists_only_after_wbs060_status():
+    text = PROJECT_STATUS.read_text(encoding="utf-8")
+    if "WBS-060_COMPLETED" not in text:
+        assert not DYNARE_WRAPPER.exists()
+        return
+
+    assert DYNARE_WRAPPER.is_file()

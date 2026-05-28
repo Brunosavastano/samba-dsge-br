@@ -1,6 +1,13 @@
 import csv
+import importlib.util
+import json
+import shutil
+import subprocess
+import sys
 from io import StringIO
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,8 +17,14 @@ BLOCKERS = ROOT / "docs" / "wbs057_blockers.md"
 MODEL_FILE = ROOT / "model" / "samba_classic" / "samba_classic.mod"
 SHOCKS_FILE = ROOT / "model" / "samba_classic" / "shocks.inc"
 OBSERVABLES_FILE = ROOT / "model" / "samba_classic" / "observables.inc"
+WRAPPER_FILE = ROOT / "src" / "diagnostics" / "run_dynare.py"
 FORBIDDEN_WBS057_FILES = {
     ROOT / "model" / "samba_classic" / "priors.inc",
+}
+FORBIDDEN_GENERATED_PATHS = {
+    ROOT / "model" / "samba_classic" / "samba_classic.log",
+    ROOT / "model" / "samba_classic" / "samba_classic",
+    ROOT / "model" / "samba_classic" / "+samba_classic",
 }
 
 
@@ -55,6 +68,22 @@ def _wbs057_symbol_rows() -> list[dict[str, str]]:
     body_start = text.index("\n", fenced) + 1
     body_end = text.index("```", body_start)
     return list(csv.DictReader(StringIO(text[body_start:body_end])))
+
+
+def _execution_status() -> str:
+    return next(
+        line for line in _project_status_text().splitlines()
+        if line.startswith("Execution status:")
+    )
+
+
+def _load_dynare_wrapper():
+    spec = importlib.util.spec_from_file_location("run_dynare", WRAPPER_FILE)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
@@ -199,6 +228,53 @@ def test_wbs059_observables_include_uses_wp239_aligned_varobs_only_after_wbs059(
     assert "estimation" not in text
     assert "stoch_simul" not in text
     assert "measurement_errors" not in text
+
+
+def test_wbs060_dynare_wrapper_exists_and_constructs_smoke_command_after_wbs060():
+    if "WBS-060_COMPLETED" not in _execution_status():
+        return
+
+    assert WRAPPER_FILE.exists()
+    wrapper = _load_dynare_wrapper()
+
+    assert wrapper.build_dynare_command("dynare") == [
+        "dynare",
+        "samba_classic.mod",
+        "noclearall",
+        "nolog",
+    ]
+    assert set(wrapper.REQUIRED_MODEL_FILES) == {
+        "samba_classic.mod",
+        "calibration.m",
+        "steady_state.m",
+        "shocks.inc",
+        "observables.inc",
+    }
+
+
+def test_wbs060_dynare_wrapper_smoke_runs_in_temp_without_repo_outputs_after_wbs060():
+    if "WBS-060_COMPLETED" not in _execution_status():
+        return
+    if shutil.which("dynare") is None:
+        pytest.skip("Dynare is unavailable on PATH.")
+
+    completed = subprocess.run(
+        [sys.executable, str(WRAPPER_FILE), "--mode", "smoke"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=240,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["status"] == "passed"
+    assert summary["working_directory"] == "temporary"
+    assert summary["returncode"] == 0
+    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
 
 
 def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():
