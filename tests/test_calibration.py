@@ -1,6 +1,12 @@
 import csv
+import json
 import re
+import shutil
+import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -8,6 +14,8 @@ NOTES = ROOT / "docs" / "03_calibration_notes.md"
 CALIBRATION = ROOT / "model" / "samba_classic" / "calibration.m"
 STEADY_STATE = ROOT / "model" / "samba_classic" / "steady_state.m"
 STEADY_STATE_BLOCKERS = ROOT / "docs" / "steady_state_blockers.md"
+PROJECT_STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
+WRAPPER = ROOT / "src" / "diagnostics" / "run_dynare.py"
 
 
 ASSIGNMENT_RE = re.compile(
@@ -24,6 +32,29 @@ def _source_tracking_rows() -> list[dict[str, str]]:
     text = NOTES.read_text(encoding="utf-8")
     lines = text.splitlines()
     heading = lines.index("## WBS-055 calibration source tracking")
+    table_start = next(
+        idx for idx in range(heading, len(lines))
+        if lines[idx].startswith("| parameter |")
+    )
+    table_lines = []
+
+    for line in lines[table_start:]:
+        if not line.startswith("|"):
+            break
+        table_lines.append(line)
+
+    header = [cell.strip() for cell in table_lines[0].strip("|").split("|")]
+    rows = []
+    for line in table_lines[2:]:
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        rows.append(dict(zip(header, cells)))
+    return rows
+
+
+def _residual_parameter_rows() -> list[dict[str, str]]:
+    text = NOTES.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    heading = lines.index("## WBS-061 residual-blocking parameter assignments")
     table_start = next(
         idx for idx in range(heading, len(lines))
         if lines[idx].startswith("| parameter |")
@@ -101,7 +132,7 @@ def test_calibration_file_exists_and_documents_source():
 
 
 def test_calibration_assigns_only_usable_sourced_parameters():
-    rows = _source_tracking_rows()
+    rows = _source_tracking_rows() + _residual_parameter_rows()
     usable_rows = {
         row["canonical_project_name"]: row
         for row in rows
@@ -167,3 +198,36 @@ def test_wbs056_steady_state_file_exists_and_matches_documented_assignments():
                 "sourced_from_samba",
                 "sourced_from_project_decision",
             }
+
+
+def test_wbs061_steady_state_residuals_below_tolerance_after_wbs061():
+    status = PROJECT_STATUS.read_text(encoding="utf-8")
+    if "WBS-061_COMPLETED" not in status:
+        return
+    if shutil.which("dynare") is None:
+        pytest.skip("Dynare is unavailable on PATH.")
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(WRAPPER),
+            "--mode",
+            "residuals",
+            "--residual-tolerance",
+            "1e-8",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=240,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    summary = json.loads(completed.stdout)
+    assert summary["status"] == "passed"
+    assert summary["residual_equation_count"] > 0
+    assert summary["nonfinite_residual_count"] == 0
+    assert summary["max_abs_residual"] <= 1e-8

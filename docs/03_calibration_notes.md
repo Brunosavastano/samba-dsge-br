@@ -70,10 +70,27 @@ Posterior means below are allowed as MVP baseline assignments only because the p
 | rho_admin | rho_admin | rho_A | ADMIN | Administered-price shock persistence | 0.37 | BCB_WP239 | Table 3 estimated parameters, PDF page 98 / printed page 97, administered prices row; Appendix C.6 C.58, PDF page 92 / printed page 91 | sourced_from_samba_posterior_mean | true | Canonical administered-price AR(1) persistence for the classic MVP. |
 | theta_admin | theta_admin | theta_A | ADMIN | Fraction/probability of administered-price firms allowed to adjust according to the administered-price rule | 0.25 | BCB_WP239 | Administered-price sector, administered-price rule discussion around C.22-C.23, PDF page 29 / printed page 28 | sourced_from_samba | true | WP239 states theta_A = 1/4 because administered prices are usually allowed to change once a year; do not confuse with CPI weight omega_A. |
 | chi_admin | chi_admin | chi_A | ADMIN | Convergence parameter in administered-price rule | 0.8 | BCB_WP239 | Calibrated-parameters discussion, PDF page 49 / printed page 48 | sourced_from_samba | true | Administered-price rule convergence parameter for WBS-057. |
-
 Naming blockers are resolved for WBS-055: legacy `rho_a`, `phi_y_sp`, `sp_ss`, `alpha_a_target`, and `alpha_a_m` are tracked as not required for the classic WP239 MVP, while `rho_admin` and `alpha_a_mc` are the canonical sourced names.
 
 Administered-price CPI weight distinction: `omega_admin` maps to WP239 `omega_A` / `varpi_A`, value `0.3`, sourced from the WP239 calibrated-parameters discussion, PDF page 49 / printed page 48. It is the CPI weight of administered-price inflation and is not `theta_admin`; it is documented as sourced but not required for WBS-057 `calibration.m`.
+
+## WBS-061 residual-blocking parameter assignments
+
+Status: `sourced_for_wbs061_residual_evaluation`
+
+These assignments are added only because WBS-061 residual evaluation requires every parameter used by `samba_classic.mod` to be finite. Values are either WP239 posterior means or deterministic evaluations of WP239 Appendix C formulas using already sourced Table 2/3 parameters. They are not priors, estimation results, or new model equations.
+
+| parameter | canonical_project_name | aliases | block | role | value | source | source_location | status | usable_in_mvp_calibration_m | notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| rho_z_c | rho_z_c | rho_C | SHOCK | Preference shock persistence needed for residual evaluation | 0.13 | BCB_WP239 | Table 3 estimated parameters, PDF page 98 / printed page 97, autoregressive shocks household preference row | sourced_from_samba_posterior_mean | true | Shock standard deviation remains documented in WBS-058. |
+| rho_z_z | rho_z_z | rho_Z | SHOCK | Permanent-technology shock persistence needed for residual evaluation | 0.25 | BCB_WP239 | Table 3 estimated parameters, PDF page 98 / printed page 97, autoregressive shocks permanent technology row | sourced_from_samba_posterior_mean | true | Shock standard deviation remains documented in WBS-058. |
+| rho_z_i | rho_z_i | rho_I | SHOCK | Investment-adjustment shock persistence needed for residual evaluation | 0.33 | BCB_WP239 | Table 3 estimated parameters, PDF page 98 / printed page 97, autoregressive shocks investment adjustment cost row | sourced_from_samba_posterior_mean | true | Shock standard deviation remains documented in WBS-058. |
+| lambda_w | lambda_w | lambda_W | HH | Real-wage Phillips curve slope | 0.01450 | BCB_WP239 | Appendix C.1 C.10, PDF page 86 / printed page 85; Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | derived_from_samba_formula_and_sourced_parameters | true | Formula uses `beta_tilde=0.989`, `theta_w=0.75`, `eps_wage_eos=3`, `eta_labor_inverse_elasticity=1.00`, and `wage_indexation=0.49`. |
+| lambda_m | lambda_m | lambda_M | FIRM | Import-price Phillips curve slope | 0.20646 | BCB_WP239 | Appendix C.2 C.14, PDF page 86 / printed page 85; Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | derived_from_samba_formula_and_sourced_parameters | true | Formula uses `beta_tilde=0.989` and `calvo_import_price=0.64`. |
+| lambda_g | lambda_g | lambda_H for H=G | FIRM | Government-goods price Phillips curve slope | 0.60349 | BCB_WP239 | Appendix C.2 C.18, PDF page 87 / printed page 86; Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | derived_from_samba_formula_and_sourced_parameters | true | Formula uses `beta_tilde=0.989` and `calvo_government_price=0.47`. |
+| lambda_i | lambda_i | lambda_H for H=I | FIRM | Investment-goods price Phillips curve slope | 0.19231 | BCB_WP239 | Appendix C.2 C.18, PDF page 87 / printed page 86; Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | derived_from_samba_formula_and_sourced_parameters | true | Formula uses `beta_tilde=0.989` and `calvo_investment_price=0.65`. |
+| lambda_f | lambda_f | lambda_F | FIRM | Free-price consumption-goods Phillips curve slope | 0.09421 | BCB_WP239 | Appendix C.2 C.20-C.21, PDF page 88 / printed page 87; Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | derived_from_samba_formula_and_sourced_parameters | true | Formula uses `beta_tilde=0.989` and `calvo_free_price=0.74`. |
+| lambda_x | lambda_x | lambda_X | FIRM | Export-price Phillips curve slope | 0.07123 | BCB_WP239 | Appendix C.2 C.25-C.26, PDF page 88 / printed page 87; Tables 2/3, PDF pages 95 and 97 / printed pages 94 and 96 | derived_from_samba_formula_and_sourced_parameters | true | Formula uses `beta_tilde=0.989` and `calvo_export_price=0.77`. |
 
 ## WBS-057 formula parameter and weight mappings
 

@@ -243,6 +243,14 @@ def test_wbs060_dynare_wrapper_exists_and_constructs_smoke_command_after_wbs060(
         "noclearall",
         "nolog",
     ]
+    residual_summary = wrapper._parse_residuals(
+        "Equation number  1: EQ-TEST :       0.000000\n"
+    )
+    assert residual_summary == {
+        "residual_equation_count": 1,
+        "nonfinite_residual_count": 0,
+        "max_abs_residual": 0.0,
+    }
     assert set(wrapper.REQUIRED_MODEL_FILES) == {
         "samba_classic.mod",
         "calibration.m",

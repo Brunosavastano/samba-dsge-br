@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
+import re
 import shutil
 import subprocess
 import sys
@@ -88,13 +90,44 @@ def _run_command(
     )
 
 
-def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> dict[str, Any]:
+RESIDUAL_RE = re.compile(
+    r"Equation number\s+\d+:\s+.*?:\s+([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][-+]?\d+)?|NaN|Inf|-Inf)\s*$"
+)
+
+
+def _parse_residuals(stdout: str) -> dict[str, Any]:
+    values = []
+    nonfinite = 0
+    for line in stdout.splitlines():
+        match = RESIDUAL_RE.search(line)
+        if not match:
+            continue
+        token = match.group(1)
+        value = float(token)
+        values.append(value)
+        if not math.isfinite(value):
+            nonfinite += 1
+
+    finite_abs = [abs(value) for value in values if math.isfinite(value)]
+    return {
+        "residual_equation_count": len(values),
+        "nonfinite_residual_count": nonfinite,
+        "max_abs_residual": max(finite_abs) if finite_abs else None,
+    }
+
+
+def run_dynare(
+    mode: str = "smoke",
+    dynare_executable: str = "dynare",
+    timeout_seconds: int = 180,
+    residual_tolerance: float = 1e-8,
+) -> dict[str, Any]:
     root = repo_root()
     source_dir = samba_model_dir(root)
     dynare_path = shutil.which(dynare_executable)
     if dynare_path is None:
         return {
-            "mode": "smoke",
+            "mode": mode,
             "status": "unavailable",
             "returncode": 127,
             "model_file": str(source_dir / "samba_classic.mod"),
@@ -114,13 +147,17 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
                 "error": str(exc),
             }
 
+        if mode == "residuals":
+            with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
+                handle.write("\nresid;\n")
+
         command = build_dynare_command(dynare_path)
         started = time.monotonic()
         try:
             completed = _run_command(command, temp_dir, timeout_seconds)
         except subprocess.TimeoutExpired as exc:
             return {
-                "mode": "smoke",
+                "mode": mode,
                 "status": "failed",
                 "returncode": 124,
                 "command": command,
@@ -133,27 +170,58 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
             }
 
         elapsed = round(time.monotonic() - started, 3)
+        residuals = (
+            _parse_residuals(completed.stdout)
+            if mode == "residuals"
+            else {}
+        )
+        status = "passed" if completed.returncode == 0 else "failed"
+        returncode = completed.returncode
+        if mode == "residuals" and completed.returncode == 0:
+            max_abs_residual = residuals["max_abs_residual"]
+            residuals_pass = (
+                residuals["residual_equation_count"] > 0
+                and residuals["nonfinite_residual_count"] == 0
+                and max_abs_residual is not None
+                and max_abs_residual <= residual_tolerance
+            )
+            status = "passed" if residuals_pass else "failed"
+            returncode = 0 if residuals_pass else 1
+
         return {
-            "mode": "smoke",
-            "status": "passed" if completed.returncode == 0 else "failed",
-            "returncode": completed.returncode,
+            "mode": mode,
+            "status": status,
+            "returncode": returncode,
+            "dynare_returncode": completed.returncode,
             "command": command,
             "model_file": str(source_dir / "samba_classic.mod"),
             "working_directory": "temporary",
             "elapsed_seconds": elapsed,
+            "residual_tolerance": residual_tolerance if mode == "residuals" else None,
+            **residuals,
             "stdout_tail": _tail(completed.stdout),
             "stderr_tail": _tail(completed.stderr),
         }
 
 
+def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> dict[str, Any]:
+    return run_dynare("smoke", dynare_executable, timeout_seconds)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("smoke",), default="smoke")
+    parser.add_argument("--mode", choices=("smoke", "residuals"), default="smoke")
     parser.add_argument("--dynare", default="dynare")
     parser.add_argument("--timeout-seconds", type=int, default=180)
+    parser.add_argument("--residual-tolerance", type=float, default=1e-8)
     args = parser.parse_args()
 
-    result = run_smoke(args.dynare, args.timeout_seconds)
+    result = run_dynare(
+        args.mode,
+        args.dynare,
+        args.timeout_seconds,
+        args.residual_tolerance,
+    )
     print(json.dumps(result, indent=2, sort_keys=True))
     return int(result["returncode"])
 
