@@ -16,7 +16,7 @@ Required user action: continue to WBS-065 identification protocol only; do not s
 Files changed: `docs/06_model_validation.md`, `docs/wbs064_mvp_calibrated_report.md`, `outputs/reports/mvp_calibrated_report.md`, `docs/PROJECT_STATUS.md`, `tests/test_model_outputs.py`, `tests/test_validation_templates.py`.
 Tests run: `python -m pytest` - 93 passed; `git diff --check` - passed.
 Dynare results: smoke passed; residuals passed with 36 equations and max absolute residual 0.0; BK passed with 26 unstable roots for 26 forward-looking variables and order/rank verified; IRFs passed with 5 targets evaluated, 5 passed, 0 failed.
-Commit hash: pending for WBS-064 completion.
+Commit hash: reported in final response after WBS-064 commit.
 Safe to continue: true for WBS-065 identification protocol; forbidden next without prompt: estimation/MH/priors/backtesting/Redux/sovereign.
 
 Visual status:
