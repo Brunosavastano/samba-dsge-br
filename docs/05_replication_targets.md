@@ -10,6 +10,10 @@ results_created: false
 
 This document is a template. It does not approve replication targets, data, model results, priors, or calibration values.
 
+WBS-063 adds a narrow set of source-backed calibrated-MVP IRF restrictions in
+`docs/wbs063_irf_targets.md`. These are not Gate 6 replication targets and do not
+approve posterior IRF, moment, validation, backtesting, Redux, or sovereign work.
+
 ## Target schema
 
 Every future target row must include:
@@ -31,6 +35,7 @@ Required IRF fields:
 
 ```yaml
 targets_approved: false
+wbs063_mvp_irf_targets_approved: true
 earliest_target_fill_wbs: WBS-074
 requires_gate3_model_outputs: true
 no_source_or_result_invention: true

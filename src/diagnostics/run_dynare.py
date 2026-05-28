@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import math
 import re
@@ -23,6 +24,12 @@ REQUIRED_MODEL_FILES = (
     "observables.inc",
 )
 IRF_HORIZON = 20
+IRF_EPSILON = 1e-10
+
+
+def irf_targets_file(root: Path | None = None) -> Path:
+    base = root if root is not None else repo_root()
+    return base / "docs" / "wbs063_irf_targets.md"
 
 
 def repo_root() -> Path:
@@ -146,6 +153,108 @@ def _parse_bk(stdout: str) -> dict[str, Any]:
     }
 
 
+def _parse_fenced_csv(text: str, marker: str) -> list[dict[str, str]]:
+    start = text.index(marker)
+    fenced = text.index("```csv", start)
+    body_start = text.index("\n", fenced) + 1
+    body_end = text.index("```", body_start)
+    return list(csv.DictReader(text[body_start:body_end].splitlines()))
+
+
+def load_irf_targets(root: Path | None = None) -> list[dict[str, str]]:
+    path = irf_targets_file(root)
+    if not path.exists():
+        return []
+    rows = _parse_fenced_csv(path.read_text(encoding="utf-8"), "## Target rows")
+    return [row for row in rows if row["status"] == "approved_for_wbs063"]
+
+
+def _read_irf_series(path: Path) -> dict[str, list[float]]:
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        rows = csv.DictReader(handle)
+        return {
+            row["field"]: [
+                float(row[f"h{horizon}"])
+                for horizon in range(1, IRF_HORIZON + 1)
+            ]
+            for row in rows
+        }
+
+
+def _window_values(series: list[float], start: int, end: int) -> list[float]:
+    return series[start - 1:end]
+
+
+def evaluate_irf_targets(
+    targets: list[dict[str, str]],
+    irf_series: dict[str, list[float]],
+) -> dict[str, Any]:
+    results = []
+    failures = []
+    for target in targets:
+        field = target["irf_field"]
+        values = irf_series.get(field)
+        if values is None:
+            result = {
+                "target_id": target["target_id"],
+                "passed": False,
+                "reason": f"missing_irf_field:{field}",
+            }
+            results.append(result)
+            failures.append(result)
+            continue
+
+        window_start = int(target["sign_window_start"])
+        window_end = int(target["sign_window_end"])
+        window = _window_values(values, window_start, window_end)
+        expected_sign = target["expected_sign"]
+        if expected_sign == "positive":
+            sign_passed = (
+                all(value >= -IRF_EPSILON for value in window)
+                and any(value > IRF_EPSILON for value in window)
+            )
+        elif expected_sign == "negative":
+            sign_passed = (
+                all(value <= IRF_EPSILON for value in window)
+                and any(value < -IRF_EPSILON for value in window)
+            )
+        else:
+            sign_passed = False
+
+        return_horizon = int(target["return_horizon"])
+        peak_abs = max(abs(value) for value in window)
+        terminal_abs = abs(values[return_horizon - 1])
+        return_rule = target["return_rule"]
+        return_passed = (
+            return_rule == "abs_at_return_horizon_less_than_window_peak"
+            and terminal_abs < peak_abs
+        )
+
+        result = {
+            "target_id": target["target_id"],
+            "irf_field": field,
+            "passed": sign_passed and return_passed,
+            "sign_passed": sign_passed,
+            "return_passed": return_passed,
+            "window_peak_abs": peak_abs,
+            "return_horizon_abs": terminal_abs,
+        }
+        results.append(result)
+        if not result["passed"]:
+            failures.append(result)
+
+    return {
+        "irf_restrictions_evaluated": bool(targets),
+        "irf_target_count": len(targets),
+        "irf_targets_passed": len(targets) - len(failures),
+        "irf_targets_failed": len(failures),
+        "irf_failures": failures,
+        "irf_target_results": results,
+    }
+
+
 def run_dynare(
     mode: str = "smoke",
     dynare_executable: str = "dynare",
@@ -183,10 +292,25 @@ def run_dynare(
         if mode == "bk":
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write("\nsteady;\ncheck;\n")
-        if mode == "irfs":
+        normalized_mode = "irfs" if mode == "irf" else mode
+        if normalized_mode == "irfs":
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write(
                     f"\nstoch_simul(order=1, irf={IRF_HORIZON}, nograph, noprint);\n"
+                    "fid=fopen('irf_series.csv','w');\n"
+                    "fprintf(fid,'field"
+                    + "".join(f",h{horizon}" for horizon in range(1, IRF_HORIZON + 1))
+                    + "\\n');\n"
+                    "fields=fieldnames(oo_.irfs);\n"
+                    "for i=1:length(fields)\n"
+                    "  v=oo_.irfs.(fields{i});\n"
+                    "  fprintf(fid,'%s',fields{i});\n"
+                    f"  for j=1:{IRF_HORIZON}\n"
+                    "    fprintf(fid,',%.15g',v(j));\n"
+                    "  end\n"
+                    "  fprintf(fid,'\\n');\n"
+                    "end\n"
+                    "fclose(fid);\n"
                 )
 
         command = build_dynare_command(dynare_path)
@@ -214,15 +338,15 @@ def run_dynare(
             else {}
         )
         bk = _parse_bk(completed.stdout) if mode == "bk" else {}
-        irfs = (
-            {
+        irfs = {}
+        if normalized_mode == "irfs":
+            targets = load_irf_targets(root)
+            irf_series = _read_irf_series(temp_dir / "irf_series.csv")
+            irfs = {
                 "irf_horizon": IRF_HORIZON,
-                "irf_restrictions_evaluated": False,
                 "persistent_outputs_created": False,
+                **evaluate_irf_targets(targets, irf_series),
             }
-            if mode == "irfs"
-            else {}
-        )
         status = "passed" if completed.returncode == 0 else "failed"
         returncode = completed.returncode
         if mode == "residuals" and completed.returncode == 0:
@@ -244,9 +368,16 @@ def run_dynare(
             )
             status = "passed" if bk_pass else "failed"
             returncode = 0 if bk_pass else 1
+        if normalized_mode == "irfs" and completed.returncode == 0:
+            irf_pass = (
+                irfs["irf_restrictions_evaluated"]
+                and irfs["irf_targets_failed"] == 0
+            )
+            status = "passed" if irf_pass else "failed"
+            returncode = 0 if irf_pass else 1
 
         return {
-            "mode": mode,
+            "mode": normalized_mode,
             "status": status,
             "returncode": returncode,
             "dynare_returncode": completed.returncode,
@@ -269,7 +400,7 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("smoke", "residuals", "bk", "irfs"), default="smoke")
+    parser.add_argument("--mode", choices=("smoke", "residuals", "bk", "irf", "irfs"), default="smoke")
     parser.add_argument("--dynare", default="dynare")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     parser.add_argument("--residual-tolerance", type=float, default=1e-8)
