@@ -9,14 +9,14 @@ Blocked WBS: WBS-057b.
 Previous blocking status: BLOCKED_WBS057_MOD_TRANSCRIPTION.
 Last completed task: WBS-057b exact formula transcription for `.mod` rows.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: resolve the 26 unresolved WP239 symbol mappings before creating `.mod`.
+Next safe task: source or formally defer `theta_admin` and `chi_admin` before creating `.mod`.
 Blocker classification: missing_dynare_symbol_mapping, not a test-contract issue and not a subjective macro judgment.
-Blockers: formula text is transcribed, but exact executable Dynare implementation still needs canonical names and calibration/value mappings for WP239 auxiliary symbols that appear in the formulas but are not yet resolved as project/Dynare symbols. Remaining true source blockers: 0. Remaining executable formula-text blockers: 0. Remaining Dynare symbol mapping blockers: 26 symbols. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0.
-Required user action: resolve or approve canonical mappings/sourced values for the 26 unresolved WP239 symbols; do not create `.mod` until all formula symbols are mapped.
-Files changed: `docs/PROJECT_STATUS.md`, `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `tests/test_model_outputs.py`.
-Tests run: `python -m pytest` - 76 passed; `git diff --check` - passed.
-Commit hash: pending for WBS-057b symbol-mapping blocker update.
-Safe to continue: false for `.mod` creation until WP239 formula symbols are mapped to canonical project/Dynare names and sourced values. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
+Blockers: assistant-reviewed symbol mappings were applied, but `theta_admin` and `chi_admin` still lack sourced numeric values in `docs/03_calibration_notes.md` or `calibration.m`. Remaining true source blockers: 0. Remaining executable formula-text blockers: 0. Remaining WBS-057 symbol blockers: 2 parameters. Deferred WBS-058 rows: 11. Deferred WBS-058 shock-process symbol rows: 7. Deferred WBS-059 rows among the 27 unresolved items: 0.
+Required user action: source or formally defer `theta_admin` and `chi_admin`; do not create `.mod` until the WBS-057 parameter blocker count is zero.
+Files changed: `docs/PROJECT_STATUS.md`, `docs/wbs057_equation_sourcing.md`, `docs/wbs057_blockers.md`, `docs/01_equation_registry.md`, `tests/test_equation_registry.py`, `tests/test_model_outputs.py`.
+Tests run: `python -m pytest` - 77 passed; `git diff --check` - passed.
+Commit hash: pending for assistant-reviewed WBS-057 symbol mappings.
+Safe to continue: false for `.mod` creation until `theta_admin` and `chi_admin` are sourced or formally deferred. Do not create `.mod`, `.inc`, fake outputs, data, estimation, Redux, or sovereign extension.
 
 Visual status:
 
@@ -34,7 +34,7 @@ Progress metric: 60/86 WBS complete, approximately 70% by WBS item count. This i
 | PR 08 equation registry | 034..044 | 11/11 | complete | none |
 | PR 09 dataset generation | 052 | 1/1 | complete | none |
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
-| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked at WBS-057b | 26 WP239 symbols still need canonical Dynare mappings or sourced values |
+| PR 11 Dynare calibrated model | 054..064 | 3/11 | blocked at WBS-057b | `theta_admin` and `chi_admin` lack sourced values |
 | PR 12 identification | 065..067 | 0/3 | blocked | requires solved Gate 3 model |
 | PR 13 estimation smoke/priors | 068..071a | 0/5 | blocked | requires Gate 4 |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
@@ -50,7 +50,7 @@ Gate view:
 | Gate 1b | approved | `docs/gate1b_approval_record.md` |
 | Gate 2a | complete | `docs/00a_literature_map.md` |
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
-| Gate 3 | in progress | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, WBS-057 sourcing, and WBS-057b formula transcription complete; WBS-057b blocked on 26 symbol mappings |
+| Gate 3 | in progress | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, WBS-057 sourcing, formula transcription, and symbol-name mapping complete; WBS-057b blocked on 2 missing parameter values |
 | Gate 4 | not started | no identification outputs |
 | Gate 5a/5b | not started | no estimation outputs |
 | Gate 6 | not started | no validation/backtesting outputs |

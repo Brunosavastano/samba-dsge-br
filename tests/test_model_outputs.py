@@ -74,7 +74,7 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     assert "Dynare-ready rows by source/formula status: 24" in SOURCING.read_text(encoding="utf-8")
     assert "Remaining executable formula-text blockers: 0" in SOURCING.read_text(encoding="utf-8")
     if "BLOCKED_WBS057_SYMBOL_MAPPING" in status:
-        assert "Remaining unresolved symbol rows: 26" in blockers
+        assert "Remaining WBS-057 symbol blockers: 2" in blockers
     assert not MODEL_FILE.exists()
 
 
@@ -107,6 +107,7 @@ def test_wbs057b_symbol_mapping_records_unresolved_symbols():
         "mapped_to_steady_state",
         "alias_resolved",
         "not_required_for_wbs057",
+        "deferred_to_wbs058_shocks",
         "missing_canonical_name",
         "missing_sourced_value",
         "ambiguous_symbol",
@@ -123,16 +124,26 @@ def test_wbs057b_symbol_mapping_records_unresolved_symbols():
     ]
 
     assert len(rows) == 33
-    assert len(unresolved) == 26
+    deferred = [
+        row for row in rows
+        if row["mapping_status"] == "deferred_to_wbs058_shocks"
+    ]
+
+    assert len(unresolved) == 2
+    assert len(deferred) == 7
     for row in rows:
         assert row["wp239_symbol"] != ""
         assert row["economic_meaning"] != ""
         assert row["type"] in {
             "endogenous",
+            "endogenous/shock_state",
             "parameter",
             "shock",
+            "shock_state",
             "steady_state_assignment",
             "alias",
+            "template_alias_expanded",
+            "endogenous_aux",
         }
         assert row["source_location"] != ""
         assert row["used_in_equation_ids"] != ""
@@ -140,6 +151,9 @@ def test_wbs057b_symbol_mapping_records_unresolved_symbols():
         if row["mapping_status"] in mapped_statuses:
             assert row["canonical_project_name"] != ""
             assert row["dynare_name"] != ""
+        if row["mapping_status"] == "missing_sourced_value":
+            assert row["wp239_symbol"] in {"theta_A", "chi_A"}
+            assert row["canonical_project_name"] in {"theta_admin", "chi_admin"}
 
 
 def test_wbs057_sourcing_uses_required_columns_and_boolean_flags():

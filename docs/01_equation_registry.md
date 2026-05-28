@@ -33,7 +33,7 @@ decision_status: approved
 approved_by: Bruno
 approval_date: 2026-05-26
 approval_basis: "Objective Gate 2b checklist authorized by Bruno: core blocks, variables, shocks, parameters, tests, and statuses are versioned and sourced."
-registry_version: 0.11.2-wbs057-source-mapping
+registry_version: 0.11.3-wbs057-symbol-mapping
 created_at: 2026-05-26
 updated_at: 2026-05-26
 ```
@@ -157,4 +157,40 @@ EQ-MEAS-012,MEAS,Import price inflation observable draft,measurement_draft,LM-ME
 EQ-MEAS-013,MEAS,Inflation target observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_inflation_target,pi_target|br_inflation_target,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;pi_target_deterministic_in_calibrated_mvp;eps_pi_target_off,draft,WBS-043,Calibrated MVP treats target as deterministic or exogenous series.
 EQ-MEAS-014,MEAS,Risk premium observable draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_risk_premium,risk|br_risk_premium,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;risk_ar1_structural_process_present;no_data_created,draft,WBS-043,Observable candidate does not replace structural risk process.
 EQ-MEAS-015,MEAS,Output gap observable candidate draft,measurement_draft,LM-MEAS-001,BCB_WP239,WP239 Section 3 Data and Estimation PDF pages 43-53; Table 1 PDF page 94; docs/02_data_dictionary.md br_output_gap,y_gap|br_output_gap,measurement_transform_pending_gate1b,none,measurement_draft_until_gate1b;source_id_tbd_allowed_until_gate1b;y_gap_structural_variable_present;measurement_not_final,draft,WBS-043,Observed or semi-observed output gap remains future Gate 1b or later work.
+```
+
+---
+
+## 5. WBS-057b Dynare symbol mappings
+
+These mappings are assistant-reviewed registry aliases for WBS-057b only. They do not authorize `.mod`, `.inc`, data, outputs, estimation, Redux, or sovereign files.
+
+```csv
+wp239_symbol,canonical_project_name,dynare_name,type,used_in_equation_ids,wbs_assignment,mapping_status
+cO_t,c_o,c_o,endogenous,EQ-HH-001;EQ-HH-002,WBS-057,mapped_to_registry
+sB_t,risk_dom,risk_dom,endogenous/shock_state,EQ-HH-001;EQ-EXT-001;EQ-FIRM-003,WBS-057,mapped_to_registry
+zQ_t,z_q,z_q,shock_state,EQ-EXT-001,WBS-057/WBS-058,mapped_to_registry
+rho_Q,rho_z_q,rho_z_q,parameter,EQ-EXT-001,WBS-058,deferred_to_wbs058_shocks
+rho_C,rho_z_c,rho_z_c,parameter,EQ-HH-001;EQ-HH-003,WBS-058,deferred_to_wbs058_shocks
+rho_Z,rho_z_z,rho_z_z,parameter,EQ-HH-001;EQ-FIRM-003;EQ-FISC-003,WBS-058,deferred_to_wbs058_shocks
+rho_I,rho_z_i,rho_z_i,parameter,EQ-FIRM-003,WBS-058,deferred_to_wbs058_shocks
+rho_D,rho_z_d,rho_z_d,parameter,EQ-FIRM-001,WBS-058,deferred_to_wbs058_shocks
+rho_M,rho_z_m,rho_z_m,parameter,EQ-FIRM-004,WBS-058,deferred_to_wbs058_shocks
+rho_P,rho_z_p,rho_z_p,parameter,EQ-FIRM-002,WBS-058,deferred_to_wbs058_shocks
+qF_t,q_f,q_f,endogenous,EQ-PRICE-001;EQ-FIRM-002,WBS-057,mapped_to_registry
+qG_t,q_g,q_g,endogenous,EQ-FISC-002;EQ-AGG-003,WBS-057,mapped_to_registry
+qI_t,q_i,q_i,endogenous,EQ-FIRM-003;EQ-AGG-003,WBS-057,mapped_to_registry
+qMstar_t,q_m_star,q_m_star,endogenous,EQ-EXT-003;EQ-AGG-002;EQ-AGG-003,WBS-057,mapped_to_registry
+qXstar_t,q_x_star,q_x_star,endogenous,EQ-FIRM-002;EQ-AGG-002;EQ-AGG-003,WBS-057,mapped_to_registry
+zM_t,z_m,z_m,shock_state,EQ-FIRM-004,WBS-057/WBS-058,mapped_to_registry
+piF_t,pi_f,pi_f,endogenous,EQ-FIRM-002;EQ-PRICE-001,WBS-057,mapped_to_registry
+piH_t,pi_g|pi_i,pi_g|pi_i,template_alias_expanded,EQ-FIRM-002,WBS-057,alias_resolved
+piM_t,pi_m,pi_m,endogenous,EQ-FIRM-002;EQ-FIRM-004,WBS-057,mapped_to_registry
+piX_t,pi_x,pi_x,endogenous,EQ-FIRM-002,WBS-057,mapped_to_registry
+vF_t,v_f,v_f,endogenous_aux,EQ-FIRM-002,WBS-057,mapped_to_registry
+vH_t,v_g|v_i,v_g|v_i,template_alias_expanded,EQ-FIRM-002,WBS-057,alias_resolved
+vM_t,v_m,v_m,endogenous_aux,EQ-FIRM-002,WBS-057,mapped_to_registry
+vX_t,v_x,v_x,endogenous_aux,EQ-FIRM-002,WBS-057,mapped_to_registry
+theta_A,theta_admin,theta_admin,parameter,EQ-PRICE-001,WBS-057,missing_sourced_value
+chi_A,chi_admin,chi_admin,parameter,EQ-PRICE-001,WBS-057,missing_sourced_value
 ```

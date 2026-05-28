@@ -1,6 +1,6 @@
 # WBS-057 Equation Sourcing
 
-Status: `WBS-057_READY_FOR_MOD`
+Status: `BLOCKED_WBS057_SYMBOL_MAPPING`
 
 Scope: formula extraction and readiness classification for WBS-057 only. This file does not authorize `samba_classic.mod`, `shocks.inc`, `observables.inc`, outputs, data, estimation, Redux, or sovereign work.
 
@@ -93,7 +93,7 @@ EQ-AGG-003,transcribed,"C.40: y_t = sC*c_t + sI*i_t + sG*g_t + sX*x_t - sM*m_t. 
 
 ## WBS-057b Dynare symbol mapping
 
-Status: `blocked_symbol_mapping`.
+Status: `blocked_missing_wbs057_parameter_values`.
 
 The rows below track WP239 formula symbols whose Dynare implementation status was checked against the registry, calibration notes, `calibration.m`, and `steady_state.m`. Missing or ambiguous rows block `.mod` creation; no new symbol, alias, value, equation, or model file is introduced here.
 
@@ -106,32 +106,32 @@ rho_Bstar,Country risk AR(1) persistence,rho_risk,rho_risk,parameter,WP239 Table
 rho_A,Administered-price shock persistence,rho_admin,rho_admin,parameter,WP239 Table 3 and docs/03 WBS-055,EQ-PRICE-002,mapped_to_calibration
 bY_t,Government debt-to-GDP deviation,b,b,endogenous,docs/01 EQ-FISC-001/EQ-FISC-003 and steady_state.m,EQ-FISC-001;EQ-FISC-003,mapped_to_registry
 piCbar_t,Inflation target deviation,pi_target,pi_target,endogenous,docs/00b TARGET-001 and steady_state.m,EQ-MON-001;EQ-MON-002,mapped_to_registry
-cO_t,Optimizing-household consumption component,,,endogenous,WP239 Appendix C.1 C.1/C.3,EQ-HH-001;EQ-HH-002,missing_canonical_name
-sB_t,Domestic risk-premium wedge,,,endogenous,WP239 Appendix C.1 C.1/C.4/C.5,EQ-HH-001;EQ-EXT-001;EQ-FIRM-003,missing_canonical_name
-zQ_t,Real exchange-rate shock state,,,shock,WP239 Appendix C.1 C.4 and C.6 C.49,EQ-EXT-001,missing_canonical_name
-rho_Q,Real exchange-rate shock persistence,,,parameter,WP239 Appendix C.6 C.49,EQ-EXT-001,missing_sourced_value
-rho_C,Preference shock persistence,,,parameter,WP239 Appendix C.6 C.48,EQ-HH-001;EQ-HH-003,missing_sourced_value
-rho_Z,Trend/permanent-technology shock persistence,,,parameter,WP239 Appendix C.6 C.52,EQ-HH-001;EQ-FIRM-003;EQ-FISC-003,missing_sourced_value
-rho_I,Investment-technology shock persistence,,,parameter,WP239 Appendix C.6 C.53,EQ-FIRM-003,missing_sourced_value
-rho_D,Transitory-technology shock persistence,,,parameter,WP239 Appendix C.6 C.51,EQ-FIRM-001,missing_sourced_value
-rho_M,Import-demand shock persistence,,,parameter,WP239 Appendix C.6 C.54,EQ-FIRM-004,missing_sourced_value
-rho_P,Price-markup shock persistence,,,parameter,WP239 Appendix C.6 C.57,EQ-FIRM-002,missing_sourced_value
-qF_t,Free-price relative price symbol,,,endogenous,WP239 Appendix C.2 C.20-C.23,EQ-PRICE-001;EQ-FIRM-002,ambiguous_symbol
-qG_t,Government-consumption relative price symbol,,,endogenous,WP239 Appendix C.3 C.33 and C.4-C.5,EQ-FISC-002;EQ-AGG-003,ambiguous_symbol
-qI_t,Investment relative price symbol,,,endogenous,WP239 Appendix C.1 C.6 and C.5 C.41,EQ-FIRM-003;EQ-AGG-003,ambiguous_symbol
-qMstar_t,Foreign-currency import-price relative price,,,endogenous,WP239 Appendix C.4-C.5 C.38/C.41/C.44,EQ-EXT-003;EQ-AGG-002;EQ-AGG-003,ambiguous_symbol
-qXstar_t,Export foreign-currency relative price,,,endogenous,WP239 Appendix C.2 C.25-C.27 and C.4-C.5,EQ-FIRM-002;EQ-AGG-002;EQ-AGG-003,ambiguous_symbol
-zM_t,Import-demand shock state,,,shock,WP239 Appendix C.2 C.15/C.17 and C.6 C.54,EQ-FIRM-004,ambiguous_symbol
-piF_t,Free-price inflation component,,,endogenous,WP239 Appendix C.2 C.20/C.24,EQ-FIRM-002;EQ-PRICE-001,missing_canonical_name
-piH_t,Sectoral price inflation for H=G/I,,,endogenous,WP239 Appendix C.2 C.18-C.19,EQ-FIRM-002,missing_canonical_name
-piM_t,Import-price inflation,,,endogenous,WP239 Appendix C.2 C.14,EQ-FIRM-002;EQ-FIRM-004,missing_canonical_name
-piX_t,Export-price inflation,,,endogenous,WP239 Appendix C.2 C.25-C.26,EQ-FIRM-002,missing_canonical_name
-vF_t,Free-price indexation rule,,,alias,WP239 Appendix C.2 C.21,EQ-FIRM-002,missing_canonical_name
-vH_t,Sectoral indexation rule for H=G/I,,,alias,WP239 Appendix C.2 C.19,EQ-FIRM-002,missing_canonical_name
-vM_t,Import-price indexation rule,,,alias,WP239 Appendix C.2 C.14,EQ-FIRM-002,missing_canonical_name
-vX_t,Export-price indexation rule,,,alias,WP239 Appendix C.2 C.26,EQ-FIRM-002,missing_canonical_name
-theta_A,Administered-price weight in C.22/C.23,,,parameter,WP239 Appendix C.2 C.22-C.23,EQ-PRICE-001,missing_sourced_value
-chi_A,Backward-looking administered-price rule weight,,,parameter,WP239 Appendix C.2 C.23,EQ-PRICE-001,missing_sourced_value
+cO_t,Optimizing-household consumption component,c_o,c_o,endogenous,WP239 Appendix C.1 C.1/C.3,EQ-HH-001;EQ-HH-002,mapped_to_registry
+sB_t,Domestic risk-premium wedge,risk_dom,risk_dom,endogenous/shock_state,WP239 Appendix C.1 C.1/C.4/C.5,EQ-HH-001;EQ-EXT-001;EQ-FIRM-003,mapped_to_registry
+zQ_t,Real exchange-rate shock state,z_q,z_q,shock_state,WP239 Appendix C.1 C.4 and C.6 C.49,EQ-EXT-001,mapped_to_registry
+rho_Q,Real exchange-rate shock persistence,rho_z_q,rho_z_q,parameter,WP239 Appendix C.6 C.49,EQ-EXT-001,deferred_to_wbs058_shocks
+rho_C,Preference shock persistence,rho_z_c,rho_z_c,parameter,WP239 Appendix C.6 C.48,EQ-HH-001;EQ-HH-003,deferred_to_wbs058_shocks
+rho_Z,Trend/permanent-technology shock persistence,rho_z_z,rho_z_z,parameter,WP239 Appendix C.6 C.52,EQ-HH-001;EQ-FIRM-003;EQ-FISC-003,deferred_to_wbs058_shocks
+rho_I,Investment-technology shock persistence,rho_z_i,rho_z_i,parameter,WP239 Appendix C.6 C.53,EQ-FIRM-003,deferred_to_wbs058_shocks
+rho_D,Transitory-technology shock persistence,rho_z_d,rho_z_d,parameter,WP239 Appendix C.6 C.51,EQ-FIRM-001,deferred_to_wbs058_shocks
+rho_M,Import-demand shock persistence,rho_z_m,rho_z_m,parameter,WP239 Appendix C.6 C.54,EQ-FIRM-004,deferred_to_wbs058_shocks
+rho_P,Price-markup shock persistence,rho_z_p,rho_z_p,parameter,WP239 Appendix C.6 C.57,EQ-FIRM-002,deferred_to_wbs058_shocks
+qF_t,Free-price relative price symbol,q_f,q_f,endogenous,WP239 Appendix C.2 C.20-C.23,EQ-PRICE-001;EQ-FIRM-002,mapped_to_registry
+qG_t,Government-consumption relative price symbol,q_g,q_g,endogenous,WP239 Appendix C.3 C.33 and C.4-C.5,EQ-FISC-002;EQ-AGG-003,mapped_to_registry
+qI_t,Investment relative price symbol,q_i,q_i,endogenous,WP239 Appendix C.1 C.6 and C.5 C.41,EQ-FIRM-003;EQ-AGG-003,mapped_to_registry
+qMstar_t,Foreign-currency import-price relative price,q_m_star,q_m_star,endogenous,WP239 Appendix C.4-C.5 C.38/C.41/C.44,EQ-EXT-003;EQ-AGG-002;EQ-AGG-003,mapped_to_registry
+qXstar_t,Export foreign-currency relative price,q_x_star,q_x_star,endogenous,WP239 Appendix C.2 C.25-C.27 and C.4-C.5,EQ-FIRM-002;EQ-AGG-002;EQ-AGG-003,mapped_to_registry
+zM_t,Import-demand shock state,z_m,z_m,shock_state,WP239 Appendix C.2 C.15/C.17 and C.6 C.54,EQ-FIRM-004,mapped_to_registry
+piF_t,Free-price inflation component,pi_f,pi_f,endogenous,WP239 Appendix C.2 C.20/C.24,EQ-FIRM-002;EQ-PRICE-001,mapped_to_registry
+piH_t,Sectoral price inflation template for H=G/I,pi_g|pi_i,pi_g|pi_i,template_alias_expanded,WP239 Appendix C.2 C.18-C.19,EQ-FIRM-002,alias_resolved
+piM_t,Import-price inflation,pi_m,pi_m,endogenous,WP239 Appendix C.2 C.14,EQ-FIRM-002;EQ-FIRM-004,mapped_to_registry
+piX_t,Export-price inflation,pi_x,pi_x,endogenous,WP239 Appendix C.2 C.25-C.26,EQ-FIRM-002,mapped_to_registry
+vF_t,Free-price indexation rule,v_f,v_f,endogenous_aux,WP239 Appendix C.2 C.21,EQ-FIRM-002,mapped_to_registry
+vH_t,Sectoral indexation rule template for H=G/I,v_g|v_i,v_g|v_i,template_alias_expanded,WP239 Appendix C.2 C.19,EQ-FIRM-002,alias_resolved
+vM_t,Import-price indexation rule,v_m,v_m,endogenous_aux,WP239 Appendix C.2 C.14,EQ-FIRM-002,mapped_to_registry
+vX_t,Export-price indexation rule,v_x,v_x,endogenous_aux,WP239 Appendix C.2 C.26,EQ-FIRM-002,mapped_to_registry
+theta_A,Administered-price weight in C.22/C.23,theta_admin,theta_admin,parameter,WP239 Appendix C.2 C.22-C.23,EQ-PRICE-001,missing_sourced_value
+chi_A,Backward-looking administered-price rule weight,chi_admin,chi_admin,parameter,WP239 Appendix C.2 C.23,EQ-PRICE-001,missing_sourced_value
 ```
 
-Current result: WBS-057b formula text is transcribed, but WBS-057 is blocked before `samba_classic.mod` implementation until symbol mapping is complete. Dynare-ready rows by source/formula status: 24. WBS-057 rows resolved to Dynare-ready in the formula/weight pass: 15. Remaining true WBS-057 source blockers: 0. Remaining executable formula-text blockers: 0. Remaining Dynare symbol mapping blockers: 26 symbols. Deferred WBS-058 rows: 11. Deferred WBS-059 rows among the 27 unresolved items: 0.
+Current result: WBS-057b formula text is transcribed and assistant-reviewed symbol mappings have been applied. Dynare-ready rows by source/formula status: 24. WBS-057 rows resolved to Dynare-ready in the formula/weight pass: 15. Remaining true WBS-057 source blockers: 0. Remaining executable formula-text blockers: 0. Remaining WBS-057 symbol blockers: 2 parameters (`theta_admin`, `chi_admin`) missing sourced numeric values. Deferred WBS-058 equation rows: 11. Deferred WBS-058 shock-process symbol rows: 7. Deferred WBS-059 rows among the 27 unresolved items: 0.

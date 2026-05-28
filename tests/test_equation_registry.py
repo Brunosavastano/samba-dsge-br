@@ -364,3 +364,36 @@ def test_measurement_registry_entries_are_draft_for_wbs043():
     assert "pi_target_deterministic_in_calibrated_mvp" in by_variable["pi_target"]["tests"]
     assert "y_gap_structural_variable_present" in by_variable["y_gap"]["tests"]
     assert not list((ROOT / "model").rglob("*.mod")) if (ROOT / "model").exists() else True
+
+
+def test_wbs057b_symbol_mappings_are_registered_without_model_files():
+    text = REGISTRY.read_text(encoding="utf-8")
+    rows = _csv_dicts_after(text, "## 5. WBS-057b Dynare symbol mappings")
+    by_symbol = {row["wp239_symbol"]: row for row in rows}
+    model_file = ROOT / "model" / "samba_classic" / "samba_classic.mod"
+    allowed_statuses = {
+        "mapped_to_registry",
+        "alias_resolved",
+        "deferred_to_wbs058_shocks",
+        "missing_sourced_value",
+    }
+
+    assert len(rows) == 26
+    assert by_symbol["cO_t"]["dynare_name"] == "c_o"
+    assert by_symbol["sB_t"]["dynare_name"] == "risk_dom"
+    assert by_symbol["piH_t"]["dynare_name"] == "pi_g|pi_i"
+    assert by_symbol["vH_t"]["dynare_name"] == "v_g|v_i"
+    assert by_symbol["theta_A"]["dynare_name"] == "theta_admin"
+    assert by_symbol["chi_A"]["dynare_name"] == "chi_admin"
+    assert {
+        row["mapping_status"] for row in rows
+    }.issubset(allowed_statuses)
+    assert sum(
+        row["mapping_status"] == "missing_sourced_value"
+        for row in rows
+    ) == 2
+    assert sum(
+        row["mapping_status"] == "deferred_to_wbs058_shocks"
+        for row in rows
+    ) == 7
+    assert not model_file.exists()
