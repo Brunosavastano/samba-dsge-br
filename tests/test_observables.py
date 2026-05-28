@@ -80,7 +80,11 @@ def test_wbs029_revision_policy_contract_is_documented():
 
 def test_wbs059_blocks_observables_until_measurement_mappings_are_ready():
     status = PROJECT_STATUS.read_text(encoding="utf-8")
-    if "BLOCKED_WBS059_MEASUREMENT_MAPPING" not in status:
+    execution_status = next(
+        line for line in status.splitlines()
+        if line.startswith("Execution status:")
+    )
+    if "BLOCKED_WBS059_MEASUREMENT_MAPPING" not in execution_status:
         return
 
     sourcing = WBS059_SOURCING.read_text(encoding="utf-8")
@@ -92,3 +96,20 @@ def test_wbs059_blocks_observables_until_measurement_mappings_are_ready():
     assert "BLOCKED_WBS059_MEASUREMENT_MAPPING" in blockers
     assert "missing_mapping" in sourcing
     assert "missing_data" in sourcing
+
+
+def test_wbs059_observables_are_documented_when_completed():
+    status = PROJECT_STATUS.read_text(encoding="utf-8")
+    if "WBS-059_COMPLETED" not in status:
+        return
+
+    sourcing = WBS059_SOURCING.read_text(encoding="utf-8")
+    blockers = WBS059_BLOCKERS.read_text(encoding="utf-8")
+    inc = OBSERVABLES_INC.read_text(encoding="utf-8")
+
+    assert "WP239 Section 3.1" in sourcing
+    assert "usable_in_observables_inc" in sourcing
+    assert "Remaining blockers for WBS-059 include creation: 0" in blockers
+    assert "varobs y c i g q r_t;" in inc
+    assert "priors" not in inc
+    assert "estimation" not in inc

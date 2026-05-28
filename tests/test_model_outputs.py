@@ -9,8 +9,8 @@ SOURCING = ROOT / "docs" / "wbs057_equation_sourcing.md"
 BLOCKERS = ROOT / "docs" / "wbs057_blockers.md"
 MODEL_FILE = ROOT / "model" / "samba_classic" / "samba_classic.mod"
 SHOCKS_FILE = ROOT / "model" / "samba_classic" / "shocks.inc"
+OBSERVABLES_FILE = ROOT / "model" / "samba_classic" / "observables.inc"
 FORBIDDEN_WBS057_FILES = {
-    ROOT / "model" / "samba_classic" / "observables.inc",
     ROOT / "model" / "samba_classic" / "priors.inc",
 }
 
@@ -94,6 +94,8 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     assert all(not path.exists() for path in FORBIDDEN_WBS057_FILES)
     if "WBS-058_COMPLETED" not in execution_status:
         assert not SHOCKS_FILE.exists()
+    if "WBS-059_COMPLETED" not in execution_status:
+        assert not OBSERVABLES_FILE.exists()
 
 
 def test_wbs057_mod_shell_uses_sourced_inputs_without_future_artifacts():
@@ -119,14 +121,14 @@ def test_wbs057_mod_shell_uses_sourced_inputs_without_future_artifacts():
         "EQ-AGG-003",
     ]
     forbidden_markers = [
-        "varobs",
         "estimation",
         "stoch_simul",
-        '@#include "observables.inc"',
         '@#include "priors.inc"',
     ]
     if "WBS-058_COMPLETED" not in execution_status:
         forbidden_markers.extend(["shocks;", '@#include "shocks.inc"'])
+    if "WBS-059_COMPLETED" not in execution_status:
+        forbidden_markers.extend(["varobs", '@#include "observables.inc"'])
 
     for marker in required_markers:
         assert marker in text
@@ -176,6 +178,27 @@ def test_wbs058_shocks_include_uses_wp239_stderr_values_only_after_wbs058():
     for shock, stderr in expected.items():
         assert f"var {shock};" in text
         assert f"stderr {stderr};" in text
+
+
+def test_wbs059_observables_include_uses_wp239_aligned_varobs_only_after_wbs059():
+    status = _project_status_text()
+    execution_status = next(
+        line for line in status.splitlines()
+        if line.startswith("Execution status:")
+    )
+    if "WBS-059_COMPLETED" not in execution_status:
+        return
+
+    assert OBSERVABLES_FILE.exists()
+    text = OBSERVABLES_FILE.read_text(encoding="utf-8")
+    model_text = MODEL_FILE.read_text(encoding="utf-8")
+
+    assert "WP239 Section 3.1" in text
+    assert "varobs y c i g q r_t;" in text
+    assert '@#include "observables.inc"' in model_text
+    assert "estimation" not in text
+    assert "stoch_simul" not in text
+    assert "measurement_errors" not in text
 
 
 def test_wbs057b_formula_text_is_transcribed_for_dynare_ready_rows():

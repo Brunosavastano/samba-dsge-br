@@ -209,6 +209,7 @@ model(linear);
 end;
 
 @#include "shocks.inc"
+@#include "observables.inc"
 
 initval;
   r_t = 0;

@@ -1,14 +1,22 @@
 # WBS-059 Blockers
 
-Status: `BLOCKED_WBS059_MEASUREMENT_MAPPING`
+Status: `WBS-059_COMPLETED`
 
-`model/samba_classic/observables.inc` was not created.
+Remaining blockers for WBS-059 include creation: 0.
 
-Current blockers:
+`model/samba_classic/observables.inc` was created with six MVP smoke/pilot observables mapped from WP239 Section 3.1 and approved WBS-052 data columns:
 
-- Core WBS-052 data columns are not yet mapped to log-linear model deviations or compatible measurement equations.
-- `pi`, `x`, and `m` are currently `varexo` in `samba_classic.mod`, so direct `varobs` is not safe.
-- EQ-MEAS-001 through EQ-MEAS-015 remain `measurement_draft` with `measurement_transform_pending_gate1b`.
-- Auxiliary/non-core observables are missing generated data and, for several rows, still have TBD sources.
+- `y`
+- `c`
+- `i`
+- `g`
+- `q`
+- `r_t`
 
-Next action: finalize WBS-059 measurement equations and scaling/deviation transforms before creating `observables.inc`.
+Deferred items:
+
+- Observables mapped to current `varexo` variables are not included in `varobs`.
+- Observables without approved data dictionary entries or generated WBS-052 data files are deferred.
+- Measurement errors remain excluded from WBS-059.
+
+Next task: WBS-060 Dynare wrapper.

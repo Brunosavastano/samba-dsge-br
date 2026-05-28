@@ -18,6 +18,8 @@ def _allowed_executable_model_files() -> set[str]:
         allowed.add("model/samba_classic/samba_classic.mod")
     if re.search(r"Execution status: .*WBS-058_COMPLETED", text):
         allowed.add("model/samba_classic/shocks.inc")
+    if re.search(r"Execution status: .*WBS-059_COMPLETED", text):
+        allowed.add("model/samba_classic/observables.inc")
     return allowed
 
 
