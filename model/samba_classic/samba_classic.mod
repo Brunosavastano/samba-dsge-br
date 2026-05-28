@@ -12,6 +12,9 @@ var
   y q_y pi_y
 ;
 
+// WP239 Appendix C.39 and C.7 write NFA and capital as t+1 stock laws.
+predetermined_variables nfa k;
+
 varexo
   pi pi_target y_gap r_star pi_star
   risk_dom z_q z_z z_c z_i z_w z_p z_px z_g

@@ -129,8 +129,9 @@ def _parse_bk(stdout: str) -> dict[str, Any]:
             forward_looking_variables = int(match.group(2))
             break
 
-    order_verified = "The order condition is verified." in stdout
-    rank_verified = "The rank condition is verified." in stdout
+    combined_verified = "The order and rank conditions are verified." in stdout
+    order_verified = combined_verified or "The order condition is verified." in stdout
+    rank_verified = combined_verified or "The rank condition is verified." in stdout
     order_not_verified = "The order condition is NOT verified." in stdout
     indeterminacy = "indeterminacy" in stdout.lower()
 

@@ -259,6 +259,14 @@ def test_wbs060_dynare_wrapper_exists_and_constructs_smoke_command_after_wbs060(
     assert bk_summary["forward_looking_variables"] == 28
     assert bk_summary["bk_order_condition_not_verified"] is True
     assert bk_summary["bk_order_condition_verified"] is False
+    passed_bk_summary = wrapper._parse_bk(
+        "There are 26 eigenvalue(s) larger than 1 in modulus for 26 forward-looking variable(s).\n"
+        "The order and rank conditions are verified.\n"
+    )
+    assert passed_bk_summary["eigenvalues_larger_than_one"] == 26
+    assert passed_bk_summary["forward_looking_variables"] == 26
+    assert passed_bk_summary["bk_order_condition_verified"] is True
+    assert passed_bk_summary["bk_rank_condition_verified"] is True
     assert set(wrapper.REQUIRED_MODEL_FILES) == {
         "samba_classic.mod",
         "calibration.m",
@@ -299,6 +307,9 @@ def test_wbs062_bk_wrapper_passes_only_after_wbs062_completed():
         return
     if shutil.which("dynare") is None:
         pytest.skip("Dynare is unavailable on PATH.")
+
+    mod_text = MODEL_FILE.read_text(encoding="utf-8")
+    assert "predetermined_variables nfa k;" in mod_text
 
     completed = subprocess.run(
         [sys.executable, str(WRAPPER_FILE), "--mode", "bk"],
