@@ -1,5 +1,5 @@
 ---
-status: blocked_wbs066_identification_solve
+status: wbs066_identification_completed
 wbs: WBS-066
 gate: Gate 4 preparation
 identification_run_created: true
@@ -83,11 +83,11 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: diagnose the WBS-066 identification solve mismatch. Do not
-start WBS-067, priors, estimation, posterior analysis, backtesting, Redux, or
-sovereign extension while WBS-066 remains blocked.
+Next safe task: WBS-067, classify and treat the nonidentified parameters
+reported by WBS-066. Do not start priors, estimation, posterior analysis,
+backtesting, Redux, or sovereign extension before WBS-067 is complete.
 
-## WBS-066 Attempted Result
+## WBS-066 Completed Result
 
 WBS-066 local identification diagnostics were attempted against the existing
 calibrated SAMBA classic MVP. A temporary Dynare probe with `steady; check;`
@@ -98,7 +98,17 @@ order and rank conditions were verified.
 The Dynare `identification;` command then stopped with `info = 3`, reporting
 that `Current_params` does not solve because Blanchard and Kahn conditions are
 not satisfied and there is no stable equilibrium. This is recorded as
-`BLOCKED_WBS066_IDENTIFICATION_SOLVE`.
+the initial WBS-066 solve mismatch.
+
+The mismatch was mechanical: Dynare identification uses the estimation
+initializer, which resets the stationary QZ criterion to `0.999999`. A
+temporary diagnostic using the documented nonstationary path
+`diffuse_filter`/`lik_init=3`, `qz_criterium=1.000001`, and reduced-form
+identification completed with exit code 0.
+
+The completed diagnostic reports a deficient rank of Tau and identifies the
+shock standard deviations and model parameters requiring WBS-067 treatment in
+`outputs/identification/wbs066_identification_diagnostics.md`.
 
 The attempt did not create priors, posterior outputs, backtesting outputs,
 estimation artifacts, Redux files, or sovereign-extension files. The diagnostic

@@ -17,7 +17,7 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     assert STRATEGY.exists()
     text = STRATEGY.read_text(encoding="utf-8")
 
-    assert "status: blocked_wbs066_identification_solve" in text
+    assert "status: wbs066_identification_completed" in text
     assert "wbs: WBS-066" in text
     assert "identification_run_created: true" in text
     assert "identification_outputs_created: true" in text
@@ -37,11 +37,16 @@ def test_wbs065_protocol_does_not_create_future_phase_artifacts():
         and "BLOCKED_WBS066_IDENTIFICATION_SOLVE" not in execution_status
     ):
         assert not (ROOT / "outputs" / "identification").exists()
-    if "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in execution_status:
+    if (
+        "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in execution_status
+        or "WBS-066_COMPLETED" in execution_status
+    ):
         assert diagnostics.exists()
         text = diagnostics.read_text(encoding="utf-8")
-        assert "info = 3" in text
-        assert "Current_params" in text
+        assert "WBS-066_COMPLETED" in text
+        assert "diffuse_filter" in text
+        assert "rank of Tau" in text
+        assert "not identified" in text
         assert "order and rank conditions are verified" in text
         assert "no priors" in text
         assert "no posterior outputs" in text

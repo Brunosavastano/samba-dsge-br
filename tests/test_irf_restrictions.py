@@ -43,7 +43,10 @@ def _execution_status() -> str:
 
 def _forbidden_generated_paths() -> set[Path]:
     paths = set(FORBIDDEN_GENERATED_PATHS)
-    if "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in _execution_status():
+    if (
+        "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in _execution_status()
+        or "WBS-066_COMPLETED" in _execution_status()
+    ):
         paths.discard(ROOT / "outputs" / "identification")
     return paths
 
