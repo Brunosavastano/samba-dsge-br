@@ -41,6 +41,13 @@ def _execution_status() -> str:
     )
 
 
+def _forbidden_generated_paths() -> set[Path]:
+    paths = set(FORBIDDEN_GENERATED_PATHS)
+    if "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in _execution_status():
+        paths.discard(ROOT / "outputs" / "identification")
+    return paths
+
+
 def _wbs063_target_rows() -> list[dict[str, str]]:
     text = WBS063_TARGETS.read_text(encoding="utf-8")
     start = text.index("## Target rows")
@@ -113,4 +120,4 @@ def test_wbs063_irf_restrictions_run_in_temp_without_committed_outputs():
     assert summary["irf_target_count"] == 5
     assert summary["irf_targets_failed"] == 0
     assert summary["persistent_outputs_created"] is False
-    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+    assert all(not path.exists() for path in _forbidden_generated_paths())

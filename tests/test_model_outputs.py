@@ -40,6 +40,9 @@ FORBIDDEN_TRACKED_PATH_PREFIXES = (
 FORBIDDEN_TRACKED_EXACT_PATHS = {
     "model/samba_classic/priors.inc",
 }
+ALLOWED_WBS066_IDENTIFICATION_DIAGNOSTIC = (
+    "outputs/identification/wbs066_identification_diagnostics.md"
+)
 FORBIDDEN_TRACKED_DYNARE_SUFFIXES = (
     ".log",
     "_dynamic.m",
@@ -96,6 +99,29 @@ def _execution_status() -> str:
     return next(
         line for line in _project_status_text().splitlines()
         if line.startswith("Execution status:")
+    )
+
+
+def _forbidden_generated_paths() -> set[Path]:
+    paths = set(FORBIDDEN_GENERATED_PATHS)
+    if "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in _execution_status():
+        paths.discard(ROOT / "outputs" / "identification")
+    return paths
+
+
+def _is_forbidden_tracked_path(path: str) -> bool:
+    if (
+        "BLOCKED_WBS066_IDENTIFICATION_SOLVE" in _execution_status()
+        and path == ALLOWED_WBS066_IDENTIFICATION_DIAGNOSTIC
+    ):
+        return False
+    return (
+        path in FORBIDDEN_TRACKED_EXACT_PATHS
+        or path.startswith(FORBIDDEN_TRACKED_PATH_PREFIXES)
+        or (
+            path.startswith("model/samba_classic/")
+            and path.endswith(FORBIDDEN_TRACKED_DYNARE_SUFFIXES)
+        )
     )
 
 
@@ -320,7 +346,7 @@ def test_wbs060_dynare_wrapper_smoke_runs_in_temp_without_repo_outputs_after_wbs
     assert summary["status"] == "passed"
     assert summary["working_directory"] == "temporary"
     assert summary["returncode"] == 0
-    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+    assert all(not path.exists() for path in _forbidden_generated_paths())
 
 
 def test_wbs062_bk_wrapper_passes_only_after_wbs062_completed():
@@ -349,7 +375,7 @@ def test_wbs062_bk_wrapper_passes_only_after_wbs062_completed():
     assert summary["status"] == "passed"
     assert summary["bk_order_condition_verified"] is True
     assert summary["bk_rank_condition_verified"] is True
-    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+    assert all(not path.exists() for path in _forbidden_generated_paths())
 
 
 def test_wbs064_gate3_report_records_current_wrapper_evidence_without_dynare_clutter():
@@ -373,7 +399,7 @@ def test_wbs064_gate3_report_records_current_wrapper_evidence_without_dynare_clu
     assert "No Bayesian estimation yet." in text
     assert "No posterior outputs." in text
     assert "No backtesting outputs." in text
-    assert all(not path.exists() for path in FORBIDDEN_GENERATED_PATHS)
+    assert all(not path.exists() for path in _forbidden_generated_paths())
 
 
 def test_no_generated_dynare_clutter_or_future_phase_artifacts_are_tracked():
@@ -389,17 +415,7 @@ def test_no_generated_dynare_clutter_or_future_phase_artifacts_are_tracked():
 
     assert completed.returncode == 0, completed.stderr
     tracked = completed.stdout.splitlines()
-    forbidden = [
-        path for path in tracked
-        if (
-            path in FORBIDDEN_TRACKED_EXACT_PATHS
-            or path.startswith(FORBIDDEN_TRACKED_PATH_PREFIXES)
-            or (
-                path.startswith("model/samba_classic/")
-                and path.endswith(FORBIDDEN_TRACKED_DYNARE_SUFFIXES)
-            )
-        )
-    ]
+    forbidden = [path for path in tracked if _is_forbidden_tracked_path(path)]
     assert forbidden == []
 
 

@@ -1,9 +1,9 @@
 ---
-status: wbs065_identification_protocol
-wbs: WBS-065
+status: blocked_wbs066_identification_solve
+wbs: WBS-066
 gate: Gate 4 preparation
-identification_run_created: false
-identification_outputs_created: false
+identification_run_created: true
+identification_outputs_created: true
 priors_created: false
 estimation_started: false
 posterior_created: false
@@ -83,5 +83,23 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: WBS-066, run local identification diagnostics and write only
-`outputs/identification/` artifacts allowed by that WBS.
+Next safe task: diagnose the WBS-066 identification solve mismatch. Do not
+start WBS-067, priors, estimation, posterior analysis, backtesting, Redux, or
+sovereign extension while WBS-066 remains blocked.
+
+## WBS-066 Attempted Result
+
+WBS-066 local identification diagnostics were attempted against the existing
+calibrated SAMBA classic MVP. A temporary Dynare probe with `steady; check;`
+followed by `identification;` reported that the standalone model check passed:
+26 eigenvalues were larger than one for 26 forward-looking variables, and the
+order and rank conditions were verified.
+
+The Dynare `identification;` command then stopped with `info = 3`, reporting
+that `Current_params` does not solve because Blanchard and Kahn conditions are
+not satisfied and there is no stable equilibrium. This is recorded as
+`BLOCKED_WBS066_IDENTIFICATION_SOLVE`.
+
+The attempt did not create priors, posterior outputs, backtesting outputs,
+estimation artifacts, Redux files, or sovereign-extension files. The diagnostic
+record is `outputs/identification/wbs066_identification_diagnostics.md`.
