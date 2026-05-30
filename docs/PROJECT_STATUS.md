@@ -2,22 +2,22 @@
 
 Updated: 2026-05-30
 
-Current gate: Gate 5a completed; Gate 5b blocked on MH pilot runtime; Gate 4 completed; Gate 3 completed; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED; WBS-071_COMPLETED; WBS-071a_COMPLETED; WBS-072_CONFIG_APPROVED; BLOCKED_WBS072_MH_PILOT_RUNTIME.
-Current PR/WBS: WBS-072 / PR14 MH pilot blocked after approved pilot attempt.
+Current gate: Gate 5a completed; Gate 5b blocked on MH pilot acceptance; Gate 4 completed; Gate 3 completed; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
+Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED; WBS-071_COMPLETED; WBS-071a_COMPLETED; WBS-072_CONFIG_APPROVED; BLOCKED_WBS072_ACCEPTANCE_BAND.
+Current PR/WBS: WBS-072 / PR14 MH pilot blocked by acceptance outside approved band.
 Blocked WBS: WBS-072 MH pilot.
 Previous blocking status: BLOCKED_WBS066_IDENTIFICATION_SOLVE resolved mechanically by using Dynare's documented diffuse-filter identification path.
 Last completed task: WBS-071a estimation smoke completed in a temporary Dynare run with `mh_replic=0`.
 Last attempted task: WBS-072 approved MH pilot run.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: resolve WBS-072 MH pilot runtime/acceptance reporting blocker.
-Blocker classification: MH pilot runtime failed/nonzero return and acceptance ratio unavailable.
-Blockers: `docs/wbs072_blockers.md`; approved pilot returned Dynare code `3221225477` after `775.453` seconds.
+Next safe task: resolve WBS-072 acceptance band blocker without changing model equations, priors, data, or calibration blindly.
+Blocker classification: MH pilot acceptance below approved band; R-hat unavailable is warning only.
+Blockers: `docs/wbs072_blockers.md`; approved pilot returned average acceptance `0.1325`, below target `0.20..0.35`, and Dynare code `3221225477`.
 Required user action: review WBS-072 runtime blocker before retrying or revising pilot execution.
 Files changed: `src/diagnostics/run_dynare.py`, `docs/wbs072_mh_pilot_config.md`, `docs/wbs072_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_econometric.py`, `tests/test_model_outputs.py`, `tests/test_irf_restrictions.py`, `tests/test_estimation_strategy.py`.
-Tests run: `python -m pytest` - 106 passed; `git diff --check` - passed.
-Dynare results: `python src/diagnostics/run_dynare.py --mode mh-pilot --timeout-seconds 1800` returned `3221225477`; finite likelihood true; acceptance ratio unavailable; R-hat unavailable warning.
-Commit hash: pending for WBS-072 pilot blocker commit; final response reports the pushed hash.
+Tests run: `python -m pytest` - 107 passed; `git diff --check` - passed.
+Dynare results: `python src/diagnostics/run_dynare.py --mode mh-pilot --timeout-seconds 1800` returned `3221225477`; finite likelihood true; acceptance ratio `0.1325`; R-hat unavailable warning.
+Commit hash: pending for WBS-072 acceptance parser/blocker commit; final response reports the pushed hash.
 Safe to continue: false for WBS-073; forbidden next without prompt: WBS-073 full MH/backtesting/Redux/sovereign.
 
 Visual status:
@@ -39,7 +39,7 @@ Progress metric: 74/86 WBS complete, approximately 86% by WBS item count. This i
 | PR 11 Dynare calibrated model | 054..064 | 11/11 | complete | Gate 3 closed |
 | PR 12 identification | 065..067 | 3/3 | complete | Gate 4 closed |
 | PR 13 estimation smoke/priors | 068..071a | 5/5 | complete | none |
-| PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | WBS-072 pilot runtime/acceptance reporting blocker |
+| PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | WBS-072 acceptance below approved band |
 | PR 15 validation/backtesting | 074..079 | 0/6 | blocked | requires estimation outputs |
 | Post-MVP Redux/sovereign | 080..081 | 0/2 | out of MVP | only after Gate 6 and separate decision |
 
@@ -54,5 +54,5 @@ Gate view:
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
 | Gate 3 | completed | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, WBS-057 `samba_classic.mod`, WBS-058 `shocks.inc`, WBS-059 `observables.inc`, WBS-060 wrapper, WBS-061 residual tests, WBS-062 BK tests, WBS-063 IRF tests, and WBS-064 MVP report complete |
 | Gate 4 | completed | WBS-065 protocol complete; WBS-066 reduced-form identification diagnostics complete; WBS-067 treatment decisions recorded |
-| Gate 5a/5b | Gate 5a complete; Gate 5b blocked | WBS-071a estimation smoke complete; WBS-072 approved pilot returned nonzero and no acceptance ratio |
+| Gate 5a/5b | Gate 5a complete; Gate 5b blocked | WBS-071a estimation smoke complete; WBS-072 approved pilot acceptance averaged 0.1325 below target |
 | Gate 6 | not started | no validation/backtesting outputs |

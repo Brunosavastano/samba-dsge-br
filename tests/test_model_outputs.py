@@ -358,6 +358,26 @@ def test_wbs060_dynare_wrapper_exists_and_constructs_smoke_command_after_wbs060(
     }
 
 
+def test_wbs072_mh_acceptance_parser_reads_dynare_chain_block():
+    wrapper = _load_dynare_wrapper()
+    summary = wrapper._parse_mh_acceptance(
+        "random text\n"
+        "Current acceptance ratio per chain:\n"
+        "                                                       Chain  1: 16.9%\n"
+        "                                                       Chain  2: 9.6%\n"
+        "standard deviation of shocks\n"
+        "risk_dom                    1.000       0.3091      0.2493      0.3789     invg          Inf\n",
+        "",
+    )
+
+    assert summary["mh_acceptance_values"] == pytest.approx([0.169, 0.096])
+    assert summary["mh_acceptance_ratio"] == pytest.approx(0.1325)
+    assert summary["mh_chains_completed"] is True
+    assert summary["mh_acceptance_in_target_band"] is False
+    assert summary["mh_nonfinite_token_count"] == 0
+    assert summary["rhat_status"] == "unavailable_warning"
+
+
 def test_wbs060_dynare_wrapper_smoke_runs_in_temp_without_repo_outputs_after_wbs060():
     if "WBS-060_COMPLETED" not in _execution_status():
         return

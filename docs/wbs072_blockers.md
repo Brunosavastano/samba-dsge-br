@@ -1,6 +1,6 @@
 # WBS-072 Blockers
 
-Status: `BLOCKED_WBS072_MH_PILOT_RUNTIME`
+Status: `BLOCKED_WBS072_ACCEPTANCE_BAND`
 
 WBS-072 requires an MH pilot before WBS-073 full MH. Bruno approved the pilot
 configuration on 2026-05-30 with R-hat unavailable/above 1.1 treated as a
@@ -22,17 +22,21 @@ Checked sources:
 
 Proposal created and approved: `docs/wbs072_mh_pilot_config.md`.
 
-Pilot attempt result:
+Pilot attempt result after fixing acceptance parser:
 - command: `python src/diagnostics/run_dynare.py --mode mh-pilot --timeout-seconds 1800`;
 - Dynare return code: 3221225477;
-- elapsed seconds: 775.453;
+- elapsed seconds: 931.484;
 - finite likelihood reported: true;
 - last finite log posterior/likelihood: -467.15353;
-- acceptance ratio: unavailable;
+- acceptance ratios: chain 1 = 0.169, chain 2 = 0.096;
+- average acceptance ratio: 0.1325;
+- target acceptance band: 0.20 to 0.35;
 - R-hat: unavailable warning, per approved amendment;
-- stdout included `pstdev Inf` values in the posterior summary table for
-  inverse-gamma priors; no likelihood NaN/Inf was reported.
+- stdout included `pstdev Inf` values in posterior summary rows for
+  inverse-gamma priors; these are prior/posterior table standard-deviation
+  entries and no likelihood NaN/Inf was reported.
 
-WBS-072 remains blocked because the pilot run returned nonzero and did not
-produce a parseable acceptance ratio. WBS-073 full MH, backtesting, Redux, and
-sovereign outputs remain forbidden.
+WBS-072 remains blocked because average pilot acceptance is below the approved
+0.20 to 0.35 band, and the Dynare/Octave process still returned nonzero after
+the pilot diagnostics. WBS-073 full MH, backtesting, Redux, and sovereign
+outputs remain forbidden.

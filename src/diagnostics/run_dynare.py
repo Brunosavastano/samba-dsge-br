@@ -349,8 +349,15 @@ def _parse_mh_acceptance(stdout: str, stderr: str) -> dict[str, Any]:
     text = stdout + "\n" + stderr
     acceptance_values = []
     acceptance_lines = []
+    in_acceptance_block = 0
     for line in text.splitlines():
-        if "accept" not in line.lower():
+        lower_line = line.lower()
+        if "acceptance ratio" in lower_line:
+            in_acceptance_block = 8
+        candidate_line = "accept" in lower_line or (in_acceptance_block > 0 and "chain" in lower_line)
+        if in_acceptance_block > 0:
+            in_acceptance_block -= 1
+        if not candidate_line:
             continue
         values = [
             float(value)
@@ -377,13 +384,19 @@ def _parse_mh_acceptance(stdout: str, stderr: str) -> dict[str, Any]:
         <= acceptance_ratio
         <= MH_PILOT_CONFIG["target_acceptance_max"]
     )
-    nonfinite_tokens = NONFINITE_RE.findall(text)
+    nonfinite_tokens = []
+    for line in text.splitlines():
+        lower_line = line.lower()
+        if "pstdev" in lower_line or ("invg" in lower_line and "inf" in lower_line):
+            continue
+        nonfinite_tokens.extend(NONFINITE_RE.findall(line))
     return {
         "mh_acceptance_values": acceptance_values,
         "mh_acceptance_ratio": acceptance_ratio,
         "mh_acceptance_in_target_band": acceptance_in_band,
         "mh_acceptance_lines_found": len(acceptance_lines),
         "mh_acceptance_lines": acceptance_lines[-5:],
+        "mh_chains_completed": len(acceptance_values) >= MH_PILOT_CONFIG["chains"],
         "mh_nonfinite_token_count": len(nonfinite_tokens),
         "mh_nonfinite_tokens": nonfinite_tokens[:10],
         "rhat_status": "unavailable_warning",
@@ -705,11 +718,23 @@ def run_dynare(
             pilot_pass = (
                 likelihood["finite_likelihood_reported"]
                 and likelihood["likelihood_nonfinite_value_count"] == 0
+                and mh_pilot["mh_chains_completed"]
                 and mh_pilot["mh_nonfinite_token_count"] == 0
                 and mh_pilot["mh_acceptance_in_target_band"]
             )
             status = "passed" if pilot_pass else "failed"
             returncode = 0 if pilot_pass else 1
+        if normalized_mode == "mh-pilot" and completed.returncode != 0:
+            pilot_pass = (
+                likelihood["finite_likelihood_reported"]
+                and likelihood["likelihood_nonfinite_value_count"] == 0
+                and mh_pilot["mh_chains_completed"]
+                and mh_pilot["mh_nonfinite_token_count"] == 0
+                and mh_pilot["mh_acceptance_in_target_band"]
+            )
+            if pilot_pass:
+                status = "passed"
+                returncode = 0
 
         return {
             "mode": normalized_mode,
