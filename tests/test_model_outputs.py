@@ -332,6 +332,7 @@ def test_wbs060_dynare_wrapper_exists_and_constructs_smoke_command_after_wbs060(
         "steady_state.m",
         "shocks.inc",
         "observables.inc",
+        "priors.inc",
     }
 
 

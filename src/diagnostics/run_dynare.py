@@ -22,9 +22,14 @@ REQUIRED_MODEL_FILES = (
     "steady_state.m",
     "shocks.inc",
     "observables.inc",
+    "priors.inc",
 )
 IRF_HORIZON = 20
 IRF_EPSILON = 1e-10
+LIKELIHOOD_DATA_FILE = "classic_mvp_dynare.csv"
+LIKELIHOOD_OBSERVABLE_COLUMNS = ("y", "c", "i", "g", "q", "r_t")
+LIKELIHOOD_COLUMN_MAP = {"r_t": "r"}
+LOG_DIFF_DEMEAN_COLUMNS = ("y", "c", "i", "g")
 
 
 def irf_targets_file(root: Path | None = None) -> Path:
@@ -41,6 +46,11 @@ def samba_model_dir(root: Path | None = None) -> Path:
     return base / "model" / "samba_classic"
 
 
+def model_input_file(root: Path | None = None) -> Path:
+    base = root if root is not None else repo_root()
+    return base / "data" / "model_input" / "classic_mvp.csv"
+
+
 def build_dynare_command(dynare_executable: str) -> list[str]:
     return [dynare_executable, "samba_classic.mod", "noclearall", "nolog"]
 
@@ -54,6 +64,78 @@ def copy_model_inputs(source_dir: Path, target_dir: Path) -> None:
 
     for name in REQUIRED_MODEL_FILES:
         shutil.copy2(source_dir / name, target_dir / name)
+
+
+def write_likelihood_data(root: Path, target_dir: Path) -> dict[str, Any]:
+    source = model_input_file(root)
+    if not source.is_file():
+        raise FileNotFoundError(f"Missing approved model input data: {source}")
+
+    with source.open(encoding="utf-8", newline="") as handle:
+        rows = list(csv.DictReader(handle))
+
+    missing = [
+        source_column
+        for column in LIKELIHOOD_OBSERVABLE_COLUMNS
+        for source_column in [LIKELIHOOD_COLUMN_MAP.get(column, column)]
+        if rows and source_column not in rows[0]
+    ]
+    if missing:
+        raise ValueError(
+            "Missing required likelihood data columns: " + ", ".join(sorted(set(missing)))
+        )
+
+    numeric_rows = [
+        {
+            key: float(value)
+            for key, value in row.items()
+            if key != "quarter"
+        }
+        for row in rows
+    ]
+    transformed: dict[str, list[float]] = {}
+    for column in LOG_DIFF_DEMEAN_COLUMNS:
+        values = [
+            math.log(numeric_rows[index][column])
+            - math.log(numeric_rows[index - 1][column])
+            for index in range(1, len(numeric_rows))
+        ]
+        mean_value = sum(values) / len(values)
+        transformed[column] = [value - mean_value for value in values]
+
+    q_values = [row["q"] for row in numeric_rows]
+    q_mean = sum(q_values) / len(q_values)
+    q_percent_deviation = [100.0 * (value / q_mean - 1.0) for value in q_values][1:]
+    transformed["q"] = q_percent_deviation
+
+    r_values = [row["r"] for row in numeric_rows]
+    r_mean = sum(r_values) / len(r_values)
+    transformed["r_t"] = [value - r_mean for value in r_values][1:]
+
+    observation_count = len(next(iter(transformed.values())))
+    target = target_dir / LIKELIHOOD_DATA_FILE
+    with target.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=LIKELIHOOD_OBSERVABLE_COLUMNS)
+        writer.writeheader()
+        for index in range(observation_count):
+            writer.writerow(
+                {
+                    column: f"{transformed[column][index]:.15g}"
+                    for column in LIKELIHOOD_OBSERVABLE_COLUMNS
+                }
+            )
+
+    return {
+        "likelihood_data_source": str(source),
+        "likelihood_data_file": LIKELIHOOD_DATA_FILE,
+        "likelihood_observable_columns": list(LIKELIHOOD_OBSERVABLE_COLUMNS),
+        "likelihood_observation_count": observation_count,
+        "likelihood_data_transformations": {
+            "y_c_i_g": "first log-difference, demeaned",
+            "q": "percent difference from sample mean",
+            "r_t": "demeaned level, using source column r",
+        },
+    }
 
 
 def _tail(text: str | bytes | None, max_lines: int = 25, max_chars: int = 4000) -> str:
@@ -150,6 +232,36 @@ def _parse_bk(stdout: str) -> dict[str, Any]:
         "bk_rank_condition_verified": rank_verified,
         "bk_order_condition_not_verified": order_not_verified,
         "bk_indeterminacy_reported": indeterminacy,
+    }
+
+
+LIKELIHOOD_LINE_RE = re.compile(r"(log|likelihood|posterior)", re.IGNORECASE)
+NUMBER_RE = re.compile(
+    r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][-+]?\d+)?|NaN|Inf|-Inf"
+)
+
+
+def _parse_likelihood(stdout: str, stderr: str) -> dict[str, Any]:
+    likelihood_lines = [
+        line.strip()
+        for line in (stdout + "\n" + stderr).splitlines()
+        if LIKELIHOOD_LINE_RE.search(line)
+    ]
+    tokens = [
+        token
+        for line in likelihood_lines
+        for token in NUMBER_RE.findall(line)
+    ]
+    values = [float(token) for token in tokens]
+    finite_values = [value for value in values if math.isfinite(value)]
+    nonfinite_values = [value for value in values if not math.isfinite(value)]
+
+    return {
+        "likelihood_lines_found": len(likelihood_lines),
+        "likelihood_numeric_values_found": len(values),
+        "likelihood_nonfinite_value_count": len(nonfinite_values),
+        "finite_likelihood_reported": bool(finite_values) and not nonfinite_values,
+        "likelihood_last_finite_value": finite_values[-1] if finite_values else None,
     }
 
 
@@ -293,6 +405,34 @@ def run_dynare(
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write("\nsteady;\ncheck;\n")
         normalized_mode = "irfs" if mode == "irf" else mode
+        likelihood_data = {}
+        if normalized_mode == "likelihood":
+            try:
+                likelihood_data = write_likelihood_data(root, temp_dir)
+            except (FileNotFoundError, ValueError) as exc:
+                return {
+                    "mode": mode,
+                    "status": "failed",
+                    "returncode": 2,
+                    "model_file": str(source_dir / "samba_classic.mod"),
+                    "error": str(exc),
+                }
+            with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
+                handle.write(
+                    "\n@#include \"priors.inc\"\n"
+                    "estimated_params_init(use_calibration);\n"
+                    "end;\n"
+                    "estimation("
+                    "datafile=classic_mvp_dynare, "
+                    "mode_compute=0, "
+                    "mh_replic=0, "
+                    "lik_init=3, "
+                    "diffuse_filter, "
+                    "kalman_algo=4, "
+                    "nograph, "
+                    "nodisplay"
+                    ");\n"
+                )
         if normalized_mode == "irfs":
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write(
@@ -347,6 +487,11 @@ def run_dynare(
                 "persistent_outputs_created": False,
                 **evaluate_irf_targets(targets, irf_series),
             }
+        likelihood = (
+            _parse_likelihood(completed.stdout, completed.stderr)
+            if normalized_mode == "likelihood"
+            else {}
+        )
         status = "passed" if completed.returncode == 0 else "failed"
         returncode = completed.returncode
         if mode == "residuals" and completed.returncode == 0:
@@ -375,6 +520,10 @@ def run_dynare(
             )
             status = "passed" if irf_pass else "failed"
             returncode = 0 if irf_pass else 1
+        if normalized_mode == "likelihood" and completed.returncode == 0:
+            likelihood_pass = likelihood["finite_likelihood_reported"]
+            status = "passed" if likelihood_pass else "failed"
+            returncode = 0 if likelihood_pass else 1
 
         return {
             "mode": normalized_mode,
@@ -389,6 +538,8 @@ def run_dynare(
             **residuals,
             **bk,
             **irfs,
+            **likelihood_data,
+            **likelihood,
             "stdout_tail": _tail(completed.stdout),
             "stderr_tail": _tail(completed.stderr),
         }
@@ -400,7 +551,11 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("smoke", "residuals", "bk", "irf", "irfs"), default="smoke")
+    parser.add_argument(
+        "--mode",
+        choices=("smoke", "residuals", "bk", "irf", "irfs", "likelihood"),
+        default="smoke",
+    )
     parser.add_argument("--dynare", default="dynare")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     parser.add_argument("--residual-tolerance", type=float, default=1e-8)
