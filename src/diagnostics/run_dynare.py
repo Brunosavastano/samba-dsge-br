@@ -26,11 +26,19 @@ REQUIRED_MODEL_FILES = (
 )
 IRF_HORIZON = 20
 IRF_EPSILON = 1e-10
+MH_PILOT_ESTIMATED_PARAMETER_COUNT = 28
+MH_PILOT_DYNARE_DEFAULT_JSCALE = round(
+    2.38 / math.sqrt(MH_PILOT_ESTIMATED_PARAMETER_COUNT), 6
+)
 MH_PILOT_CONFIG = {
     "mh_replic": 2000,
     "chains": 2,
     "mh_nblocks": 2,
     "mh_drop": 0.5,
+    "mh_jscale": None,
+    "estimated_parameter_count": MH_PILOT_ESTIMATED_PARAMETER_COUNT,
+    "dynare_default_mh_jscale": MH_PILOT_DYNARE_DEFAULT_JSCALE,
+    "target_acceptance_central": 0.234,
     "target_acceptance_min": 0.20,
     "target_acceptance_max": 0.35,
     "rhat_policy": "warning_only",
@@ -512,6 +520,7 @@ def run_dynare(
     dynare_executable: str = "dynare",
     timeout_seconds: int = 180,
     residual_tolerance: float = 1e-8,
+    mh_jscale: float | None = None,
 ) -> dict[str, Any]:
     root = repo_root()
     source_dir = samba_model_dir(root)
@@ -523,6 +532,14 @@ def run_dynare(
             "returncode": 127,
             "model_file": str(source_dir / "samba_classic.mod"),
             "error": f"Dynare executable not found on PATH: {dynare_executable}",
+        }
+    if mh_jscale is not None and mh_jscale <= 0:
+        return {
+            "mode": mode,
+            "status": "failed",
+            "returncode": 2,
+            "model_file": str(source_dir / "samba_classic.mod"),
+            "error": "mh_jscale must be positive when provided.",
         }
 
     with tempfile.TemporaryDirectory(prefix="samba_dynare_") as temp_dir_raw:
@@ -575,12 +592,37 @@ def run_dynare(
                 mh_replic = MH_PILOT_CONFIG["mh_replic"] if normalized_mode == "mh-pilot" else 0
                 mh_nblocks = MH_PILOT_CONFIG["mh_nblocks"] if normalized_mode == "mh-pilot" else None
                 mh_drop = MH_PILOT_CONFIG["mh_drop"] if normalized_mode == "mh-pilot" else None
+                pilot_mh_jscale = (
+                    mh_jscale if mh_jscale is not None else MH_PILOT_CONFIG["mh_jscale"]
+                )
                 estimation_options = {
                     "mode_compute": mode_compute,
                     "mh_replic": mh_replic,
                     "chains": MH_PILOT_CONFIG["chains"] if normalized_mode == "mh-pilot" else None,
                     "mh_nblocks": mh_nblocks,
                     "mh_drop": mh_drop,
+                    "mh_jscale": pilot_mh_jscale if normalized_mode == "mh-pilot" else None,
+                    "mh_jscale_source": (
+                        "cli"
+                        if mh_jscale is not None
+                        else (
+                            "config"
+                            if pilot_mh_jscale is not None
+                            else "dynare_default"
+                        )
+                    )
+                    if normalized_mode == "mh-pilot"
+                    else None,
+                    "dynare_default_mh_jscale": (
+                        MH_PILOT_CONFIG["dynare_default_mh_jscale"]
+                        if normalized_mode == "mh-pilot"
+                        else None
+                    ),
+                    "target_acceptance_central": (
+                        MH_PILOT_CONFIG["target_acceptance_central"]
+                        if normalized_mode == "mh-pilot"
+                        else None
+                    ),
                     "estimation_smoke": normalized_mode == "estimation-smoke",
                     "mh_pilot": normalized_mode == "mh-pilot",
                     "posterior_mode": normalized_mode == "posterior-mode",
@@ -592,6 +634,8 @@ def run_dynare(
                         f"mh_nblocks={mh_nblocks}, "
                         f"mh_drop={mh_drop}, "
                     )
+                    if pilot_mh_jscale is not None:
+                        mh_options += f"mh_jscale={pilot_mh_jscale}, "
                 handle.write(
                     "\nshocks;\n"
                     f"{measurement_error_block}\n"
@@ -788,6 +832,12 @@ def main() -> int:
     parser.add_argument("--dynare", default="dynare")
     parser.add_argument("--timeout-seconds", type=int, default=180)
     parser.add_argument("--residual-tolerance", type=float, default=1e-8)
+    parser.add_argument(
+        "--mh-jscale",
+        type=float,
+        default=None,
+        help="Optional WBS-072 MH pilot proposal scale.",
+    )
     args = parser.parse_args()
 
     result = run_dynare(
@@ -795,6 +845,7 @@ def main() -> int:
         args.dynare,
         args.timeout_seconds,
         args.residual_tolerance,
+        args.mh_jscale,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return int(result["returncode"])

@@ -1,6 +1,6 @@
 ---
-status: wbs071a_estimation_smoke_completed
-wbs: WBS-071a
+status: wbs072_mh_pilot_completed
+wbs: WBS-072
 gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
@@ -9,6 +9,8 @@ priors_created: true
 finite_likelihood_smoke_created: true
 posterior_mode_completed: true
 estimation_smoke_completed: true
+mh_pilot_completed: true
+full_mh_started: false
 estimation_started: false
 posterior_created: false
 ---
@@ -269,3 +271,25 @@ nonfinite likelihood values. The minimal approved artifact is
 WBS-071a pass condition: the estimation smoke run completes with finite output,
 `mh_replic` remains zero, and no pilot/full posterior chains, backtesting
 outputs, Redux files, or sovereign-extension files are created.
+
+## WBS-072 MH Pilot
+
+WBS-072 runs only the Bruno-approved pilot configuration: `mh_replic=2000` per
+chain, two chains, two blocks, 50 percent burn-in, and target acceptance band
+`0.20` to `0.35`. It does not start WBS-073 full MH and does not support
+posterior inference claims.
+
+The initial pilot acceptance was below target at `0.1325`. The accepted
+mechanical fix tuned only the proposal scale to `mh_jscale=0.337313`, leaving
+model equations, priors, data, and calibration unchanged. The resulting pilot
+completed wrapper diagnostics with finite likelihood, chain acceptance ratios
+`0.2725` and `0.2920`, and average acceptance `0.28225`.
+
+R-hat was unavailable because Dynare did not compute MCMC convergence
+diagnostics for this short pilot. Per Bruno's WBS-072 amendment, this is a
+diagnostic warning only and is not final convergence evidence.
+
+WBS-072 pass condition: pilot chains complete, no likelihood NaN/Inf is
+reported, average acceptance is inside the approved band, only pilot artifacts
+are persisted, and no full MH, backtesting, Redux, or sovereign-extension
+artifacts are created.

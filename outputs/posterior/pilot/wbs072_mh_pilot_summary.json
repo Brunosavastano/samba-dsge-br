@@ -1,0 +1,42 @@
+{
+  "wbs": "WBS-072",
+  "mode": "mh-pilot",
+  "status": "passed",
+  "command": "python src/diagnostics/run_dynare.py --mode mh-pilot --timeout-seconds 1800 --mh-jscale 0.337313",
+  "returncode": 0,
+  "dynare_returncode": 3221225477,
+  "elapsed_seconds": 1124.922,
+  "mh_replic": 2000,
+  "chains": 2,
+  "mh_nblocks": 2,
+  "mh_drop": 0.5,
+  "mh_jscale": 0.337313,
+  "mh_jscale_source": "cli",
+  "dynare_default_mh_jscale": 0.449778,
+  "target_acceptance_central": 0.234,
+  "target_acceptance_min": 0.2,
+  "target_acceptance_max": 0.35,
+  "mh_acceptance_values": [
+    0.2725,
+    0.292
+  ],
+  "mh_acceptance_ratio": 0.28225,
+  "mh_acceptance_in_target_band": true,
+  "mh_chains_completed": true,
+  "mh_nonfinite_token_count": 0,
+  "finite_likelihood_reported": true,
+  "likelihood_last_finite_value": -467.763166,
+  "likelihood_nonfinite_value_count": 0,
+  "likelihood_observation_count": 67,
+  "rhat_status": "unavailable_warning",
+  "rhat_policy": "warning_only",
+  "rhat_value": null,
+  "full_mh_created": false,
+  "posterior_inference_claimed": false,
+  "persistent_outputs_created": false,
+  "notes": [
+    "Pilot artifact only; not final convergence evidence.",
+    "R-hat unavailable is a warning under the Bruno-approved WBS-072 amendment.",
+    "No model equations, priors, data, or calibration values were changed."
+  ]
+}
