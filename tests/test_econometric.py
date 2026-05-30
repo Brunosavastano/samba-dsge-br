@@ -72,3 +72,22 @@ def test_wbs071_blocked_posterior_mode_does_not_create_future_outputs():
     assert "mh_replic=0" in text
     assert "did not report a completed posterior mode" in text
     assert all(not path.exists() for path in FORBIDDEN_PERSISTENT_OUTPUTS)
+
+
+def test_wbs071_completed_posterior_mode_records_temp_run_without_future_outputs():
+    if "WBS-071_COMPLETED" not in _execution_status():
+        return
+
+    result = ROOT / "docs" / "wbs071_posterior_mode.md"
+    blocker = ROOT / "docs" / "wbs071_blockers.md"
+    assert result.exists()
+    result_text = result.read_text(encoding="utf-8")
+    blocker_text = blocker.read_text(encoding="utf-8")
+
+    assert "Status: `WBS-071_COMPLETED`" in result_text
+    assert "mh_replic=0" in result_text
+    assert "mode_compute=4" in result_text
+    assert "-456.997406" in result_text
+    assert "No MH chain" in result_text
+    assert "RESOLVED_WBS071_POSTERIOR_MODE_COMPLETED" in blocker_text
+    assert all(not path.exists() for path in FORBIDDEN_PERSISTENT_OUTPUTS)

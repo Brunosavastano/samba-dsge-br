@@ -38,6 +38,13 @@ LIKELIHOOD_MEASUREMENT_ERRORS = {
         "rationale": "GDP growth measurement error documented by WP239 and needed to avoid singular likelihood for y,c,i,g.",
     },
 }
+RUNTIME_PROCESS_NAMES = {
+    "dynare.exe",
+    "matlab.exe",
+    "octave.exe",
+    "octave-cli.exe",
+    "octave-svgconvert.exe",
+}
 
 
 def irf_targets_file(root: Path | None = None) -> Path:
@@ -160,7 +167,46 @@ def _run_command(
     cwd: Path,
     timeout_seconds: int,
 ) -> subprocess.CompletedProcess[str]:
+    def _runtime_process_ids() -> set[int]:
+        if not sys.platform.startswith("win"):
+            return set()
+        completed = subprocess.run(
+            ["tasklist", "/FO", "CSV", "/NH"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+        if completed.returncode != 0:
+            return set()
+        process_ids = set()
+        for row in csv.reader(completed.stdout.splitlines()):
+            if len(row) < 2:
+                continue
+            if row[0].lower() in RUNTIME_PROCESS_NAMES:
+                try:
+                    process_ids.add(int(row[1]))
+                except ValueError:
+                    continue
+        return process_ids
+
+    def _kill_process_tree(pid: int) -> None:
+        if sys.platform.startswith("win"):
+            subprocess.run(
+                ["taskkill", "/PID", str(pid), "/T", "/F"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        else:
+            try:
+                process.kill()
+            except NameError:
+                pass
+
     def _run_shell_command() -> subprocess.CompletedProcess[str]:
+        runtime_pids_before = _runtime_process_ids()
         process = subprocess.Popen(
             subprocess.list2cmdline(command),
             cwd=cwd,
@@ -174,15 +220,9 @@ def _run_command(
         try:
             stdout, stderr = process.communicate(timeout=timeout_seconds)
         except subprocess.TimeoutExpired:
-            if sys.platform.startswith("win"):
-                subprocess.run(
-                    ["taskkill", "/PID", str(process.pid), "/T", "/F"],
-                    capture_output=True,
-                    text=True,
-                    check=False,
-                )
-            else:
-                process.kill()
+            _kill_process_tree(process.pid)
+            for pid in _runtime_process_ids() - runtime_pids_before:
+                _kill_process_tree(pid)
             stdout, stderr = process.communicate()
             raise subprocess.TimeoutExpired(
                 cmd=command,

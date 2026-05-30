@@ -1,12 +1,13 @@
 ---
-status: wbs070_finite_likelihood_completed
-wbs: WBS-070
+status: wbs071_posterior_mode_completed
+wbs: WBS-071
 gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
 priors_table_created: true
 priors_created: true
 finite_likelihood_smoke_created: true
+posterior_mode_completed: true
 estimation_started: false
 posterior_created: false
 ---
@@ -85,7 +86,7 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: WBS-071, posterior mode. Do not create MH chains,
+Next safe task: WBS-071a, estimation smoke test. Do not create MH chains,
 backtesting, Redux, or sovereign extension before the relevant later WBS.
 
 ## WBS-066 Completed Result
@@ -236,3 +237,18 @@ backtesting output, Redux file, or sovereign-extension file is created.
 WBS-070 pass condition: the temporary likelihood smoke reports a finite initial
 log posterior/likelihood and leaves no persistent posterior or backtesting
 artifacts in the repository.
+
+## WBS-071 Posterior Mode
+
+WBS-071 runs posterior mode only through
+`src/diagnostics/run_dynare.py --mode posterior-mode --timeout-seconds 900`.
+The run uses `mode_compute=4`, `mh_replic=0`, WBS-069 priors, WBS-070
+measurement treatment, and a temporary Dynare working directory.
+
+The posterior mode run completed in `518.562` seconds and reported finite log
+data density `-456.997406`. No MH chain, pilot/full posterior sample,
+backtesting output, Redux file, or sovereign-extension file is created by
+WBS-071.
+
+WBS-071 pass condition: posterior mode completes with finite output, `mh_replic`
+remains zero, and no persistent posterior/backtesting artifacts are committed.
