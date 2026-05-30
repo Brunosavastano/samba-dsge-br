@@ -12,6 +12,7 @@ STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 PRIORS_FILE = ROOT / "model" / "samba_classic" / "priors.inc"
 WRAPPER_FILE = ROOT / "src" / "diagnostics" / "run_dynare.py"
 WBS071A_SMOKE_ARTIFACT = ROOT / "outputs" / "posterior" / "smoke" / "wbs071a_estimation_smoke.json"
+WBS072_CONFIG = ROOT / "docs" / "wbs072_mh_pilot_config.md"
 FORBIDDEN_PERSISTENT_OUTPUTS = (
     ROOT / "outputs" / "backtesting",
     ROOT / "model" / "samba_redux",
@@ -127,4 +128,22 @@ def test_wbs071a_estimation_smoke_records_minimal_artifact_without_mh_outputs():
     assert summary["likelihood_nonfinite_value_count"] == 0
     assert summary["posterior_mode"] is False
     assert summary["persistent_outputs_created"] is False
+    assert all(not path.exists() for path in _forbidden_persistent_outputs())
+
+
+def test_wbs072_mh_pilot_config_is_proposal_only_without_chains():
+    if "WBS-072_CONFIG_PROPOSED" not in _execution_status():
+        return
+
+    assert WBS072_CONFIG.exists()
+    text = WBS072_CONFIG.read_text(encoding="utf-8")
+
+    assert "approval_status: proposed" in text
+    assert "do_not_run_until_approved: true" in text
+    assert "`mh_replic`: 2000 per chain" in text
+    assert "chains: 2 independent pilot chains" in text
+    assert "target acceptance band: 0.20 to 0.35" in text
+    assert "R-hat scope:" in text
+    assert "outputs/posterior/pilot/" in text
+    assert "outputs/posterior/full/" in text
     assert all(not path.exists() for path in _forbidden_persistent_outputs())

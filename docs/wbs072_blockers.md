@@ -1,6 +1,6 @@
 # WBS-072 Blockers
 
-Status: `BLOCKED_WBS072_PILOT_CONFIG`
+Status: `WBS-072_CONFIG_PROPOSED`
 
 WBS-072 requires an MH pilot before WBS-073 full MH, but the approved project
 docs currently specify only "short chains" and preliminary acceptance/R-hat.
@@ -18,8 +18,11 @@ Checked sources:
 - `docs/04_estimation_strategy.md`
 - WBS-071/WBS-071a result docs
 
-Re-check result: no approved source-backed pilot configuration was found. This
-is not a mechanical blocker and must not be resolved by guessing MH settings.
+Proposal created: `docs/wbs072_mh_pilot_config.md`.
 
-WBS-072 remains blocked until Bruno approves the pilot configuration. WBS-073
-full MH, backtesting, Redux, and sovereign outputs remain forbidden.
+The proposal remains unapproved. This is not a mechanical blocker and must not
+be resolved by running MH until Bruno approves the proposed settings.
+
+WBS-072 remains blocked for execution until Bruno approves the pilot
+configuration. WBS-073 full MH, backtesting, Redux, and sovereign outputs remain
+forbidden.
