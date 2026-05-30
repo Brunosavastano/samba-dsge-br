@@ -1,11 +1,11 @@
 ---
-status: wbs068_priors_table_completed
-wbs: WBS-068
+status: wbs069_priors_inc_completed
+wbs: WBS-069
 gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
 priors_table_created: true
-priors_created: false
+priors_created: true
 estimation_started: false
 posterior_created: false
 ---
@@ -84,10 +84,9 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: WBS-069, translate the approved WBS-068 prior rows to
-`model/samba_classic/priors.inc`. Do not start estimation, create posterior
-outputs, run backtesting, Redux, or sovereign extension before the relevant
-later WBS.
+Next safe task: WBS-070, run the finite likelihood smoke test using the
+approved WBS-069 priors include. Do not create posterior outputs, run
+backtesting, Redux, or sovereign extension before the relevant later WBS.
 
 ## WBS-066 Completed Result
 
@@ -206,3 +205,16 @@ PRIOR-028,shock_stderr,stderr_q_m_star,epsilon_QMstar,Inv-Gamma,1.0,inf,BCB_WP23
 WBS-068 pass condition: every row eligible for WBS-069 has an explicit WP239
 prior distribution, mean, standard deviation, source location, and WBS-067
 rationale. Estimation remains blocked until later WBS steps.
+
+## WBS-069 Dynare Priors Include
+
+WBS-069 translates only the 28 WBS-068 rows marked
+`eligible_for_wbs069_priors_inc=true` into `model/samba_classic/priors.inc`.
+The include uses Dynare `estimated_params` syntax and keeps the WBS-067
+excluded/fixed entries out of the prior set. It does not add an estimation
+command, data file, posterior output, backtesting output, Redux file, or
+sovereign extension.
+
+WBS-069 pass condition: `priors.inc` exists, every prior entry is sourced from
+the WBS-068 table, no WBS-067 excluded/fixed entry is included, and estimation
+has not started.

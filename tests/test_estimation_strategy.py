@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 STRATEGY = ROOT / "docs" / "04_estimation_strategy.md"
+PRIORS_FILE = ROOT / "model" / "samba_classic" / "priors.inc"
 
 
 def _execution_status() -> str:
@@ -19,12 +20,12 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     assert STRATEGY.exists()
     text = STRATEGY.read_text(encoding="utf-8")
 
-    assert "status: wbs068_priors_table_completed" in text
-    assert "wbs: WBS-068" in text
+    assert "status: wbs069_priors_inc_completed" in text
+    assert "wbs: WBS-069" in text
     assert "priors_table_created: true" in text
     assert "identification_run_created: true" in text
     assert "identification_outputs_created: true" in text
-    assert "priors_created: false" in text
+    assert "priors_created: true" in text
     assert "estimation_started: false" in text
     assert "posterior_created: false" in text
     assert "Iskrev/Dynare identification gate" in text
@@ -73,7 +74,10 @@ def test_wbs065_protocol_does_not_create_future_phase_artifacts():
         assert "order and rank conditions are verified" in text
         assert "no priors" in text
         assert "no posterior outputs" in text
-    assert not (ROOT / "model" / "samba_classic" / "priors.inc").exists()
+    if "WBS-069_COMPLETED" in execution_status:
+        assert PRIORS_FILE.exists()
+    else:
+        assert not PRIORS_FILE.exists()
     assert not (ROOT / "outputs" / "posterior").exists()
     assert not (ROOT / "outputs" / "backtesting").exists()
     assert not (ROOT / "model" / "samba_redux").exists()
@@ -146,11 +150,12 @@ def test_wbs067_classifies_every_nonidentified_entry_without_priors():
         "SE_m",
         "SE_x",
     }
-    assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
-    assert not (ROOT / "model" / "samba_classic" / "priors.inc").exists()
+    if "WBS-069_COMPLETED" not in execution_status:
+        assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
+        assert not PRIORS_FILE.exists()
 
 
-def test_wbs068_priors_table_is_sourced_and_does_not_create_priors_inc():
+def test_wbs068_priors_table_is_sourced_and_priors_inc_is_phase_gated():
     execution_status = _execution_status()
     if "WBS-068_COMPLETED" not in execution_status:
         return
@@ -178,6 +183,54 @@ def test_wbs068_priors_table_is_sourced_and_does_not_create_priors_inc():
     assert all(row["source_location"] for row in rows)
     assert all(row["rationale"] for row in rows)
     assert excluded_by_wbs067.isdisjoint({row["canonical_name"] for row in rows})
-    assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
-    assert not (ROOT / "model" / "samba_classic" / "priors.inc").exists()
+    if "WBS-069_COMPLETED" in execution_status:
+        assert "priors_created: true" in STRATEGY.read_text(encoding="utf-8")
+        assert PRIORS_FILE.exists()
+    else:
+        assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
+        assert not PRIORS_FILE.exists()
     assert not (ROOT / "outputs" / "posterior").exists()
+
+
+def test_wbs069_priors_inc_translates_only_wbs068_eligible_rows():
+    if "WBS-069_COMPLETED" not in _execution_status():
+        return
+
+    rows = _wbs068_prior_rows()
+    text = PRIORS_FILE.read_text(encoding="utf-8")
+    model_params = {
+        row["canonical_name"]
+        for row in rows
+        if row["scope"] == "model_parameter"
+    }
+    shock_names = {
+        row["canonical_name"].removeprefix("stderr_")
+        for row in rows
+        if row["scope"] == "shock_stderr"
+    }
+    excluded = {
+        "phi_pi",
+        "phi_y",
+        "psi_nfa",
+        "external_debt_lom_adjustment",
+        "pi_target_gross_ss",
+        "lambda_g",
+        "lambda_i",
+        "lambda_f",
+        "stderr pi_target",
+        "stderr y_gap",
+    }
+
+    assert "estimated_params;" in text
+    assert "end;" in text
+    assert text.count("_pdf") == len(rows)
+    assert "estimation(" not in text
+    assert "mh_replic" not in text
+    assert "posterior" not in text
+    assert "datafile" not in text
+    for parameter in model_params:
+        assert f"  {parameter}, " in text
+    for shock in shock_names:
+        assert f"  stderr {shock}, " in text
+    for name in excluded:
+        assert name not in text

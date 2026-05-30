@@ -109,6 +109,8 @@ def _forbidden_generated_paths() -> set[Path]:
         or "WBS-066_COMPLETED" in _execution_status()
     ):
         paths.discard(ROOT / "outputs" / "identification")
+    if "WBS-069_COMPLETED" in _execution_status():
+        paths.discard(ROOT / "model" / "samba_classic" / "priors.inc")
     return paths
 
 
@@ -120,6 +122,8 @@ def _is_forbidden_tracked_path(path: str) -> bool:
         )
         and path == ALLOWED_WBS066_IDENTIFICATION_DIAGNOSTIC
     ):
+        return False
+    if "WBS-069_COMPLETED" in _execution_status() and path == "model/samba_classic/priors.inc":
         return False
     return (
         path in FORBIDDEN_TRACKED_EXACT_PATHS
@@ -174,7 +178,8 @@ def test_wbs057_source_mapping_or_transcription_status_blocks_mod_file():
     if "WBS-057_COMPLETED" in execution_status:
         assert MODEL_FILE.exists()
         assert "Dynare parse: passed" in blockers
-    assert all(not path.exists() for path in FORBIDDEN_WBS057_FILES)
+    if "WBS-069_COMPLETED" not in execution_status:
+        assert all(not path.exists() for path in FORBIDDEN_WBS057_FILES)
     if "WBS-058_COMPLETED" not in execution_status:
         assert not SHOCKS_FILE.exists()
     if "WBS-059_COMPLETED" not in execution_status:
