@@ -18,5 +18,8 @@ Checked sources:
 - `docs/04_estimation_strategy.md`
 - WBS-071/WBS-071a result docs
 
+Re-check result: no approved source-backed pilot configuration was found. This
+is not a mechanical blocker and must not be resolved by guessing MH settings.
+
 WBS-072 remains blocked until Bruno approves the pilot configuration. WBS-073
 full MH, backtesting, Redux, and sovereign outputs remain forbidden.

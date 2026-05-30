@@ -8,16 +8,16 @@ Current PR/WBS: WBS-072 / PR14 MH pilot blocked before running chains.
 Blocked WBS: WBS-072 MH pilot.
 Previous blocking status: BLOCKED_WBS066_IDENTIFICATION_SOLVE resolved mechanically by using Dynare's documented diffuse-filter identification path.
 Last completed task: WBS-071a estimation smoke completed in a temporary Dynare run with `mh_replic=0`.
-Last attempted task: WBS-072 MH pilot configuration audit.
+Last attempted task: WBS-072 MH pilot configuration re-check against approved docs; no source-backed configuration found.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
 Next safe task: approve WBS-072 MH pilot configuration.
-Blocker classification: missing approved pilot configuration, not a runtime/model failure.
+Blocker classification: missing approved pilot configuration, not mechanical and not a runtime/model failure.
 Blockers: `docs/wbs072_blockers.md`; WBS-072 lacks approved `mh_replic`, chain/block count, acceptance-rate band, preliminary R-hat scope, and minimal pilot artifacts.
 Required user action: approve WBS-072 pilot configuration before any MH chain is run.
 Files changed: `docs/wbs072_blockers.md`, `docs/PROJECT_STATUS.md`.
 Tests run: `python -m pytest` - 103 passed; `git diff --check` - passed.
 Dynare results: not run for WBS-072; blocked before MH because pilot configuration is not approved.
-Commit hash: pending for WBS-072 blocker commit; final response reports the pushed hash.
+Commit hash: pending for WBS-072 blocker re-check commit; final response reports the pushed hash.
 Safe to continue: false for MH until WBS-072 pilot configuration is approved; forbidden next without prompt: WBS-073 full MH/backtesting/Redux/sovereign.
 
 Visual status:
