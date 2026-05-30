@@ -18,6 +18,9 @@ MODEL_FILE = ROOT / "model" / "samba_classic" / "samba_classic.mod"
 SHOCKS_FILE = ROOT / "model" / "samba_classic" / "shocks.inc"
 OBSERVABLES_FILE = ROOT / "model" / "samba_classic" / "observables.inc"
 WRAPPER_FILE = ROOT / "src" / "diagnostics" / "run_dynare.py"
+ALLOWED_WBS071A_SMOKE_ARTIFACT = (
+    "outputs/posterior/smoke/wbs071a_estimation_smoke.json"
+)
 FORBIDDEN_WBS057_FILES = {
     ROOT / "model" / "samba_classic" / "priors.inc",
 }
@@ -111,6 +114,10 @@ def _forbidden_generated_paths() -> set[Path]:
         paths.discard(ROOT / "outputs" / "identification")
     if "WBS-069_COMPLETED" in _execution_status():
         paths.discard(ROOT / "model" / "samba_classic" / "priors.inc")
+    if "WBS-071a_COMPLETED" in _execution_status():
+        paths.discard(ROOT / "outputs" / "posterior")
+        paths.add(ROOT / "outputs" / "posterior" / "pilot")
+        paths.add(ROOT / "outputs" / "posterior" / "full")
     return paths
 
 
@@ -124,6 +131,11 @@ def _is_forbidden_tracked_path(path: str) -> bool:
     ):
         return False
     if "WBS-069_COMPLETED" in _execution_status() and path == "model/samba_classic/priors.inc":
+        return False
+    if (
+        "WBS-071a_COMPLETED" in _execution_status()
+        and path == ALLOWED_WBS071A_SMOKE_ARTIFACT
+    ):
         return False
     return (
         path in FORBIDDEN_TRACKED_EXACT_PATHS

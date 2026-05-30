@@ -479,8 +479,11 @@ def run_dynare(
             normalized_mode = "likelihood-smoke"
         if mode == "posterior-mode":
             normalized_mode = "posterior-mode"
+        if mode == "estimation-smoke":
+            normalized_mode = "estimation-smoke"
         likelihood_data = {}
-        if normalized_mode in {"likelihood-smoke", "posterior-mode"}:
+        estimation_options: dict[str, Any] = {}
+        if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke"}:
             try:
                 likelihood_data = write_likelihood_data(root, temp_dir)
             except (FileNotFoundError, ValueError) as exc:
@@ -496,7 +499,14 @@ def run_dynare(
                     f"var {variable}; stderr {metadata['stderr']};"
                     for variable, metadata in LIKELIHOOD_MEASUREMENT_ERRORS.items()
                 )
-                mode_compute = 0 if normalized_mode == "likelihood-smoke" else 4
+                mode_compute = 4 if normalized_mode == "posterior-mode" else 0
+                estimation_options = {
+                    "mode_compute": mode_compute,
+                    "mh_replic": 0,
+                    "estimation_smoke": normalized_mode == "estimation-smoke",
+                    "posterior_mode": normalized_mode == "posterior-mode",
+                    "persistent_outputs_created": False,
+                }
                 handle.write(
                     "\nshocks;\n"
                     f"{measurement_error_block}\n"
@@ -571,7 +581,7 @@ def run_dynare(
             }
         likelihood = (
             _parse_likelihood(completed.stdout, completed.stderr)
-            if normalized_mode in {"likelihood-smoke", "posterior-mode"}
+            if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke"}
             else {}
         )
         status = "passed" if completed.returncode == 0 else "failed"
@@ -602,7 +612,7 @@ def run_dynare(
             )
             status = "passed" if irf_pass else "failed"
             returncode = 0 if irf_pass else 1
-        if normalized_mode == "likelihood-smoke" and completed.returncode == 0:
+        if normalized_mode in {"likelihood-smoke", "estimation-smoke"} and completed.returncode == 0:
             likelihood_pass = likelihood["finite_likelihood_reported"]
             status = "passed" if likelihood_pass else "failed"
             returncode = 0 if likelihood_pass else 1
@@ -628,9 +638,10 @@ def run_dynare(
             **bk,
             **irfs,
             **likelihood_data,
+            **estimation_options,
             "likelihood_measurement_errors": (
                 LIKELIHOOD_MEASUREMENT_ERRORS
-                if normalized_mode in {"likelihood-smoke", "posterior-mode"}
+                if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke"}
                 else None
             ),
             **likelihood,
@@ -656,6 +667,7 @@ def main() -> int:
             "likelihood",
             "likelihood-smoke",
             "posterior-mode",
+            "estimation-smoke",
         ),
         default="smoke",
     )

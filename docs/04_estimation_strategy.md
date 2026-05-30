@@ -1,6 +1,6 @@
 ---
-status: wbs071_posterior_mode_completed
-wbs: WBS-071
+status: wbs071a_estimation_smoke_completed
+wbs: WBS-071a
 gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
@@ -8,6 +8,7 @@ priors_table_created: true
 priors_created: true
 finite_likelihood_smoke_created: true
 posterior_mode_completed: true
+estimation_smoke_completed: true
 estimation_started: false
 posterior_created: false
 ---
@@ -86,8 +87,8 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: WBS-071a, estimation smoke test. Do not create MH chains,
-backtesting, Redux, or sovereign extension before the relevant later WBS.
+Next safe task: WBS-072, MH pilot. Do not create full MH chains, backtesting,
+Redux, or sovereign extension before the relevant later WBS.
 
 ## WBS-066 Completed Result
 
@@ -252,3 +253,19 @@ WBS-071.
 
 WBS-071 pass condition: posterior mode completes with finite output, `mh_replic`
 remains zero, and no persistent posterior/backtesting artifacts are committed.
+
+## WBS-071a Estimation Smoke Test
+
+WBS-071a runs a minimal estimation smoke path through
+`src/diagnostics/run_dynare.py --mode estimation-smoke --timeout-seconds 240`.
+The smoke uses WBS-052 data, WBS-059 transformations, WBS-069 priors, WBS-070
+measurement treatment, `mode_compute=0`, and `mh_replic=0`.
+
+The smoke run completed in a temporary Dynare working directory, reported a
+finite initial log posterior or likelihood of `-4472.9048`, and found zero
+nonfinite likelihood values. The minimal approved artifact is
+`outputs/posterior/smoke/wbs071a_estimation_smoke.json`.
+
+WBS-071a pass condition: the estimation smoke run completes with finite output,
+`mh_replic` remains zero, and no pilot/full posterior chains, backtesting
+outputs, Redux files, or sovereign-extension files are created.

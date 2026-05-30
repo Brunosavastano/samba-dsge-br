@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 STRATEGY = ROOT / "docs" / "04_estimation_strategy.md"
 PRIORS_FILE = ROOT / "model" / "samba_classic" / "priors.inc"
+WBS071A_SMOKE_ARTIFACT = ROOT / "outputs" / "posterior" / "smoke" / "wbs071a_estimation_smoke.json"
 
 
 def _execution_status() -> str:
@@ -16,18 +17,28 @@ def _execution_status() -> str:
     )
 
 
+def _assert_no_forbidden_posterior_outputs() -> None:
+    if "WBS-071a_COMPLETED" in _execution_status():
+        assert WBS071A_SMOKE_ARTIFACT.exists()
+        assert not (ROOT / "outputs" / "posterior" / "pilot").exists()
+        assert not (ROOT / "outputs" / "posterior" / "full").exists()
+    else:
+        assert not (ROOT / "outputs" / "posterior").exists()
+
+
 def test_wbs065_identification_protocol_exists_without_running_identification():
     assert STRATEGY.exists()
     text = STRATEGY.read_text(encoding="utf-8")
 
-    assert "status: wbs071_posterior_mode_completed" in text
-    assert "wbs: WBS-071" in text
+    assert "status: wbs071a_estimation_smoke_completed" in text
+    assert "wbs: WBS-071a" in text
     assert "priors_table_created: true" in text
     assert "identification_run_created: true" in text
     assert "identification_outputs_created: true" in text
     assert "priors_created: true" in text
     assert "finite_likelihood_smoke_created: true" in text
     assert "posterior_mode_completed: true" in text
+    assert "estimation_smoke_completed: true" in text
     assert "estimation_started: false" in text
     assert "posterior_created: false" in text
     assert "Iskrev/Dynare identification gate" in text
@@ -37,6 +48,7 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     assert "WBS-069 Dynare Priors Include" in text
     assert "WBS-070 Finite Likelihood Smoke" in text
     assert "WBS-071 Posterior Mode" in text
+    assert "WBS-071a Estimation Smoke Test" in text
 
 
 def _wbs067_rows() -> list[dict[str, str]]:
@@ -83,7 +95,7 @@ def test_wbs065_protocol_does_not_create_future_phase_artifacts():
         assert PRIORS_FILE.exists()
     else:
         assert not PRIORS_FILE.exists()
-    assert not (ROOT / "outputs" / "posterior").exists()
+    _assert_no_forbidden_posterior_outputs()
     assert not (ROOT / "outputs" / "backtesting").exists()
     assert not (ROOT / "model" / "samba_redux").exists()
     assert not (ROOT / "model" / "sovereign_extension").exists()
@@ -194,7 +206,7 @@ def test_wbs068_priors_table_is_sourced_and_priors_inc_is_phase_gated():
     else:
         assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
         assert not PRIORS_FILE.exists()
-    assert not (ROOT / "outputs" / "posterior").exists()
+    _assert_no_forbidden_posterior_outputs()
 
 
 def test_wbs069_priors_inc_translates_only_wbs068_eligible_rows():

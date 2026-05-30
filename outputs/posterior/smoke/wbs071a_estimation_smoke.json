@@ -1,0 +1,28 @@
+{
+  "wbs": "WBS-071a",
+  "mode": "estimation-smoke",
+  "status": "passed",
+  "command": "python src/diagnostics/run_dynare.py --mode estimation-smoke --timeout-seconds 240",
+  "working_directory": "temporary",
+  "mode_compute": 0,
+  "mh_replic": 0,
+  "posterior_mode": false,
+  "persistent_outputs_created": false,
+  "likelihood_observation_count": 67,
+  "likelihood_observable_columns": ["y", "c", "i", "g", "q", "r_t"],
+  "likelihood_data_file": "classic_mvp_dynare.csv",
+  "likelihood_data_source": "data/model_input/classic_mvp.csv",
+  "likelihood_measurement_errors": {
+    "y": {
+      "stderr": 0.08,
+      "source": "BCB_WP239",
+      "source_location": "WP239 Table 3 measurement errors, PDF page 99 printed page 98"
+    }
+  },
+  "finite_likelihood_reported": true,
+  "likelihood_nonfinite_value_count": 0,
+  "likelihood_last_finite_value": -4472.9048,
+  "elapsed_seconds": 7.156,
+  "forbidden_outputs_created": false,
+  "next_task": "WBS-072 MH pilot"
+}
