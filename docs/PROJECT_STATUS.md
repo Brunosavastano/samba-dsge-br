@@ -17,7 +17,7 @@ Required user action: approve or revise the WBS-072 pilot configuration before a
 Files changed: `docs/wbs072_mh_pilot_config.md`, `docs/wbs072_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_econometric.py`.
 Tests run: `python -m pytest` - 104 passed; `git diff --check` - passed.
 Dynare results: not run for WBS-072; this task created a proposal only.
-Commit hash: pending for WBS-072 config proposal commit; final response reports the pushed hash.
+Commit hash: `94701e5` for WBS-072 config proposal commit.
 Safe to continue: false for MH until WBS-072 pilot configuration is approved; forbidden next without prompt: WBS-073 full MH/backtesting/Redux/sovereign.
 
 Visual status:
