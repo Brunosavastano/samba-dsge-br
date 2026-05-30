@@ -160,21 +160,43 @@ def _run_command(
     cwd: Path,
     timeout_seconds: int,
 ) -> subprocess.CompletedProcess[str]:
+    def _run_shell_command() -> subprocess.CompletedProcess[str]:
+        process = subprocess.Popen(
+            subprocess.list2cmdline(command),
+            cwd=cwd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            shell=True,
+        )
+        try:
+            stdout, stderr = process.communicate(timeout=timeout_seconds)
+        except subprocess.TimeoutExpired:
+            if sys.platform.startswith("win"):
+                subprocess.run(
+                    ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+            else:
+                process.kill()
+            stdout, stderr = process.communicate()
+            raise subprocess.TimeoutExpired(
+                cmd=command,
+                timeout=timeout_seconds,
+                output=stdout,
+                stderr=stderr,
+            )
+        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
+
     if sys.platform.startswith("win") and Path(command[0]).suffix.lower() in {
         ".bat",
         ".cmd",
     }:
-        return subprocess.run(
-            subprocess.list2cmdline(command),
-            cwd=cwd,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=timeout_seconds,
-            shell=True,
-            check=False,
-        )
+        return _run_shell_command()
 
     return subprocess.run(
         command,
@@ -415,8 +437,10 @@ def run_dynare(
         normalized_mode = "irfs" if mode == "irf" else mode
         if mode == "likelihood":
             normalized_mode = "likelihood-smoke"
+        if mode == "posterior-mode":
+            normalized_mode = "posterior-mode"
         likelihood_data = {}
-        if normalized_mode == "likelihood-smoke":
+        if normalized_mode in {"likelihood-smoke", "posterior-mode"}:
             try:
                 likelihood_data = write_likelihood_data(root, temp_dir)
             except (FileNotFoundError, ValueError) as exc:
@@ -432,6 +456,7 @@ def run_dynare(
                     f"var {variable}; stderr {metadata['stderr']};"
                     for variable, metadata in LIKELIHOOD_MEASUREMENT_ERRORS.items()
                 )
+                mode_compute = 0 if normalized_mode == "likelihood-smoke" else 4
                 handle.write(
                     "\nshocks;\n"
                     f"{measurement_error_block}\n"
@@ -441,7 +466,7 @@ def run_dynare(
                     "end;\n"
                     "estimation("
                     "datafile=classic_mvp_dynare, "
-                    "mode_compute=0, "
+                    f"mode_compute={mode_compute}, "
                     "mh_replic=0, "
                     "lik_init=3, "
                     "diffuse_filter, "
@@ -506,7 +531,7 @@ def run_dynare(
             }
         likelihood = (
             _parse_likelihood(completed.stdout, completed.stderr)
-            if normalized_mode == "likelihood-smoke"
+            if normalized_mode in {"likelihood-smoke", "posterior-mode"}
             else {}
         )
         status = "passed" if completed.returncode == 0 else "failed"
@@ -541,6 +566,13 @@ def run_dynare(
             likelihood_pass = likelihood["finite_likelihood_reported"]
             status = "passed" if likelihood_pass else "failed"
             returncode = 0 if likelihood_pass else 1
+        if normalized_mode == "posterior-mode" and completed.returncode == 0:
+            mode_pass = (
+                likelihood["finite_likelihood_reported"]
+                and "mode" in (completed.stdout + completed.stderr).lower()
+            )
+            status = "passed" if mode_pass else "failed"
+            returncode = 0 if mode_pass else 1
 
         return {
             "mode": normalized_mode,
@@ -558,7 +590,7 @@ def run_dynare(
             **likelihood_data,
             "likelihood_measurement_errors": (
                 LIKELIHOOD_MEASUREMENT_ERRORS
-                if normalized_mode == "likelihood-smoke"
+                if normalized_mode in {"likelihood-smoke", "posterior-mode"}
                 else None
             ),
             **likelihood,
@@ -575,7 +607,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
-        choices=("smoke", "residuals", "bk", "irf", "irfs", "likelihood", "likelihood-smoke"),
+        choices=(
+            "smoke",
+            "residuals",
+            "bk",
+            "irf",
+            "irfs",
+            "likelihood",
+            "likelihood-smoke",
+            "posterior-mode",
+        ),
         default="smoke",
     )
     parser.add_argument("--dynare", default="dynare")

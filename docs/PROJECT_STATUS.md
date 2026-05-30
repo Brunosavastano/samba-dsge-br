@@ -3,22 +3,22 @@
 Updated: 2026-05-29
 
 Current gate: Gate 5a preparation started; Gate 4 completed; Gate 3 completed; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED.
-Current PR/WBS: WBS-070 / PR13 finite likelihood smoke test completed.
-Blocked WBS: none for WBS-070; WBS-071 posterior mode is next.
+Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED; BLOCKED_WBS071_POSTERIOR_MODE_TIMEOUT.
+Current PR/WBS: WBS-071 / PR13 posterior mode blocked.
+Blocked WBS: WBS-071 posterior mode.
 Previous blocking status: BLOCKED_WBS066_IDENTIFICATION_SOLVE resolved mechanically by using Dynare's documented diffuse-filter identification path.
 Last completed task: WBS-070 finite likelihood smoke passed with source-backed GDP measurement error.
-Last attempted task: WBS-070 finite likelihood smoke through the temporary Dynare wrapper.
+Last attempted task: WBS-071 posterior mode through the temporary Dynare wrapper.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: WBS-071 posterior mode.
-Blocker classification: none for WBS-070; likelihood NaN resolved by source-backed GDP measurement error in temporary smoke run.
-Blockers: none for WBS-070. WBS-071 must not start MH chains, backtesting, Redux, or sovereign outputs.
-Required user action: continue to WBS-071 posterior mode only; do not start MH pilot or backtesting.
-Files changed: `src/diagnostics/run_dynare.py`, `tests/test_econometric.py`, `tests/test_estimation_strategy.py`, `docs/wbs070_blockers.md`, `docs/04_estimation_strategy.md`, `docs/PROJECT_STATUS.md`.
-Tests run: `python -m pytest` - 100 passed; `git diff --check` - passed.
-Dynare results: `python src/diagnostics/run_dynare.py --mode likelihood-smoke --timeout-seconds 240` - passed, finite initial log posterior/likelihood `-4472.9048`.
-Commit hash: pending for WBS-070 completion commit; final response reports the pushed hash.
-Safe to continue: true for WBS-071 posterior mode only; forbidden next without prompt: MH pilot/backtesting/Redux/sovereign.
+Next safe task: resolve WBS-071 posterior mode timeout.
+Blocker classification: BLOCKED_WBS071_POSTERIOR_MODE_TIMEOUT.
+Blockers: Dynare posterior mode optimization did not complete within 90 seconds using WBS-069 priors and WBS-070 measurement treatment; see `docs/wbs071_blockers.md`.
+Required user action: resolve WBS-071 posterior mode timeout; do not proceed to WBS-071a smoke or WBS-072 MH pilot.
+Files changed: `src/diagnostics/run_dynare.py`, `tests/test_econometric.py`, `docs/wbs071_blockers.md`, `docs/PROJECT_STATUS.md`.
+Tests run: `python -m pytest` - 101 passed; `git diff --check` - passed.
+Dynare results: `python src/diagnostics/run_dynare.py --mode posterior-mode --timeout-seconds 90` - failed by timeout; no posterior outputs created.
+Commit hash: pending for WBS-071 blocker commit; final response reports the pushed hash.
+Safe to continue: false for WBS-071a/WBS-072; allowed next is WBS-071 blocker resolution only.
 
 Visual status:
 
@@ -38,7 +38,7 @@ Progress metric: 72/86 WBS complete, approximately 84% by WBS item count. This i
 | PR 10 calibration notes | 053 | 1/1 | complete | none |
 | PR 11 Dynare calibrated model | 054..064 | 11/11 | complete | Gate 3 closed |
 | PR 12 identification | 065..067 | 3/3 | complete | Gate 4 closed |
-| PR 13 estimation smoke/priors | 068..071a | 3/5 | in progress | WBS-071 posterior mode |
+| PR 13 estimation smoke/priors | 068..071a | 3/5 | blocked | WBS-071 posterior mode timeout |
 | PR 14 Bayesian estimation | 072..073 | 0/2 | blocked | requires smoke/pilot gates |
 | PR 15 validation/backtesting | 074..079 | 0/6 | blocked | requires estimation outputs |
 | Post-MVP Redux/sovereign | 080..081 | 0/2 | out of MVP | only after Gate 6 and separate decision |
@@ -54,5 +54,5 @@ Gate view:
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
 | Gate 3 | completed | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, WBS-057 `samba_classic.mod`, WBS-058 `shocks.inc`, WBS-059 `observables.inc`, WBS-060 wrapper, WBS-061 residual tests, WBS-062 BK tests, WBS-063 IRF tests, and WBS-064 MVP report complete |
 | Gate 4 | completed | WBS-065 protocol complete; WBS-066 reduced-form identification diagnostics complete; WBS-067 treatment decisions recorded |
-| Gate 5a/5b | in preparation | WBS-070 finite likelihood smoke complete; no posterior or backtesting outputs |
+| Gate 5a/5b | blocked | WBS-071 posterior mode timeout; no posterior or backtesting outputs |
 | Gate 6 | not started | no validation/backtesting outputs |

@@ -58,3 +58,17 @@ def test_wbs070_finite_likelihood_runs_in_temp_without_future_outputs():
     assert summary["finite_likelihood_reported"] is True
     assert summary["likelihood_nonfinite_value_count"] == 0
     assert all(not path.exists() for path in FORBIDDEN_PERSISTENT_OUTPUTS)
+
+
+def test_wbs071_blocked_posterior_mode_does_not_create_future_outputs():
+    status = _execution_status()
+    if "BLOCKED_WBS071_POSTERIOR_MODE_TIMEOUT" not in status:
+        return
+
+    blocker = ROOT / "docs" / "wbs071_blockers.md"
+    assert blocker.exists()
+    text = blocker.read_text(encoding="utf-8")
+    assert "mode_compute=4" in text
+    assert "mh_replic=0" in text
+    assert "did not report a completed posterior mode" in text
+    assert all(not path.exists() for path in FORBIDDEN_PERSISTENT_OUTPUTS)
