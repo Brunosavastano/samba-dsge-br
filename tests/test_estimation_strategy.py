@@ -19,8 +19,9 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     assert STRATEGY.exists()
     text = STRATEGY.read_text(encoding="utf-8")
 
-    assert "status: wbs067_parameter_classification_completed" in text
-    assert "wbs: WBS-067" in text
+    assert "status: wbs068_priors_table_completed" in text
+    assert "wbs: WBS-068" in text
+    assert "priors_table_created: true" in text
     assert "identification_run_created: true" in text
     assert "identification_outputs_created: true" in text
     assert "priors_created: false" in text
@@ -29,11 +30,21 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     assert "Iskrev/Dynare identification gate" in text
     assert "WBS-066" in text
     assert "WBS-067 Parameter Treatment Decisions" in text
+    assert "WBS-068 Source-Backed Priors Table" in text
 
 
 def _wbs067_rows() -> list[dict[str, str]]:
     text = STRATEGY.read_text(encoding="utf-8")
     start = text.index("## WBS-067 Parameter Treatment Decisions")
+    fenced = text.index("```csv", start)
+    body_start = text.index("\n", fenced) + 1
+    body_end = text.index("```", body_start)
+    return list(csv.DictReader(StringIO(text[body_start:body_end])))
+
+
+def _wbs068_prior_rows() -> list[dict[str, str]]:
+    text = STRATEGY.read_text(encoding="utf-8")
+    start = text.index("## WBS-068 Source-Backed Priors Table")
     fenced = text.index("```csv", start)
     body_start = text.index("\n", fenced) + 1
     body_end = text.index("```", body_start)
@@ -137,3 +148,36 @@ def test_wbs067_classifies_every_nonidentified_entry_without_priors():
     }
     assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
     assert not (ROOT / "model" / "samba_classic" / "priors.inc").exists()
+
+
+def test_wbs068_priors_table_is_sourced_and_does_not_create_priors_inc():
+    execution_status = _execution_status()
+    if "WBS-068_COMPLETED" not in execution_status:
+        return
+
+    rows = _wbs068_prior_rows()
+    excluded_by_wbs067 = {
+        "phi_pi",
+        "phi_y",
+        "psi_nfa",
+        "external_debt_lom_adjustment",
+        "pi_target_gross_ss",
+        "lambda_g",
+        "lambda_i",
+        "lambda_f",
+        "stderr_pi_target",
+        "stderr_y_gap",
+    }
+
+    assert len(rows) == 28
+    assert {row["eligible_for_wbs069_priors_inc"] for row in rows} == {"true"}
+    assert {row["source"] for row in rows} == {"BCB_WP239"}
+    assert all(row["prior_distribution"] for row in rows)
+    assert all(row["prior_mean"] for row in rows)
+    assert all(row["prior_sd"] for row in rows)
+    assert all(row["source_location"] for row in rows)
+    assert all(row["rationale"] for row in rows)
+    assert excluded_by_wbs067.isdisjoint({row["canonical_name"] for row in rows})
+    assert "priors_created: false" in STRATEGY.read_text(encoding="utf-8")
+    assert not (ROOT / "model" / "samba_classic" / "priors.inc").exists()
+    assert not (ROOT / "outputs" / "posterior").exists()

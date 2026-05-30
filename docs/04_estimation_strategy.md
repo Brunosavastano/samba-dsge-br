@@ -1,9 +1,10 @@
 ---
-status: wbs067_parameter_classification_completed
-wbs: WBS-067
-gate: Gate 4 completed
+status: wbs068_priors_table_completed
+wbs: WBS-068
+gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
+priors_table_created: true
 priors_created: false
 estimation_started: false
 posterior_created: false
@@ -83,9 +84,10 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: WBS-068, create a priors table with source and rationale only.
-Do not create `priors.inc`, start estimation, create posterior outputs, run
-backtesting, Redux, or sovereign extension before the relevant later WBS.
+Next safe task: WBS-069, translate the approved WBS-068 prior rows to
+`model/samba_classic/priors.inc`. Do not start estimation, create posterior
+outputs, run backtesting, Redux, or sovereign extension before the relevant
+later WBS.
 
 ## WBS-066 Completed Result
 
@@ -155,3 +157,52 @@ WBS-067 pass condition: every WBS-066 nonidentified entry has a treatment
 decision, and none is left as `requires_human_review`. WBS-068 may prepare a
 source-backed priors table, but it must not create `priors.inc` or start
 estimation.
+
+## WBS-068 Source-Backed Priors Table
+
+WBS-068 records priors only where WP239 Table 3 explicitly reports a prior
+distribution, mean, and standard deviation. These rows are documentation only:
+no `priors.inc`, posterior output, estimation run, Redux file, or sovereign
+extension is created here.
+
+Rows excluded by WBS-067 remain excluded from the WBS-069 `priors.inc` until a
+later source-backed treatment is approved. In particular, `phi_pi`, `phi_y`,
+`lambda_g`, `lambda_i`, and `lambda_f` remain fixed at sourced calibration;
+`psi_nfa`, `external_debt_lom_adjustment`, `pi_target_gross_ss`, and the
+restricted auxiliary stderr entries remain out of the prior set.
+
+```csv
+prior_id,scope,canonical_name,wp239_symbol,prior_distribution,prior_mean,prior_sd,source,source_location,wbs067_status,eligible_for_wbs069_priors_inc,rationale
+PRIOR-001,model_parameter,rho_r,gamma_R,Beta,0.60,0.15,BCB_WP239,Table 3 Taylor rule PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-002,model_parameter,rho_risk,rho_Bstar,Beta,0.50,0.25,BCB_WP239,Table 3 autoregressive shocks PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-003,model_parameter,rho_sp_target,rho_Sbar,Beta,0.50,0.25,BCB_WP239,Table 3 autoregressive shocks PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-004,model_parameter,phi_b,phi_B,Inv-Gamma,0.05,0.15,BCB_WP239,Table 3 fiscal rule PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-005,model_parameter,alpha_a_fx,vartheta_A_1,Beta,0.05,0.03,BCB_WP239,Table 3 administered price rule PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-006,model_parameter,alpha_a_mc,vartheta_A_2,Beta,0.20,0.05,BCB_WP239,Table 3 administered price rule PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-007,model_parameter,rho_admin,rho_A,Beta,0.50,0.25,BCB_WP239,Table 3 autoregressive shocks PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-008,model_parameter,rho_z_c,rho_C,Beta,0.50,0.25,BCB_WP239,Table 3 autoregressive shocks PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-009,model_parameter,rho_z_z,rho_Z,Beta,0.50,0.25,BCB_WP239,Table 3 autoregressive shocks PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-010,model_parameter,rho_z_i,rho_I,Beta,0.50,0.25,BCB_WP239,Table 3 autoregressive shocks PDF page 98 printed page 97,identified_candidate,true,Not flagged as nonidentified by WBS-066 and WP239 reports prior hyperparameters.
+PRIOR-011,shock_stderr,stderr_risk_dom,epsilon_B,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-012,shock_stderr,stderr_z_i,epsilon_I,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-013,shock_stderr,stderr_z_c,epsilon_C,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-014,shock_stderr,stderr_eps_admin,epsilon_A,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-015,shock_stderr,stderr_z_p,epsilon_P,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-016,shock_stderr,stderr_pi,epsilon_PiC,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-017,shock_stderr,stderr_z_w,epsilon_W,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-018,shock_stderr,stderr_z_z,epsilon_Z,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-019,shock_stderr,stderr_z_q,epsilon_Q,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-020,shock_stderr,stderr_eps_risk,epsilon_Bstar,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-021,shock_stderr,stderr_z_g,epsilon_G,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-022,shock_stderr,stderr_eps_tax,epsilon_T,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-023,shock_stderr,stderr_eps_sp_target,epsilon_Sbar,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-024,shock_stderr,stderr_eps_monetary,epsilon_R,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-025,shock_stderr,stderr_z_px,epsilon_Pstar,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-026,shock_stderr,stderr_pi_star,epsilon_Pistar,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-027,shock_stderr,stderr_r_star,epsilon_Rstar,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+PRIOR-028,shock_stderr,stderr_q_m_star,epsilon_QMstar,Inv-Gamma,1.0,inf,BCB_WP239,Table 3 exogenous shocks PDF page 99 printed page 98,identified_candidate,true,Current WBS-058 shock has WP239 prior hyperparameters and was not excluded by WBS-067.
+```
+
+WBS-068 pass condition: every row eligible for WBS-069 has an explicit WP239
+prior distribution, mean, standard deviation, source location, and WBS-067
+rationale. Estimation remains blocked until later WBS steps.
