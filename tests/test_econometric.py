@@ -13,6 +13,8 @@ PRIORS_FILE = ROOT / "model" / "samba_classic" / "priors.inc"
 WRAPPER_FILE = ROOT / "src" / "diagnostics" / "run_dynare.py"
 WBS071A_SMOKE_ARTIFACT = ROOT / "outputs" / "posterior" / "smoke" / "wbs071a_estimation_smoke.json"
 WBS072_CONFIG = ROOT / "docs" / "wbs072_mh_pilot_config.md"
+WBS072_PILOT_SUMMARY = ROOT / "outputs" / "posterior" / "pilot" / "wbs072_mh_pilot_summary.json"
+WBS072_PILOT_DIAGNOSTICS = ROOT / "outputs" / "posterior" / "pilot" / "wbs072_mh_pilot_diagnostics.md"
 FORBIDDEN_PERSISTENT_OUTPUTS = (
     ROOT / "outputs" / "backtesting",
     ROOT / "model" / "samba_redux",
@@ -30,7 +32,9 @@ def _execution_status() -> str:
 
 def _forbidden_persistent_outputs() -> tuple[Path, ...]:
     paths = list(FORBIDDEN_PERSISTENT_OUTPUTS)
-    if "WBS-071a_COMPLETED" in _execution_status():
+    if "WBS-072_COMPLETED" in _execution_status():
+        paths.append(ROOT / "outputs" / "posterior" / "full")
+    elif "WBS-071a_COMPLETED" in _execution_status():
         paths.extend(
             [
                 ROOT / "outputs" / "posterior" / "pilot",
@@ -146,4 +150,48 @@ def test_wbs072_mh_pilot_config_is_proposal_only_without_chains():
     assert "R-hat scope:" in text
     assert "outputs/posterior/pilot/" in text
     assert "outputs/posterior/full/" in text
+    assert all(not path.exists() for path in _forbidden_persistent_outputs())
+
+
+def test_wbs072_mh_pilot_approved_config_records_amendment():
+    if "WBS-072_CONFIG_APPROVED" not in _execution_status() and "WBS-072_COMPLETED" not in _execution_status():
+        return
+
+    assert WBS072_CONFIG.exists()
+    text = WBS072_CONFIG.read_text(encoding="utf-8")
+
+    assert "approval_status: approved" in text
+    assert "approved_by: Bruno" in text
+    assert "approval_date: 2026-05-30" in text
+    assert "amendment: R-hat unavailable is warning, not blocker." in text
+    assert "`mh_replic`: 2000 per chain" in text
+    assert "chains: 2 independent pilot chains" in text
+    assert "target acceptance band: 0.20 to 0.35" in text
+    assert "not final convergence evidence" in text
+    assert "outputs/posterior/full/" in text
+
+
+def test_wbs072_completed_mh_pilot_records_only_pilot_artifacts():
+    if "WBS-072_COMPLETED" not in _execution_status():
+        return
+
+    assert WBS072_PILOT_SUMMARY.exists()
+    assert WBS072_PILOT_DIAGNOSTICS.exists()
+    summary = json.loads(WBS072_PILOT_SUMMARY.read_text(encoding="utf-8"))
+    diagnostics = WBS072_PILOT_DIAGNOSTICS.read_text(encoding="utf-8")
+
+    assert summary["wbs"] == "WBS-072"
+    assert summary["mode"] == "mh-pilot"
+    assert summary["status"] == "passed"
+    assert summary["mh_replic"] == 2000
+    assert summary["chains"] == 2
+    assert summary["mh_nblocks"] == 2
+    assert summary["mh_drop"] == 0.5
+    assert 0.20 <= summary["mh_acceptance_ratio"] <= 0.35
+    assert summary["mh_acceptance_in_target_band"] is True
+    assert summary["mh_nonfinite_token_count"] == 0
+    assert summary["rhat_status"] in {"computed", "unavailable_warning", "above_threshold_warning"}
+    assert summary["full_mh_created"] is False
+    assert summary["posterior_inference_claimed"] is False
+    assert "not final convergence evidence" in diagnostics
     assert all(not path.exists() for path in _forbidden_persistent_outputs())

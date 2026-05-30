@@ -26,6 +26,15 @@ REQUIRED_MODEL_FILES = (
 )
 IRF_HORIZON = 20
 IRF_EPSILON = 1e-10
+MH_PILOT_CONFIG = {
+    "mh_replic": 2000,
+    "chains": 2,
+    "mh_nblocks": 2,
+    "mh_drop": 0.5,
+    "target_acceptance_min": 0.20,
+    "target_acceptance_max": 0.35,
+    "rhat_policy": "warning_only",
+}
 LIKELIHOOD_DATA_FILE = "classic_mvp_dynare.csv"
 LIKELIHOOD_OBSERVABLE_COLUMNS = ("y", "c", "i", "g", "q", "r_t")
 LIKELIHOOD_COLUMN_MAP = {"r_t": "r"}
@@ -309,6 +318,7 @@ LIKELIHOOD_LINE_RE = re.compile(r"(log|likelihood|posterior)", re.IGNORECASE)
 NUMBER_RE = re.compile(
     r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][-+]?\d+)?|NaN|Inf|-Inf"
 )
+NONFINITE_RE = re.compile(r"(?<![A-Za-z])(?:NaN|[-+]?Inf|Infinity)(?![A-Za-z])", re.IGNORECASE)
 
 
 def _parse_likelihood(stdout: str, stderr: str) -> dict[str, Any]:
@@ -332,6 +342,53 @@ def _parse_likelihood(stdout: str, stderr: str) -> dict[str, Any]:
         "likelihood_nonfinite_value_count": len(nonfinite_values),
         "finite_likelihood_reported": bool(finite_values) and not nonfinite_values,
         "likelihood_last_finite_value": finite_values[-1] if finite_values else None,
+    }
+
+
+def _parse_mh_acceptance(stdout: str, stderr: str) -> dict[str, Any]:
+    text = stdout + "\n" + stderr
+    acceptance_values = []
+    acceptance_lines = []
+    for line in text.splitlines():
+        if "accept" not in line.lower():
+            continue
+        values = [
+            float(value)
+            for value in NUMBER_RE.findall(line)
+            if value.lower() not in {"inf", "-inf", "nan"}
+        ]
+        if not values:
+            continue
+        value = values[-1]
+        if value > 1.0 and value <= 100.0:
+            value = value / 100.0
+        if 0.0 <= value <= 1.0:
+            acceptance_values.append(value)
+            acceptance_lines.append(line.strip())
+
+    acceptance_ratio = (
+        sum(acceptance_values) / len(acceptance_values)
+        if acceptance_values
+        else None
+    )
+    acceptance_in_band = (
+        acceptance_ratio is not None
+        and MH_PILOT_CONFIG["target_acceptance_min"]
+        <= acceptance_ratio
+        <= MH_PILOT_CONFIG["target_acceptance_max"]
+    )
+    nonfinite_tokens = NONFINITE_RE.findall(text)
+    return {
+        "mh_acceptance_values": acceptance_values,
+        "mh_acceptance_ratio": acceptance_ratio,
+        "mh_acceptance_in_target_band": acceptance_in_band,
+        "mh_acceptance_lines_found": len(acceptance_lines),
+        "mh_acceptance_lines": acceptance_lines[-5:],
+        "mh_nonfinite_token_count": len(nonfinite_tokens),
+        "mh_nonfinite_tokens": nonfinite_tokens[:10],
+        "rhat_status": "unavailable_warning",
+        "rhat_value": None,
+        "rhat_policy": MH_PILOT_CONFIG["rhat_policy"],
     }
 
 
@@ -481,9 +538,11 @@ def run_dynare(
             normalized_mode = "posterior-mode"
         if mode == "estimation-smoke":
             normalized_mode = "estimation-smoke"
+        if mode == "mh-pilot":
+            normalized_mode = "mh-pilot"
         likelihood_data = {}
         estimation_options: dict[str, Any] = {}
-        if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke"}:
+        if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke", "mh-pilot"}:
             try:
                 likelihood_data = write_likelihood_data(root, temp_dir)
             except (FileNotFoundError, ValueError) as exc:
@@ -499,14 +558,27 @@ def run_dynare(
                     f"var {variable}; stderr {metadata['stderr']};"
                     for variable, metadata in LIKELIHOOD_MEASUREMENT_ERRORS.items()
                 )
-                mode_compute = 4 if normalized_mode == "posterior-mode" else 0
+                mode_compute = 4 if normalized_mode in {"posterior-mode", "mh-pilot"} else 0
+                mh_replic = MH_PILOT_CONFIG["mh_replic"] if normalized_mode == "mh-pilot" else 0
+                mh_nblocks = MH_PILOT_CONFIG["mh_nblocks"] if normalized_mode == "mh-pilot" else None
+                mh_drop = MH_PILOT_CONFIG["mh_drop"] if normalized_mode == "mh-pilot" else None
                 estimation_options = {
                     "mode_compute": mode_compute,
-                    "mh_replic": 0,
+                    "mh_replic": mh_replic,
+                    "chains": MH_PILOT_CONFIG["chains"] if normalized_mode == "mh-pilot" else None,
+                    "mh_nblocks": mh_nblocks,
+                    "mh_drop": mh_drop,
                     "estimation_smoke": normalized_mode == "estimation-smoke",
+                    "mh_pilot": normalized_mode == "mh-pilot",
                     "posterior_mode": normalized_mode == "posterior-mode",
                     "persistent_outputs_created": False,
                 }
+                mh_options = ""
+                if normalized_mode == "mh-pilot":
+                    mh_options = (
+                        f"mh_nblocks={mh_nblocks}, "
+                        f"mh_drop={mh_drop}, "
+                    )
                 handle.write(
                     "\nshocks;\n"
                     f"{measurement_error_block}\n"
@@ -517,7 +589,8 @@ def run_dynare(
                     "estimation("
                     "datafile=classic_mvp_dynare, "
                     f"mode_compute={mode_compute}, "
-                    "mh_replic=0, "
+                    f"mh_replic={mh_replic}, "
+                    f"{mh_options}"
                     "lik_init=3, "
                     "diffuse_filter, "
                     "kalman_algo=4, "
@@ -581,7 +654,12 @@ def run_dynare(
             }
         likelihood = (
             _parse_likelihood(completed.stdout, completed.stderr)
-            if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke"}
+            if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke", "mh-pilot"}
+            else {}
+        )
+        mh_pilot = (
+            _parse_mh_acceptance(completed.stdout, completed.stderr)
+            if normalized_mode == "mh-pilot"
             else {}
         )
         status = "passed" if completed.returncode == 0 else "failed"
@@ -623,6 +701,15 @@ def run_dynare(
             )
             status = "passed" if mode_pass else "failed"
             returncode = 0 if mode_pass else 1
+        if normalized_mode == "mh-pilot" and completed.returncode == 0:
+            pilot_pass = (
+                likelihood["finite_likelihood_reported"]
+                and likelihood["likelihood_nonfinite_value_count"] == 0
+                and mh_pilot["mh_nonfinite_token_count"] == 0
+                and mh_pilot["mh_acceptance_in_target_band"]
+            )
+            status = "passed" if pilot_pass else "failed"
+            returncode = 0 if pilot_pass else 1
 
         return {
             "mode": normalized_mode,
@@ -639,9 +726,10 @@ def run_dynare(
             **irfs,
             **likelihood_data,
             **estimation_options,
+            **mh_pilot,
             "likelihood_measurement_errors": (
                 LIKELIHOOD_MEASUREMENT_ERRORS
-                if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke"}
+                if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke", "mh-pilot"}
                 else None
             ),
             **likelihood,
@@ -668,6 +756,7 @@ def main() -> int:
             "likelihood-smoke",
             "posterior-mode",
             "estimation-smoke",
+            "mh-pilot",
         ),
         default="smoke",
     )

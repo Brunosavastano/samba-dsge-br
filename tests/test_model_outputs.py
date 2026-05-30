@@ -21,6 +21,10 @@ WRAPPER_FILE = ROOT / "src" / "diagnostics" / "run_dynare.py"
 ALLOWED_WBS071A_SMOKE_ARTIFACT = (
     "outputs/posterior/smoke/wbs071a_estimation_smoke.json"
 )
+ALLOWED_WBS072_PILOT_ARTIFACTS = {
+    "outputs/posterior/pilot/wbs072_mh_pilot_summary.json",
+    "outputs/posterior/pilot/wbs072_mh_pilot_diagnostics.md",
+}
 FORBIDDEN_WBS057_FILES = {
     ROOT / "model" / "samba_classic" / "priors.inc",
 }
@@ -116,7 +120,8 @@ def _forbidden_generated_paths() -> set[Path]:
         paths.discard(ROOT / "model" / "samba_classic" / "priors.inc")
     if "WBS-071a_COMPLETED" in _execution_status():
         paths.discard(ROOT / "outputs" / "posterior")
-        paths.add(ROOT / "outputs" / "posterior" / "pilot")
+        if "WBS-072_COMPLETED" not in _execution_status():
+            paths.add(ROOT / "outputs" / "posterior" / "pilot")
         paths.add(ROOT / "outputs" / "posterior" / "full")
     return paths
 
@@ -135,6 +140,11 @@ def _is_forbidden_tracked_path(path: str) -> bool:
     if (
         "WBS-071a_COMPLETED" in _execution_status()
         and path == ALLOWED_WBS071A_SMOKE_ARTIFACT
+    ):
+        return False
+    if (
+        "WBS-072_COMPLETED" in _execution_status()
+        and path in ALLOWED_WBS072_PILOT_ARTIFACTS
     ):
         return False
     return (

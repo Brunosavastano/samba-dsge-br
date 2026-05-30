@@ -52,7 +52,8 @@ def _forbidden_generated_paths() -> set[Path]:
         paths.discard(ROOT / "model" / "samba_classic" / "priors.inc")
     if "WBS-071a_COMPLETED" in _execution_status():
         paths.discard(ROOT / "outputs" / "posterior")
-        paths.add(ROOT / "outputs" / "posterior" / "pilot")
+        if "WBS-072_COMPLETED" not in _execution_status():
+            paths.add(ROOT / "outputs" / "posterior" / "pilot")
         paths.add(ROOT / "outputs" / "posterior" / "full")
     return paths
 

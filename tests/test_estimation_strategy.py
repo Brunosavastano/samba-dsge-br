@@ -8,6 +8,7 @@ STATUS = ROOT / "docs" / "PROJECT_STATUS.md"
 STRATEGY = ROOT / "docs" / "04_estimation_strategy.md"
 PRIORS_FILE = ROOT / "model" / "samba_classic" / "priors.inc"
 WBS071A_SMOKE_ARTIFACT = ROOT / "outputs" / "posterior" / "smoke" / "wbs071a_estimation_smoke.json"
+WBS072_PILOT_SUMMARY = ROOT / "outputs" / "posterior" / "pilot" / "wbs072_mh_pilot_summary.json"
 
 
 def _execution_status() -> str:
@@ -18,7 +19,11 @@ def _execution_status() -> str:
 
 
 def _assert_no_forbidden_posterior_outputs() -> None:
-    if "WBS-071a_COMPLETED" in _execution_status():
+    if "WBS-072_COMPLETED" in _execution_status():
+        assert WBS071A_SMOKE_ARTIFACT.exists()
+        assert WBS072_PILOT_SUMMARY.exists()
+        assert not (ROOT / "outputs" / "posterior" / "full").exists()
+    elif "WBS-071a_COMPLETED" in _execution_status():
         assert WBS071A_SMOKE_ARTIFACT.exists()
         assert not (ROOT / "outputs" / "posterior" / "pilot").exists()
         assert not (ROOT / "outputs" / "posterior" / "full").exists()
@@ -29,9 +34,17 @@ def _assert_no_forbidden_posterior_outputs() -> None:
 def test_wbs065_identification_protocol_exists_without_running_identification():
     assert STRATEGY.exists()
     text = STRATEGY.read_text(encoding="utf-8")
+    execution_status = _execution_status()
 
-    assert "status: wbs071a_estimation_smoke_completed" in text
-    assert "wbs: WBS-071a" in text
+    if "WBS-072_COMPLETED" in execution_status:
+        assert "status: wbs072_mh_pilot_completed" in text
+        assert "wbs: WBS-072" in text
+        assert "mh_pilot_completed: true" in text
+        assert "full_mh_started: false" in text
+        assert "WBS-072 MH Pilot" in text
+    else:
+        assert "status: wbs071a_estimation_smoke_completed" in text
+        assert "wbs: WBS-071a" in text
     assert "priors_table_created: true" in text
     assert "identification_run_created: true" in text
     assert "identification_outputs_created: true" in text
