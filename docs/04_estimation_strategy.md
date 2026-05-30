@@ -1,11 +1,12 @@
 ---
-status: wbs069_priors_inc_completed
-wbs: WBS-069
+status: wbs070_finite_likelihood_completed
+wbs: WBS-070
 gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
 priors_table_created: true
 priors_created: true
+finite_likelihood_smoke_created: true
 estimation_started: false
 posterior_created: false
 ---
@@ -84,8 +85,7 @@ Stop and do not proceed to priors or estimation if:
 
 ## Next Task
 
-Next safe task: WBS-070, run the finite likelihood smoke test using the
-approved WBS-069 priors include. Do not create posterior outputs, run
+Next safe task: WBS-071, posterior mode. Do not create MH chains,
 backtesting, Redux, or sovereign extension before the relevant later WBS.
 
 ## WBS-066 Completed Result
@@ -218,3 +218,21 @@ sovereign extension.
 WBS-069 pass condition: `priors.inc` exists, every prior entry is sourced from
 the WBS-068 table, no WBS-067 excluded/fixed entry is included, and estimation
 has not started.
+
+## WBS-070 Finite Likelihood Smoke
+
+WBS-070 runs a temporary finite-likelihood smoke test through
+`src/diagnostics/run_dynare.py --mode likelihood-smoke`. The smoke test uses
+the WBS-052 approved data, WBS-059 documented transformations, WBS-069 priors,
+and no persistent Dynare outputs.
+
+The initial NaN was mechanical: the likelihood became singular only when
+`y,c,i,g` were observed together. WP239 Table 3 reports a GDP measurement error
+for `epsilon_Y_me`; WBS-070 therefore adds a temporary measurement error for
+observed `y` with stderr `0.08` in the smoke run. No structural equation,
+shock process, prior value, data source, posterior output, MH chain,
+backtesting output, Redux file, or sovereign-extension file is created.
+
+WBS-070 pass condition: the temporary likelihood smoke reports a finite initial
+log posterior/likelihood and leaves no persistent posterior or backtesting
+artifacts in the repository.

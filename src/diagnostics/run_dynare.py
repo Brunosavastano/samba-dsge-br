@@ -30,6 +30,14 @@ LIKELIHOOD_DATA_FILE = "classic_mvp_dynare.csv"
 LIKELIHOOD_OBSERVABLE_COLUMNS = ("y", "c", "i", "g", "q", "r_t")
 LIKELIHOOD_COLUMN_MAP = {"r_t": "r"}
 LOG_DIFF_DEMEAN_COLUMNS = ("y", "c", "i", "g")
+LIKELIHOOD_MEASUREMENT_ERRORS = {
+    "y": {
+        "stderr": 0.08,
+        "source": "BCB_WP239",
+        "source_location": "WP239 Table 3 measurement errors, PDF page 99 printed page 98",
+        "rationale": "GDP growth measurement error documented by WP239 and needed to avoid singular likelihood for y,c,i,g.",
+    },
+}
 
 
 def irf_targets_file(root: Path | None = None) -> Path:
@@ -405,8 +413,10 @@ def run_dynare(
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write("\nsteady;\ncheck;\n")
         normalized_mode = "irfs" if mode == "irf" else mode
+        if mode == "likelihood":
+            normalized_mode = "likelihood-smoke"
         likelihood_data = {}
-        if normalized_mode == "likelihood":
+        if normalized_mode == "likelihood-smoke":
             try:
                 likelihood_data = write_likelihood_data(root, temp_dir)
             except (FileNotFoundError, ValueError) as exc:
@@ -418,8 +428,15 @@ def run_dynare(
                     "error": str(exc),
                 }
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
+                measurement_error_block = "\n".join(
+                    f"var {variable}; stderr {metadata['stderr']};"
+                    for variable, metadata in LIKELIHOOD_MEASUREMENT_ERRORS.items()
+                )
                 handle.write(
-                    "\n@#include \"priors.inc\"\n"
+                    "\nshocks;\n"
+                    f"{measurement_error_block}\n"
+                    "end;\n"
+                    "@#include \"priors.inc\"\n"
                     "estimated_params_init(use_calibration);\n"
                     "end;\n"
                     "estimation("
@@ -489,7 +506,7 @@ def run_dynare(
             }
         likelihood = (
             _parse_likelihood(completed.stdout, completed.stderr)
-            if normalized_mode == "likelihood"
+            if normalized_mode == "likelihood-smoke"
             else {}
         )
         status = "passed" if completed.returncode == 0 else "failed"
@@ -520,7 +537,7 @@ def run_dynare(
             )
             status = "passed" if irf_pass else "failed"
             returncode = 0 if irf_pass else 1
-        if normalized_mode == "likelihood" and completed.returncode == 0:
+        if normalized_mode == "likelihood-smoke" and completed.returncode == 0:
             likelihood_pass = likelihood["finite_likelihood_reported"]
             status = "passed" if likelihood_pass else "failed"
             returncode = 0 if likelihood_pass else 1
@@ -539,6 +556,11 @@ def run_dynare(
             **bk,
             **irfs,
             **likelihood_data,
+            "likelihood_measurement_errors": (
+                LIKELIHOOD_MEASUREMENT_ERRORS
+                if normalized_mode == "likelihood-smoke"
+                else None
+            ),
             **likelihood,
             "stdout_tail": _tail(completed.stdout),
             "stderr_tail": _tail(completed.stderr),
@@ -553,7 +575,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
-        choices=("smoke", "residuals", "bk", "irf", "irfs", "likelihood"),
+        choices=("smoke", "residuals", "bk", "irf", "irfs", "likelihood", "likelihood-smoke"),
         default="smoke",
     )
     parser.add_argument("--dynare", default="dynare")

@@ -20,18 +20,21 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     assert STRATEGY.exists()
     text = STRATEGY.read_text(encoding="utf-8")
 
-    assert "status: wbs069_priors_inc_completed" in text
-    assert "wbs: WBS-069" in text
+    assert "status: wbs070_finite_likelihood_completed" in text
+    assert "wbs: WBS-070" in text
     assert "priors_table_created: true" in text
     assert "identification_run_created: true" in text
     assert "identification_outputs_created: true" in text
     assert "priors_created: true" in text
+    assert "finite_likelihood_smoke_created: true" in text
     assert "estimation_started: false" in text
     assert "posterior_created: false" in text
     assert "Iskrev/Dynare identification gate" in text
     assert "WBS-066" in text
     assert "WBS-067 Parameter Treatment Decisions" in text
     assert "WBS-068 Source-Backed Priors Table" in text
+    assert "WBS-069 Dynare Priors Include" in text
+    assert "WBS-070 Finite Likelihood Smoke" in text
 
 
 def _wbs067_rows() -> list[dict[str, str]]:
