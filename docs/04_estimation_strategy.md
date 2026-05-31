@@ -1,6 +1,6 @@
 ---
-status: wbs072_mh_pilot_completed
-wbs: WBS-072
+status: wbs073_full_mh_blocked
+wbs: WBS-073
 gate: Gate 5a preparation
 identification_run_created: true
 identification_outputs_created: true
@@ -10,7 +10,9 @@ finite_likelihood_smoke_created: true
 posterior_mode_completed: true
 estimation_smoke_completed: true
 mh_pilot_completed: true
-full_mh_started: false
+full_mh_started: true
+full_mh_completed: false
+final_posterior_inference_claimed: false
 estimation_started: false
 posterior_created: false
 ---
@@ -293,3 +295,17 @@ WBS-072 pass condition: pilot chains complete, no likelihood NaN/Inf is
 reported, average acceptance is inside the approved band, only pilot artifacts
 are persisted, and no full MH, backtesting, Redux, or sovereign-extension
 artifacts are created.
+
+## WBS-073 Full MH Operational Validation
+
+WBS-073 full MH was approved by Bruno for operational validation only, with
+`mh_replic=20000`, four chains, approved blocks metadata of 2, burn-in 50
+percent, `mh_jscale=0.337313`, and timeout 43200 seconds.
+
+The approved command timed out at 43200 seconds before full diagnostics
+completed. The wrapper returned code 124 and the stdout tail showed convergence
+diagnostic progress through parameter 28. R-hat was therefore unavailable, which
+is a WBS-073 blocker under the approved safeguards.
+
+WBS-073 remains blocked. The recorded files under `outputs/posterior/full/` are
+failure diagnostics only, not final publication-grade posterior evidence.

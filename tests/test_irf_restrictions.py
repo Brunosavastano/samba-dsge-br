@@ -54,7 +54,8 @@ def _forbidden_generated_paths() -> set[Path]:
         paths.discard(ROOT / "outputs" / "posterior")
         if "WBS-072_COMPLETED" not in _execution_status():
             paths.add(ROOT / "outputs" / "posterior" / "pilot")
-        paths.add(ROOT / "outputs" / "posterior" / "full")
+        if "WBS-073_COMPLETED" not in _execution_status() and "BLOCKED_WBS073" not in _execution_status():
+            paths.add(ROOT / "outputs" / "posterior" / "full")
     return paths
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import re
@@ -43,6 +44,24 @@ MH_PILOT_CONFIG = {
     "target_acceptance_max": 0.35,
     "rhat_policy": "warning_only",
 }
+FULL_MH_CONFIG = {
+    "mh_replic": 20000,
+    "chains": 4,
+    "mh_nblocks": 4,
+    "approved_blocks": 2,
+    "mh_drop": 0.5,
+    "mh_jscale": 0.337313,
+    "target_acceptance_central": 0.234,
+    "target_acceptance_min": 0.20,
+    "target_acceptance_max": 0.35,
+    "rhat_max": 1.1,
+    "rhat_policy": "blocking_if_unavailable_or_above_threshold",
+}
+FULL_MH_ARTIFACT_FILENAMES = {
+    "summary": "wbs073_full_mh_summary.json",
+    "diagnostics": "wbs073_full_mh_diagnostics.md",
+    "manifest": "wbs073_full_mh_manifest.json",
+}
 LIKELIHOOD_DATA_FILE = "classic_mvp_dynare.csv"
 LIKELIHOOD_OBSERVABLE_COLUMNS = ("y", "c", "i", "g", "q", "r_t")
 LIKELIHOOD_COLUMN_MAP = {"r_t": "r"}
@@ -81,6 +100,11 @@ def samba_model_dir(root: Path | None = None) -> Path:
 def model_input_file(root: Path | None = None) -> Path:
     base = root if root is not None else repo_root()
     return base / "data" / "model_input" / "classic_mvp.csv"
+
+
+def full_mh_output_dir(root: Path | None = None) -> Path:
+    base = root if root is not None else repo_root()
+    return base / "outputs" / "posterior" / "full"
 
 
 def build_dynare_command(dynare_executable: str) -> list[str]:
@@ -353,7 +377,12 @@ def _parse_likelihood(stdout: str, stderr: str) -> dict[str, Any]:
     }
 
 
-def _parse_mh_acceptance(stdout: str, stderr: str) -> dict[str, Any]:
+def _parse_mh_acceptance(
+    stdout: str,
+    stderr: str,
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    mh_config = config if config is not None else MH_PILOT_CONFIG
     text = stdout + "\n" + stderr
     acceptance_values = []
     acceptance_lines = []
@@ -388,9 +417,9 @@ def _parse_mh_acceptance(stdout: str, stderr: str) -> dict[str, Any]:
     )
     acceptance_in_band = (
         acceptance_ratio is not None
-        and MH_PILOT_CONFIG["target_acceptance_min"]
+        and mh_config["target_acceptance_min"]
         <= acceptance_ratio
-        <= MH_PILOT_CONFIG["target_acceptance_max"]
+        <= mh_config["target_acceptance_max"]
     )
     nonfinite_tokens = []
     for line in text.splitlines():
@@ -404,12 +433,225 @@ def _parse_mh_acceptance(stdout: str, stderr: str) -> dict[str, Any]:
         "mh_acceptance_in_target_band": acceptance_in_band,
         "mh_acceptance_lines_found": len(acceptance_lines),
         "mh_acceptance_lines": acceptance_lines[-5:],
-        "mh_chains_completed": len(acceptance_values) >= MH_PILOT_CONFIG["chains"],
+        "mh_chains_completed": len(acceptance_values) >= mh_config["chains"],
         "mh_nonfinite_token_count": len(nonfinite_tokens),
         "mh_nonfinite_tokens": nonfinite_tokens[:10],
         "rhat_status": "unavailable_warning",
         "rhat_value": None,
-        "rhat_policy": MH_PILOT_CONFIG["rhat_policy"],
+        "rhat_policy": mh_config["rhat_policy"],
+    }
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _generated_file_manifest(temp_dir: Path) -> dict[str, Any]:
+    copied_inputs = set(REQUIRED_MODEL_FILES) | {LIKELIHOOD_DATA_FILE}
+    entries = []
+    for path in sorted(item for item in temp_dir.rglob("*") if item.is_file()):
+        relative = path.relative_to(temp_dir).as_posix()
+        if relative in copied_inputs:
+            continue
+        size = path.stat().st_size
+        is_raw_chain = (
+            "metropolis/" in relative
+            and "_mh" in path.name
+            and path.suffix.lower() == ".mat"
+        )
+        entries.append(
+            {
+                "path": relative,
+                "size_bytes": size,
+                "sha256": _file_sha256(path),
+                "raw_chain_artifact": is_raw_chain,
+                "committed_to_git": False,
+            }
+        )
+    raw_entries = [entry for entry in entries if entry["raw_chain_artifact"]]
+    return {
+        "generated_artifact_count": len(entries),
+        "generated_artifact_total_bytes": sum(entry["size_bytes"] for entry in entries),
+        "raw_chain_artifact_count": len(raw_entries),
+        "raw_chain_artifact_total_bytes": sum(entry["size_bytes"] for entry in raw_entries),
+        "raw_chain_artifacts_committed": False,
+        "generated_artifacts": entries,
+    }
+
+
+def _compute_rhat_from_metropolis(temp_dir: Path, drop_fraction: float) -> dict[str, Any]:
+    try:
+        import numpy as np
+        from scipy.io import loadmat
+    except Exception as exc:  # pragma: no cover - dependency availability varies.
+        return {
+            "rhat_status": "unavailable",
+            "rhat_value": None,
+            "rhat_error": f"R-hat dependencies unavailable: {type(exc).__name__}: {exc}",
+        }
+
+    chain_files = sorted(temp_dir.rglob("*_mh*_blck*.mat"))
+    if not chain_files:
+        return {
+            "rhat_status": "unavailable",
+            "rhat_value": None,
+            "rhat_error": "No Dynare metropolis chain files found.",
+        }
+
+    chains: dict[int, list[tuple[int, Any]]] = {}
+    for path in chain_files:
+        match = re.search(r"_mh(\d+)_blck(\d+)\.mat$", path.name)
+        if match is None:
+            continue
+        file_index = int(match.group(1))
+        block_index = int(match.group(2))
+        try:
+            data = loadmat(path)
+        except Exception:
+            continue
+        draws = data.get("x2")
+        if draws is None:
+            continue
+        chains.setdefault(block_index, []).append((file_index, draws))
+
+    chain_arrays = []
+    for block_index in sorted(chains):
+        pieces = [
+            draws
+            for _, draws in sorted(chains[block_index], key=lambda item: item[0])
+        ]
+        if not pieces:
+            continue
+        chain = np.vstack(pieces)
+        if chain.ndim != 2:
+            continue
+        drop = int(math.ceil(chain.shape[0] * drop_fraction))
+        kept = chain[drop:, :]
+        if kept.shape[0] >= 2:
+            chain_arrays.append(kept)
+
+    if len(chain_arrays) < 2:
+        return {
+            "rhat_status": "unavailable",
+            "rhat_value": None,
+            "rhat_error": "Fewer than two post-burn-in chains available.",
+            "rhat_chain_count": len(chain_arrays),
+        }
+
+    draw_count = min(chain.shape[0] for chain in chain_arrays)
+    parameter_count = min(chain.shape[1] for chain in chain_arrays)
+    sample = np.stack(
+        [chain[-draw_count:, :parameter_count] for chain in chain_arrays],
+        axis=0,
+    )
+    chain_count = sample.shape[0]
+    chain_means = np.mean(sample, axis=1)
+    chain_variances = np.var(sample, axis=1, ddof=1)
+    between = draw_count * np.var(chain_means, axis=0, ddof=1)
+    within = np.mean(chain_variances, axis=0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        variance_hat = ((draw_count - 1) / draw_count) * within + between / draw_count
+        rhat_values = np.sqrt(variance_hat / within)
+    finite = rhat_values[np.isfinite(rhat_values)]
+    if finite.size == 0:
+        return {
+            "rhat_status": "unavailable",
+            "rhat_value": None,
+            "rhat_error": "R-hat values were not finite.",
+            "rhat_chain_count": chain_count,
+            "rhat_draws_per_chain": draw_count,
+            "rhat_parameter_count": parameter_count,
+        }
+
+    max_rhat = float(np.max(finite))
+    status = "computed" if max_rhat <= FULL_MH_CONFIG["rhat_max"] else "above_threshold"
+    return {
+        "rhat_status": status,
+        "rhat_value": max_rhat,
+        "rhat_max": max_rhat,
+        "rhat_chain_count": chain_count,
+        "rhat_draws_per_chain": draw_count,
+        "rhat_parameter_count": parameter_count,
+        "rhat_values": [float(value) for value in rhat_values[:parameter_count]],
+        "rhat_policy": FULL_MH_CONFIG["rhat_policy"],
+    }
+
+
+def _write_full_mh_artifacts(root: Path, result: dict[str, Any]) -> dict[str, Any]:
+    output_dir = full_mh_output_dir(root)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    summary_path = output_dir / FULL_MH_ARTIFACT_FILENAMES["summary"]
+    diagnostics_path = output_dir / FULL_MH_ARTIFACT_FILENAMES["diagnostics"]
+    manifest_path = output_dir / FULL_MH_ARTIFACT_FILENAMES["manifest"]
+
+    summary = {
+        key: value
+        for key, value in result.items()
+        if key not in {"stdout_tail", "stderr_tail", "generated_artifact_manifest"}
+    }
+    summary.update(
+        {
+            "wbs": "WBS-073",
+            "full_mh_created": result["status"] == "passed",
+            "posterior_inference_claimed": False,
+            "publication_grade_posterior_evidence": False,
+            "manifest": manifest_path.relative_to(root).as_posix(),
+        }
+    )
+    manifest = {
+        "wbs": "WBS-073",
+        "summary_artifact": summary_path.relative_to(root).as_posix(),
+        "diagnostics_artifact": diagnostics_path.relative_to(root).as_posix(),
+        "manifest_artifact": manifest_path.relative_to(root).as_posix(),
+        "committed_artifacts": [
+            summary_path.relative_to(root).as_posix(),
+            diagnostics_path.relative_to(root).as_posix(),
+            manifest_path.relative_to(root).as_posix(),
+        ],
+        "raw_heavy_chain_artifacts_committed": False,
+        **result["generated_artifact_manifest"],
+    }
+    diagnostics = "\n".join(
+        [
+            "# WBS-073 Full MH Diagnostics",
+            "",
+            f"Status: {result['status']}.",
+            "",
+            f"Command: `{' '.join(str(part) for part in result['command'])}`",
+            "",
+            "Configuration:",
+            f"- `mh_replic`: {result['mh_replic']} per chain",
+            f"- chains: {result['chains']}",
+            f"- Dynare `mh_nblocks`: {result['mh_nblocks']}",
+            f"- approved blocks metadata: {result['approved_blocks']}",
+            f"- burn-in: {result['mh_drop']}",
+            f"- `mh_jscale`: {result['mh_jscale']}",
+            "",
+            "Diagnostics:",
+            f"- finite likelihood reported: {result['finite_likelihood_reported']}",
+            f"- acceptance values: {result['mh_acceptance_values']}",
+            f"- average acceptance ratio: {result['mh_acceptance_ratio']}",
+            f"- R-hat status: {result['rhat_status']}",
+            f"- max R-hat: {result['rhat_value']}",
+            f"- raw chain artifacts committed: {manifest['raw_heavy_chain_artifacts_committed']}",
+            "",
+            "This is full-MH operational validation, not final publication-grade posterior evidence.",
+            "WBS-074, backtesting, Redux, and sovereign-extension work remain forbidden until explicitly approved.",
+            "",
+        ]
+    )
+
+    summary_path.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    diagnostics_path.write_text(diagnostics, encoding="utf-8")
+    return {
+        "summary_artifact": summary_path.relative_to(root).as_posix(),
+        "diagnostics_artifact": diagnostics_path.relative_to(root).as_posix(),
+        "manifest_artifact": manifest_path.relative_to(root).as_posix(),
     }
 
 
@@ -570,9 +812,18 @@ def run_dynare(
             normalized_mode = "estimation-smoke"
         if mode == "mh-pilot":
             normalized_mode = "mh-pilot"
+        if mode == "full-mh":
+            normalized_mode = "full-mh"
         likelihood_data = {}
         estimation_options: dict[str, Any] = {}
-        if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke", "mh-pilot"}:
+        estimation_modes = {
+            "likelihood-smoke",
+            "posterior-mode",
+            "estimation-smoke",
+            "mh-pilot",
+            "full-mh",
+        }
+        if normalized_mode in estimation_modes:
             try:
                 likelihood_data = write_likelihood_data(root, temp_dir)
             except (FileNotFoundError, ValueError) as exc:
@@ -588,54 +839,61 @@ def run_dynare(
                     f"var {variable}; stderr {metadata['stderr']};"
                     for variable, metadata in LIKELIHOOD_MEASUREMENT_ERRORS.items()
                 )
-                mode_compute = 4 if normalized_mode in {"posterior-mode", "mh-pilot"} else 0
-                mh_replic = MH_PILOT_CONFIG["mh_replic"] if normalized_mode == "mh-pilot" else 0
-                mh_nblocks = MH_PILOT_CONFIG["mh_nblocks"] if normalized_mode == "mh-pilot" else None
-                mh_drop = MH_PILOT_CONFIG["mh_drop"] if normalized_mode == "mh-pilot" else None
-                pilot_mh_jscale = (
-                    mh_jscale if mh_jscale is not None else MH_PILOT_CONFIG["mh_jscale"]
+                mh_config = FULL_MH_CONFIG if normalized_mode == "full-mh" else MH_PILOT_CONFIG
+                mode_compute = 4 if normalized_mode in {"posterior-mode", "mh-pilot", "full-mh"} else 0
+                mh_replic = mh_config["mh_replic"] if normalized_mode in {"mh-pilot", "full-mh"} else 0
+                mh_nblocks = mh_config["mh_nblocks"] if normalized_mode in {"mh-pilot", "full-mh"} else None
+                mh_drop = mh_config["mh_drop"] if normalized_mode in {"mh-pilot", "full-mh"} else None
+                active_mh_jscale = (
+                    mh_jscale if mh_jscale is not None else mh_config.get("mh_jscale")
                 )
                 estimation_options = {
                     "mode_compute": mode_compute,
                     "mh_replic": mh_replic,
-                    "chains": MH_PILOT_CONFIG["chains"] if normalized_mode == "mh-pilot" else None,
+                    "chains": mh_config["chains"] if normalized_mode in {"mh-pilot", "full-mh"} else None,
                     "mh_nblocks": mh_nblocks,
                     "mh_drop": mh_drop,
-                    "mh_jscale": pilot_mh_jscale if normalized_mode == "mh-pilot" else None,
+                    "mh_jscale": active_mh_jscale if normalized_mode in {"mh-pilot", "full-mh"} else None,
                     "mh_jscale_source": (
                         "cli"
                         if mh_jscale is not None
                         else (
                             "config"
-                            if pilot_mh_jscale is not None
+                            if active_mh_jscale is not None
                             else "dynare_default"
                         )
                     )
-                    if normalized_mode == "mh-pilot"
+                    if normalized_mode in {"mh-pilot", "full-mh"}
                     else None,
                     "dynare_default_mh_jscale": (
                         MH_PILOT_CONFIG["dynare_default_mh_jscale"]
                         if normalized_mode == "mh-pilot"
                         else None
                     ),
+                    "approved_blocks": (
+                        FULL_MH_CONFIG["approved_blocks"]
+                        if normalized_mode == "full-mh"
+                        else None
+                    ),
                     "target_acceptance_central": (
-                        MH_PILOT_CONFIG["target_acceptance_central"]
-                        if normalized_mode == "mh-pilot"
+                        mh_config["target_acceptance_central"]
+                        if normalized_mode in {"mh-pilot", "full-mh"}
                         else None
                     ),
                     "estimation_smoke": normalized_mode == "estimation-smoke",
                     "mh_pilot": normalized_mode == "mh-pilot",
+                    "full_mh": normalized_mode == "full-mh",
                     "posterior_mode": normalized_mode == "posterior-mode",
                     "persistent_outputs_created": False,
                 }
                 mh_options = ""
-                if normalized_mode == "mh-pilot":
+                if normalized_mode in {"mh-pilot", "full-mh"}:
                     mh_options = (
                         f"mh_nblocks={mh_nblocks}, "
                         f"mh_drop={mh_drop}, "
                     )
-                    if pilot_mh_jscale is not None:
-                        mh_options += f"mh_jscale={pilot_mh_jscale}, "
+                    if active_mh_jscale is not None:
+                        mh_options += f"mh_jscale={active_mh_jscale}, "
                 handle.write(
                     "\nshocks;\n"
                     f"{measurement_error_block}\n"
@@ -690,7 +948,7 @@ def run_dynare(
                 "elapsed_seconds": timeout_seconds,
                 "stdout_tail": _tail(exc.stdout),
                 "stderr_tail": _tail(exc.stderr),
-                "error": "Dynare smoke run timed out.",
+                "error": "Dynare run timed out.",
             }
 
         elapsed = round(time.monotonic() - started, 3)
@@ -711,12 +969,21 @@ def run_dynare(
             }
         likelihood = (
             _parse_likelihood(completed.stdout, completed.stderr)
-            if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke", "mh-pilot"}
+            if normalized_mode in estimation_modes
             else {}
         )
         mh_pilot = (
             _parse_mh_acceptance(completed.stdout, completed.stderr)
             if normalized_mode == "mh-pilot"
+            else {}
+        )
+        full_mh = (
+            {
+                **_parse_mh_acceptance(completed.stdout, completed.stderr, FULL_MH_CONFIG),
+                **_compute_rhat_from_metropolis(temp_dir, FULL_MH_CONFIG["mh_drop"]),
+                "generated_artifact_manifest": _generated_file_manifest(temp_dir),
+            }
+            if normalized_mode == "full-mh"
             else {}
         )
         status = "passed" if completed.returncode == 0 else "failed"
@@ -779,8 +1046,21 @@ def run_dynare(
             if pilot_pass:
                 status = "passed"
                 returncode = 0
+        if normalized_mode == "full-mh":
+            full_mh_pass = (
+                likelihood["finite_likelihood_reported"]
+                and likelihood["likelihood_nonfinite_value_count"] == 0
+                and full_mh["mh_chains_completed"]
+                and full_mh["mh_nonfinite_token_count"] == 0
+                and full_mh["mh_acceptance_in_target_band"]
+                and full_mh["rhat_status"] == "computed"
+                and full_mh["rhat_value"] is not None
+                and full_mh["rhat_value"] <= FULL_MH_CONFIG["rhat_max"]
+            )
+            status = "passed" if full_mh_pass else "failed"
+            returncode = 0 if full_mh_pass else 1
 
-        return {
+        result = {
             "mode": normalized_mode,
             "status": status,
             "returncode": returncode,
@@ -796,15 +1076,19 @@ def run_dynare(
             **likelihood_data,
             **estimation_options,
             **mh_pilot,
+            **full_mh,
             "likelihood_measurement_errors": (
                 LIKELIHOOD_MEASUREMENT_ERRORS
-                if normalized_mode in {"likelihood-smoke", "posterior-mode", "estimation-smoke", "mh-pilot"}
+                if normalized_mode in estimation_modes
                 else None
             ),
             **likelihood,
             "stdout_tail": _tail(completed.stdout),
             "stderr_tail": _tail(completed.stderr),
         }
+        if normalized_mode == "full-mh":
+            result.update(_write_full_mh_artifacts(root, result))
+        return result
 
 
 def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> dict[str, Any]:
@@ -826,6 +1110,7 @@ def main() -> int:
             "posterior-mode",
             "estimation-smoke",
             "mh-pilot",
+            "full-mh",
         ),
         default="smoke",
     )

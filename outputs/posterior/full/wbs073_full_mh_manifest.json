@@ -1,0 +1,16 @@
+{
+  "wbs": "WBS-073",
+  "status": "failed",
+  "summary_artifact": "outputs/posterior/full/wbs073_full_mh_summary.json",
+  "diagnostics_artifact": "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
+  "manifest_artifact": "outputs/posterior/full/wbs073_full_mh_manifest.json",
+  "committed_artifacts": [
+    "outputs/posterior/full/wbs073_full_mh_summary.json",
+    "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
+    "outputs/posterior/full/wbs073_full_mh_manifest.json"
+  ],
+  "raw_heavy_chain_artifacts_committed": false,
+  "raw_chain_artifact_manifest_available": false,
+  "raw_chain_artifact_manifest_note": "The approved run timed out and the temporary Dynare directory was cleaned up before raw chain files could be summarized.",
+  "forbidden_artifacts_created": false
+}

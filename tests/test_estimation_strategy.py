@@ -9,6 +9,7 @@ STRATEGY = ROOT / "docs" / "04_estimation_strategy.md"
 PRIORS_FILE = ROOT / "model" / "samba_classic" / "priors.inc"
 WBS071A_SMOKE_ARTIFACT = ROOT / "outputs" / "posterior" / "smoke" / "wbs071a_estimation_smoke.json"
 WBS072_PILOT_SUMMARY = ROOT / "outputs" / "posterior" / "pilot" / "wbs072_mh_pilot_summary.json"
+WBS073_FULL_SUMMARY = ROOT / "outputs" / "posterior" / "full" / "wbs073_full_mh_summary.json"
 
 
 def _execution_status() -> str:
@@ -19,7 +20,11 @@ def _execution_status() -> str:
 
 
 def _assert_no_forbidden_posterior_outputs() -> None:
-    if "WBS-072_COMPLETED" in _execution_status():
+    if "WBS-073_COMPLETED" in _execution_status() or "BLOCKED_WBS073" in _execution_status():
+        assert WBS071A_SMOKE_ARTIFACT.exists()
+        assert WBS072_PILOT_SUMMARY.exists()
+        assert WBS073_FULL_SUMMARY.exists()
+    elif "WBS-072_COMPLETED" in _execution_status():
         assert WBS071A_SMOKE_ARTIFACT.exists()
         assert WBS072_PILOT_SUMMARY.exists()
         assert not (ROOT / "outputs" / "posterior" / "full").exists()
@@ -36,7 +41,23 @@ def test_wbs065_identification_protocol_exists_without_running_identification():
     text = STRATEGY.read_text(encoding="utf-8")
     execution_status = _execution_status()
 
-    if "WBS-072_COMPLETED" in execution_status:
+    if "WBS-073_COMPLETED" in execution_status:
+        assert "status: wbs073_full_mh_completed" in text
+        assert "wbs: WBS-073" in text
+        assert "mh_pilot_completed: true" in text
+        assert "full_mh_started: true" in text
+        assert "full_mh_completed: true" in text
+        assert "final_posterior_inference_claimed: false" in text
+        assert "WBS-073 Full MH Operational Validation" in text
+    elif "BLOCKED_WBS073" in execution_status:
+        assert "status: wbs073_full_mh_blocked" in text
+        assert "wbs: WBS-073" in text
+        assert "mh_pilot_completed: true" in text
+        assert "full_mh_started: true" in text
+        assert "full_mh_completed: false" in text
+        assert "final_posterior_inference_claimed: false" in text
+        assert "WBS-073 Full MH Operational Validation" in text
+    elif "WBS-072_COMPLETED" in execution_status:
         assert "status: wbs072_mh_pilot_completed" in text
         assert "wbs: WBS-072" in text
         assert "mh_pilot_completed: true" in text

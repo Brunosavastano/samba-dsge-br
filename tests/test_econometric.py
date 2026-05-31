@@ -15,6 +15,10 @@ WBS071A_SMOKE_ARTIFACT = ROOT / "outputs" / "posterior" / "smoke" / "wbs071a_est
 WBS072_CONFIG = ROOT / "docs" / "wbs072_mh_pilot_config.md"
 WBS072_PILOT_SUMMARY = ROOT / "outputs" / "posterior" / "pilot" / "wbs072_mh_pilot_summary.json"
 WBS072_PILOT_DIAGNOSTICS = ROOT / "outputs" / "posterior" / "pilot" / "wbs072_mh_pilot_diagnostics.md"
+WBS073_CONFIG = ROOT / "docs" / "wbs073_full_mh_config.md"
+WBS073_FULL_SUMMARY = ROOT / "outputs" / "posterior" / "full" / "wbs073_full_mh_summary.json"
+WBS073_FULL_DIAGNOSTICS = ROOT / "outputs" / "posterior" / "full" / "wbs073_full_mh_diagnostics.md"
+WBS073_FULL_MANIFEST = ROOT / "outputs" / "posterior" / "full" / "wbs073_full_mh_manifest.json"
 FORBIDDEN_PERSISTENT_OUTPUTS = (
     ROOT / "outputs" / "backtesting",
     ROOT / "model" / "samba_redux",
@@ -32,7 +36,9 @@ def _execution_status() -> str:
 
 def _forbidden_persistent_outputs() -> tuple[Path, ...]:
     paths = list(FORBIDDEN_PERSISTENT_OUTPUTS)
-    if "WBS-072_COMPLETED" in _execution_status():
+    if "WBS-073_COMPLETED" in _execution_status() or "BLOCKED_WBS073" in _execution_status():
+        pass
+    elif "WBS-072_COMPLETED" in _execution_status():
         paths.append(ROOT / "outputs" / "posterior" / "full")
     elif "WBS-071a_COMPLETED" in _execution_status():
         paths.extend(
@@ -194,4 +200,55 @@ def test_wbs072_completed_mh_pilot_records_only_pilot_artifacts():
     assert summary["full_mh_created"] is False
     assert summary["posterior_inference_claimed"] is False
     assert "not final convergence evidence" in diagnostics
+    assert all(not path.exists() for path in _forbidden_persistent_outputs())
+
+
+def test_wbs073_full_mh_config_records_approval_only_for_wbs073():
+    if (
+        "WBS-073_APPROVED_FOR_FULL_MH" not in _execution_status()
+        and "WBS-073_COMPLETED" not in _execution_status()
+        and "BLOCKED_WBS073" not in _execution_status()
+    ):
+        return
+
+    assert WBS073_CONFIG.exists()
+    text = WBS073_CONFIG.read_text(encoding="utf-8")
+
+    assert "approval_status: approved" in text
+    assert "approved_by: Bruno" in text
+    assert "approval_date: 2026-05-30" in text
+    assert "approved_timeout_seconds: 43200" in text
+    assert "`mh_replic`: 20000 per chain" in text
+    assert "chains: 4 full-MH chains" in text
+    assert "`mh_jscale`: 0.337313" in text
+    assert "final publication-grade posterior inference claims" in text
+
+
+def test_wbs073_completed_full_mh_records_only_lightweight_artifacts():
+    if "WBS-073_COMPLETED" not in _execution_status():
+        return
+
+    assert WBS073_FULL_SUMMARY.exists()
+    assert WBS073_FULL_DIAGNOSTICS.exists()
+    assert WBS073_FULL_MANIFEST.exists()
+    summary = json.loads(WBS073_FULL_SUMMARY.read_text(encoding="utf-8"))
+    manifest = json.loads(WBS073_FULL_MANIFEST.read_text(encoding="utf-8"))
+    diagnostics = WBS073_FULL_DIAGNOSTICS.read_text(encoding="utf-8")
+
+    assert summary["wbs"] == "WBS-073"
+    assert summary["mode"] == "full-mh"
+    assert summary["status"] == "passed"
+    assert summary["mh_replic"] == 20000
+    assert summary["chains"] == 4
+    assert summary["mh_nblocks"] == 4
+    assert summary["approved_blocks"] == 2
+    assert summary["mh_drop"] == 0.5
+    assert summary["mh_jscale"] == 0.337313
+    assert 0.20 <= summary["mh_acceptance_ratio"] <= 0.35
+    assert summary["rhat_status"] == "computed"
+    assert summary["rhat_value"] <= 1.1
+    assert summary["posterior_inference_claimed"] is False
+    assert summary["publication_grade_posterior_evidence"] is False
+    assert manifest["raw_heavy_chain_artifacts_committed"] is False
+    assert "not final publication-grade posterior evidence" in diagnostics
     assert all(not path.exists() for path in _forbidden_persistent_outputs())
