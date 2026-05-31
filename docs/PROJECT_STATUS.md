@@ -1,6 +1,6 @@
 # Project Status
 
-Updated: 2026-05-30
+Updated: 2026-05-31
 
 Current gate: Gate 5a completed; Gate 5b MH pilot completed; WBS-073 full-MH run blocked by approved timeout; Gate 4 completed; Gate 3 completed; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
 Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED; WBS-071_COMPLETED; WBS-071a_COMPLETED; WBS-072_CONFIG_APPROVED; WBS-072_COMPLETED; WBS-073_APPROVED_FOR_FULL_MH; BLOCKED_WBS073_FULL_MH_TIMEOUT.
@@ -10,14 +10,15 @@ Previous blocking status: BLOCKED_WBS066_IDENTIFICATION_SOLVE resolved mechanica
 Last completed task: WBS-072 approved MH pilot completed with tuned proposal scale.
 Last attempted task: WBS-072 approved MH pilot run.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: resolve WBS-073 full-MH timeout/diagnostics blocker without changing equations, priors, data, or calibration.
+Next safe task: approve WBS-073 timeout/runtime strategy before rerunning full MH.
 Blocker classification: resolved mechanically by reducing only WBS-072 `mh_jscale`; R-hat unavailable is warning only.
 Blockers: `docs/wbs072_blockers.md` records `RESOLVED_WBS072_ACCEPTANCE_BAND`.
-Required user action: review WBS-073 timeout blocker before retrying full MH or changing the runtime strategy.
-Files changed: `src/diagnostics/run_dynare.py`, `docs/wbs073_full_mh_config.md`, `docs/wbs073_blockers.md`, `docs/PROJECT_STATUS.md`, `docs/04_estimation_strategy.md`, `tests/test_econometric.py`, `tests/test_model_outputs.py`, `tests/test_estimation_strategy.py`, `tests/test_irf_restrictions.py`, `outputs/posterior/full/wbs073_full_mh_summary.json`, `outputs/posterior/full/wbs073_full_mh_diagnostics.md`, `outputs/posterior/full/wbs073_full_mh_manifest.json`.
+Required user action: choose timeout/runtime strategy for WBS-073 before retrying full MH.
+Files changed: `docs/wbs073_runtime_diagnostics.md`, `docs/wbs073_blockers.md`, `docs/PROJECT_STATUS.md`.
 Tests run: `python -m pytest` - 109 passed; `git diff --check` - passed.
 Dynare results: `python src/diagnostics/run_dynare.py --mode full-mh --timeout-seconds 43200` timed out with wrapper return code 124 after 43200 seconds; R-hat unavailable; WBS-073 not completed.
-Commit hash: pending for WBS-073 full-MH timeout blocker commit; final response reports the pushed hash.
+Runtime diagnosis: no raw chain files are present in repo; only lightweight summary/diagnostics/manifest exist; timeout occurred during convergence diagnostics, so the approved timeout was likely too short for sampling plus diagnostics.
+Commit hash: pending for WBS-073 runtime diagnosis commit; final response reports the pushed hash.
 Safe to continue: false; forbidden next without prompt: WBS-074/backtesting/Redux/sovereign.
 
 Visual status:
