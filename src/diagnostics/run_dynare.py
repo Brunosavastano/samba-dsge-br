@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
@@ -62,6 +64,10 @@ FULL_MH_ARTIFACT_FILENAMES = {
     "diagnostics": "wbs073_full_mh_diagnostics.md",
     "manifest": "wbs073_full_mh_manifest.json",
 }
+DEFAULT_EXTERNAL_RUN_ROOT = Path("D:/SAMBA_RUN")
+DEFAULT_MIN_EXTERNAL_FREE_GB = 500.0
+DEFAULT_MIN_C_FREE_GB = 30.0
+RAW_ARTIFACT_HASH_MAX_BYTES = 256 * 1024 * 1024
 LIKELIHOOD_DATA_FILE = "classic_mvp_dynare.csv"
 LIKELIHOOD_OBSERVABLE_COLUMNS = ("y", "c", "i", "g", "q", "r_t")
 LIKELIHOOD_COLUMN_MAP = {"r_t": "r"}
@@ -105,6 +111,134 @@ def model_input_file(root: Path | None = None) -> Path:
 def full_mh_output_dir(root: Path | None = None) -> Path:
     base = root if root is not None else repo_root()
     return base / "outputs" / "posterior" / "full"
+
+
+def default_full_mh_storage_paths(root: Path | None = None) -> dict[str, Path]:
+    base = root if root is not None else repo_root()
+    return {
+        "work_dir": DEFAULT_EXTERNAL_RUN_ROOT / "work",
+        "tmp_dir": DEFAULT_EXTERNAL_RUN_ROOT / "tmp",
+        "scratch_output_dir": DEFAULT_EXTERNAL_RUN_ROOT
+        / "scratch_output"
+        / "posterior"
+        / "full",
+        "repo_output_dir": full_mh_output_dir(base),
+    }
+
+
+def _resolve_repo_relative_path(path: str | Path | None, default: Path, root: Path) -> Path:
+    if path is None:
+        return default
+    resolved = Path(path)
+    if resolved.is_absolute():
+        return resolved
+    return root / resolved
+
+
+def _drive_root(path: Path) -> Path:
+    if path.anchor:
+        return Path(path.anchor)
+    resolved = path.resolve()
+    return Path(resolved.anchor) if resolved.anchor else resolved
+
+
+def _path_for_manifest(path: Path, root: Path | None = None) -> str:
+    base = root if root is not None else repo_root()
+    try:
+        return path.relative_to(base).as_posix()
+    except ValueError:
+        return str(path)
+
+
+def _free_gb(path: Path, disk_usage_func: Any = shutil.disk_usage) -> float:
+    return disk_usage_func(path).free / (1024 ** 3)
+
+
+def preflight_full_mh_storage(
+    work_dir: Path,
+    tmp_dir: Path,
+    scratch_output_dir: Path,
+    min_free_gb: float = DEFAULT_MIN_EXTERNAL_FREE_GB,
+    min_c_free_gb: float = DEFAULT_MIN_C_FREE_GB,
+    *,
+    create_dirs: bool = True,
+    disk_usage_func: Any = shutil.disk_usage,
+    drive_exists_func: Any | None = None,
+    c_drive_root: Path = Path("C:/"),
+) -> dict[str, Any]:
+    drive_exists = drive_exists_func if drive_exists_func is not None else Path.exists
+    storage_root = _drive_root(scratch_output_dir)
+    c_root = c_drive_root if c_drive_root.exists() else _drive_root(repo_root())
+    errors: list[str] = []
+    checked_dirs = [work_dir, tmp_dir, scratch_output_dir]
+
+    if not drive_exists(storage_root):
+        errors.append(f"External scratch drive does not exist: {storage_root}")
+        return {
+            "status": "failed",
+            "external_drive": str(storage_root),
+            "external_free_gb": None,
+            "c_drive": str(c_root),
+            "c_free_gb": None,
+            "required_external_free_gb": min_free_gb,
+            "required_c_free_gb": min_c_free_gb,
+            "checked_directories": [str(path) for path in checked_dirs],
+            "errors": errors,
+        }
+
+    if create_dirs:
+        for directory in checked_dirs:
+            try:
+                directory.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:
+                errors.append(f"Could not create directory {directory}: {exc}")
+
+    for directory in checked_dirs:
+        if not directory.exists():
+            errors.append(f"Directory does not exist: {directory}")
+            continue
+        probe = directory / ".samba_write_probe"
+        try:
+            probe.write_text("ok\n", encoding="utf-8")
+            probe.unlink(missing_ok=True)
+        except OSError as exc:
+            errors.append(f"Directory is not writable: {directory}: {exc}")
+
+    external_free_gb = None
+    c_free_gb = None
+    try:
+        external_free_gb = _free_gb(storage_root, disk_usage_func)
+    except OSError as exc:
+        errors.append(f"Could not read free space for {storage_root}: {exc}")
+    try:
+        c_free_gb = _free_gb(c_root, disk_usage_func)
+    except OSError as exc:
+        errors.append(f"Could not read free space for {c_root}: {exc}")
+
+    if external_free_gb is not None and external_free_gb < min_free_gb:
+        errors.append(
+            f"External scratch drive has {external_free_gb:.3f} GB free; "
+            f"requires at least {min_free_gb:.3f} GB."
+        )
+    if c_free_gb is not None and c_free_gb < min_c_free_gb:
+        errors.append(
+            f"C: safety margin has {c_free_gb:.3f} GB free; "
+            f"requires at least {min_c_free_gb:.3f} GB."
+        )
+
+    return {
+        "status": "failed" if errors else "passed",
+        "external_drive": str(storage_root),
+        "external_free_gb": round(external_free_gb, 3)
+        if external_free_gb is not None
+        else None,
+        "c_drive": str(c_root),
+        "c_free_gb": round(c_free_gb, 3) if c_free_gb is not None else None,
+        "required_external_free_gb": min_free_gb,
+        "required_c_free_gb": min_c_free_gb,
+        "checked_directories": [str(path) for path in checked_dirs],
+        "errors": errors,
+    }
 
 
 def build_dynare_command(dynare_executable: str) -> list[str]:
@@ -203,10 +337,46 @@ def _tail(text: str | bytes | None, max_lines: int = 25, max_chars: int = 4000) 
     return "\n".join(lines)[-max_chars:]
 
 
+def _decode_output(text: str | bytes | None) -> str:
+    if text is None:
+        return ""
+    if isinstance(text, bytes):
+        return text.decode("utf-8", errors="replace")
+    return text
+
+
+def terminate_process_tree(pid: int) -> dict[str, Any]:
+    if sys.platform.startswith("win"):
+        completed = subprocess.run(
+            ["taskkill", "/PID", str(pid), "/T", "/F"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return {
+            "pid": pid,
+            "method": "taskkill /T /F",
+            "returncode": completed.returncode,
+            "stdout_tail": _tail(completed.stdout, 5, 1000),
+            "stderr_tail": _tail(completed.stderr, 5, 1000),
+        }
+    try:
+        os.kill(pid, 9)
+        return {"pid": pid, "method": "os.kill", "returncode": 0}
+    except OSError as exc:
+        return {
+            "pid": pid,
+            "method": "os.kill",
+            "returncode": 1,
+            "stderr_tail": str(exc),
+        }
+
+
 def _run_command(
     command: list[str],
     cwd: Path,
     timeout_seconds: int,
+    env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     def _runtime_process_ids() -> set[int]:
         if not sys.platform.startswith("win"):
@@ -232,20 +402,6 @@ def _run_command(
                     continue
         return process_ids
 
-    def _kill_process_tree(pid: int) -> None:
-        if sys.platform.startswith("win"):
-            subprocess.run(
-                ["taskkill", "/PID", str(pid), "/T", "/F"],
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-        else:
-            try:
-                process.kill()
-            except NameError:
-                pass
-
     def _run_shell_command() -> subprocess.CompletedProcess[str]:
         runtime_pids_before = _runtime_process_ids()
         process = subprocess.Popen(
@@ -257,20 +413,23 @@ def _run_command(
             encoding="utf-8",
             errors="replace",
             shell=True,
+            env=env,
         )
         try:
             stdout, stderr = process.communicate(timeout=timeout_seconds)
         except subprocess.TimeoutExpired:
-            _kill_process_tree(process.pid)
+            cleanup_records = [terminate_process_tree(process.pid)]
             for pid in _runtime_process_ids() - runtime_pids_before:
-                _kill_process_tree(pid)
+                cleanup_records.append(terminate_process_tree(pid))
             stdout, stderr = process.communicate()
-            raise subprocess.TimeoutExpired(
+            timeout_error = subprocess.TimeoutExpired(
                 cmd=command,
                 timeout=timeout_seconds,
                 output=stdout,
                 stderr=stderr,
             )
+            timeout_error.cleanup_records = cleanup_records  # type: ignore[attr-defined]
+            raise timeout_error
         return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
 
     if sys.platform.startswith("win") and Path(command[0]).suffix.lower() in {
@@ -288,6 +447,7 @@ def _run_command(
         errors="replace",
         timeout=timeout_seconds,
         check=False,
+        env=env,
     )
 
 
@@ -450,7 +610,10 @@ def _file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _generated_file_manifest(temp_dir: Path) -> dict[str, Any]:
+def _generated_file_manifest(
+    temp_dir: Path,
+    raw_output_dir: Path | None = None,
+) -> dict[str, Any]:
     copied_inputs = set(REQUIRED_MODEL_FILES) | {LIKELIHOOD_DATA_FILE}
     entries = []
     for path in sorted(item for item in temp_dir.rglob("*") if item.is_file()):
@@ -463,12 +626,29 @@ def _generated_file_manifest(temp_dir: Path) -> dict[str, Any]:
             and "_mh" in path.name
             and path.suffix.lower() == ".mat"
         )
+        external_raw_path = None
+        if is_raw_chain and raw_output_dir is not None:
+            external_raw_path = raw_output_dir / relative
+            external_raw_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(path, external_raw_path)
+        should_hash = not is_raw_chain or size <= RAW_ARTIFACT_HASH_MAX_BYTES
         entries.append(
             {
                 "path": relative,
                 "size_bytes": size,
-                "sha256": _file_sha256(path),
+                "sha256": _file_sha256(path) if should_hash else None,
+                "sha256_skipped_reason": (
+                    "raw artifact exceeds practical hash threshold"
+                    if not should_hash
+                    else None
+                ),
                 "raw_chain_artifact": is_raw_chain,
+                "external_raw_artifact": (
+                    str(external_raw_path)
+                    if external_raw_path is not None
+                    else None
+                ),
+                "external_untracked": is_raw_chain,
                 "committed_to_git": False,
             }
         )
@@ -479,6 +659,7 @@ def _generated_file_manifest(temp_dir: Path) -> dict[str, Any]:
         "raw_chain_artifact_count": len(raw_entries),
         "raw_chain_artifact_total_bytes": sum(entry["size_bytes"] for entry in raw_entries),
         "raw_chain_artifacts_committed": False,
+        "raw_chain_artifacts_intentionally_untracked": True,
         "generated_artifacts": entries,
     }
 
@@ -581,8 +762,12 @@ def _compute_rhat_from_metropolis(temp_dir: Path, drop_fraction: float) -> dict[
     }
 
 
-def _write_full_mh_artifacts(root: Path, result: dict[str, Any]) -> dict[str, Any]:
-    output_dir = full_mh_output_dir(root)
+def _write_full_mh_artifacts(
+    root: Path,
+    result: dict[str, Any],
+    repo_output_dir: Path | None = None,
+) -> dict[str, Any]:
+    output_dir = repo_output_dir if repo_output_dir is not None else full_mh_output_dir(root)
     output_dir.mkdir(parents=True, exist_ok=True)
     summary_path = output_dir / FULL_MH_ARTIFACT_FILENAMES["summary"]
     diagnostics_path = output_dir / FULL_MH_ARTIFACT_FILENAMES["diagnostics"]
@@ -599,20 +784,21 @@ def _write_full_mh_artifacts(root: Path, result: dict[str, Any]) -> dict[str, An
             "full_mh_created": result["status"] == "passed",
             "posterior_inference_claimed": False,
             "publication_grade_posterior_evidence": False,
-            "manifest": manifest_path.relative_to(root).as_posix(),
+            "manifest": _path_for_manifest(manifest_path, root),
         }
     )
     manifest = {
         "wbs": "WBS-073",
-        "summary_artifact": summary_path.relative_to(root).as_posix(),
-        "diagnostics_artifact": diagnostics_path.relative_to(root).as_posix(),
-        "manifest_artifact": manifest_path.relative_to(root).as_posix(),
+        "summary_artifact": _path_for_manifest(summary_path, root),
+        "diagnostics_artifact": _path_for_manifest(diagnostics_path, root),
+        "manifest_artifact": _path_for_manifest(manifest_path, root),
         "committed_artifacts": [
-            summary_path.relative_to(root).as_posix(),
-            diagnostics_path.relative_to(root).as_posix(),
-            manifest_path.relative_to(root).as_posix(),
+            _path_for_manifest(summary_path, root),
+            _path_for_manifest(diagnostics_path, root),
+            _path_for_manifest(manifest_path, root),
         ],
         "raw_heavy_chain_artifacts_committed": False,
+        "raw_heavy_chain_artifacts_intentionally_untracked": True,
         **result["generated_artifact_manifest"],
     }
     diagnostics = "\n".join(
@@ -649,9 +835,9 @@ def _write_full_mh_artifacts(root: Path, result: dict[str, Any]) -> dict[str, An
     manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     diagnostics_path.write_text(diagnostics, encoding="utf-8")
     return {
-        "summary_artifact": summary_path.relative_to(root).as_posix(),
-        "diagnostics_artifact": diagnostics_path.relative_to(root).as_posix(),
-        "manifest_artifact": manifest_path.relative_to(root).as_posix(),
+        "summary_artifact": _path_for_manifest(summary_path, root),
+        "diagnostics_artifact": _path_for_manifest(diagnostics_path, root),
+        "manifest_artifact": _path_for_manifest(manifest_path, root),
     }
 
 
@@ -763,9 +949,25 @@ def run_dynare(
     timeout_seconds: int = 180,
     residual_tolerance: float = 1e-8,
     mh_jscale: float | None = None,
+    work_dir: str | Path | None = None,
+    tmp_dir: str | Path | None = None,
+    scratch_output_dir: str | Path | None = None,
+    repo_output_dir: str | Path | None = None,
+    min_free_gb: float = DEFAULT_MIN_EXTERNAL_FREE_GB,
+    min_c_free_gb: float = DEFAULT_MIN_C_FREE_GB,
 ) -> dict[str, Any]:
     root = repo_root()
     source_dir = samba_model_dir(root)
+    normalized_requested_mode = "irfs" if mode == "irf" else mode
+    if mode == "likelihood":
+        normalized_requested_mode = "likelihood-smoke"
+    if mode in {
+        "posterior-mode",
+        "estimation-smoke",
+        "mh-pilot",
+        "full-mh",
+    }:
+        normalized_requested_mode = mode
     dynare_path = shutil.which(dynare_executable)
     if dynare_path is None:
         return {
@@ -784,7 +986,68 @@ def run_dynare(
             "error": "mh_jscale must be positive when provided.",
         }
 
-    with tempfile.TemporaryDirectory(prefix="samba_dynare_") as temp_dir_raw:
+    full_mh_storage: dict[str, Any] = {}
+    full_mh_paths = default_full_mh_storage_paths(root)
+    if normalized_requested_mode == "full-mh":
+        resolved_work_dir = _resolve_repo_relative_path(
+            work_dir,
+            full_mh_paths["work_dir"],
+            root,
+        )
+        resolved_tmp_dir = _resolve_repo_relative_path(
+            tmp_dir,
+            full_mh_paths["tmp_dir"],
+            root,
+        )
+        resolved_scratch_output_dir = _resolve_repo_relative_path(
+            scratch_output_dir,
+            full_mh_paths["scratch_output_dir"],
+            root,
+        )
+        resolved_repo_output_dir = _resolve_repo_relative_path(
+            repo_output_dir,
+            full_mh_paths["repo_output_dir"],
+            root,
+        )
+        preflight = preflight_full_mh_storage(
+            resolved_work_dir,
+            resolved_tmp_dir,
+            resolved_scratch_output_dir,
+            min_free_gb,
+            min_c_free_gb,
+        )
+        full_mh_storage = {
+            "storage_preflight": preflight,
+            "work_dir": str(resolved_work_dir),
+            "tmp_dir": str(resolved_tmp_dir),
+            "scratch_output_dir": str(resolved_scratch_output_dir),
+            "repo_output_dir": _path_for_manifest(resolved_repo_output_dir, root),
+        }
+        if preflight["status"] != "passed":
+            return {
+                "mode": "full-mh",
+                "status": "failed",
+                "returncode": 2,
+                "model_file": str(source_dir / "samba_classic.mod"),
+                "error": "Full-MH storage preflight failed before starting Dynare.",
+                **full_mh_storage,
+            }
+        temp_context = contextlib.nullcontext(str(resolved_work_dir))
+        command_env = os.environ.copy()
+        command_env.update(
+            {
+                "TEMP": str(resolved_tmp_dir),
+                "TMP": str(resolved_tmp_dir),
+                "TMPDIR": str(resolved_tmp_dir),
+            }
+        )
+    else:
+        resolved_scratch_output_dir = full_mh_paths["scratch_output_dir"]
+        resolved_repo_output_dir = full_mh_paths["repo_output_dir"]
+        command_env = None
+        temp_context = tempfile.TemporaryDirectory(prefix="samba_dynare_")
+
+    with temp_context as temp_dir_raw:
         temp_dir = Path(temp_dir_raw)
         try:
             copy_model_inputs(source_dir, temp_dir)
@@ -803,17 +1066,7 @@ def run_dynare(
         if mode == "bk":
             with (temp_dir / "samba_classic.mod").open("a", encoding="utf-8") as handle:
                 handle.write("\nsteady;\ncheck;\n")
-        normalized_mode = "irfs" if mode == "irf" else mode
-        if mode == "likelihood":
-            normalized_mode = "likelihood-smoke"
-        if mode == "posterior-mode":
-            normalized_mode = "posterior-mode"
-        if mode == "estimation-smoke":
-            normalized_mode = "estimation-smoke"
-        if mode == "mh-pilot":
-            normalized_mode = "mh-pilot"
-        if mode == "full-mh":
-            normalized_mode = "full-mh"
+        normalized_mode = normalized_requested_mode
         likelihood_data = {}
         estimation_options: dict[str, Any] = {}
         estimation_modes = {
@@ -936,20 +1189,55 @@ def run_dynare(
         command = build_dynare_command(dynare_path)
         started = time.monotonic()
         try:
-            completed = _run_command(command, temp_dir, timeout_seconds)
+            completed = _run_command(command, temp_dir, timeout_seconds, env=command_env)
         except subprocess.TimeoutExpired as exc:
-            return {
+            stdout = _decode_output(exc.stdout)
+            stderr = _decode_output(exc.stderr)
+            timeout_result = {
                 "mode": mode,
                 "status": "failed",
                 "returncode": 124,
                 "command": command,
                 "model_file": str(source_dir / "samba_classic.mod"),
-                "working_directory": "temporary",
+                "working_directory": (
+                    "external_scratch"
+                    if normalized_mode == "full-mh"
+                    else "temporary"
+                ),
                 "elapsed_seconds": timeout_seconds,
                 "stdout_tail": _tail(exc.stdout),
                 "stderr_tail": _tail(exc.stderr),
+                "process_cleanup": getattr(exc, "cleanup_records", []),
                 "error": "Dynare run timed out.",
+                **full_mh_storage,
             }
+            if normalized_mode == "full-mh":
+                full_timeout = {
+                    **_parse_mh_acceptance(stdout, stderr, FULL_MH_CONFIG),
+                    **_compute_rhat_from_metropolis(temp_dir, FULL_MH_CONFIG["mh_drop"]),
+                    "generated_artifact_manifest": _generated_file_manifest(
+                        temp_dir,
+                        resolved_scratch_output_dir,
+                    ),
+                }
+                timeout_result.update(
+                    {
+                        **likelihood_data,
+                        **estimation_options,
+                        **_parse_likelihood(stdout, stderr),
+                        **full_timeout,
+                        "timeout_artifact_handling": "raw_chain_files_kept_on_external_scratch_if_present",
+                        "likelihood_measurement_errors": LIKELIHOOD_MEASUREMENT_ERRORS,
+                    }
+                )
+                timeout_result.update(
+                    _write_full_mh_artifacts(
+                        root,
+                        timeout_result,
+                        resolved_repo_output_dir,
+                    )
+                )
+            return timeout_result
 
         elapsed = round(time.monotonic() - started, 3)
         residuals = (
@@ -981,7 +1269,10 @@ def run_dynare(
             {
                 **_parse_mh_acceptance(completed.stdout, completed.stderr, FULL_MH_CONFIG),
                 **_compute_rhat_from_metropolis(temp_dir, FULL_MH_CONFIG["mh_drop"]),
-                "generated_artifact_manifest": _generated_file_manifest(temp_dir),
+                "generated_artifact_manifest": _generated_file_manifest(
+                    temp_dir,
+                    resolved_scratch_output_dir,
+                ),
             }
             if normalized_mode == "full-mh"
             else {}
@@ -1067,9 +1358,14 @@ def run_dynare(
             "dynare_returncode": completed.returncode,
             "command": command,
             "model_file": str(source_dir / "samba_classic.mod"),
-            "working_directory": "temporary",
+            "working_directory": (
+                "external_scratch"
+                if normalized_mode == "full-mh"
+                else "temporary"
+            ),
             "elapsed_seconds": elapsed,
             "residual_tolerance": residual_tolerance if mode == "residuals" else None,
+            **full_mh_storage,
             **residuals,
             **bk,
             **irfs,
@@ -1087,7 +1383,7 @@ def run_dynare(
             "stderr_tail": _tail(completed.stderr),
         }
         if normalized_mode == "full-mh":
-            result.update(_write_full_mh_artifacts(root, result))
+            result.update(_write_full_mh_artifacts(root, result, resolved_repo_output_dir))
         return result
 
 
@@ -1095,7 +1391,7 @@ def run_smoke(dynare_executable: str = "dynare", timeout_seconds: int = 180) -> 
     return run_dynare("smoke", dynare_executable, timeout_seconds)
 
 
-def main() -> int:
+def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
@@ -1123,6 +1419,27 @@ def main() -> int:
         default=None,
         help="Optional WBS-072 MH pilot proposal scale.",
     )
+    parser.add_argument("--work-dir", default=None)
+    parser.add_argument("--tmp-dir", default=None)
+    parser.add_argument("--scratch-output-dir", default=None)
+    parser.add_argument("--repo-output-dir", default=None)
+    parser.add_argument(
+        "--min-free-gb",
+        type=float,
+        default=DEFAULT_MIN_EXTERNAL_FREE_GB,
+        help="Minimum free GB required on the full-MH scratch drive.",
+    )
+    parser.add_argument(
+        "--min-c-free-gb",
+        type=float,
+        default=DEFAULT_MIN_C_FREE_GB,
+        help="Minimum free GB required on C: for pagefile/cache safety.",
+    )
+    return parser
+
+
+def main() -> int:
+    parser = build_arg_parser()
     args = parser.parse_args()
 
     result = run_dynare(
@@ -1131,6 +1448,12 @@ def main() -> int:
         args.timeout_seconds,
         args.residual_tolerance,
         args.mh_jscale,
+        args.work_dir,
+        args.tmp_dir,
+        args.scratch_output_dir,
+        args.repo_output_dir,
+        args.min_free_gb,
+        args.min_c_free_gb,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return int(result["returncode"])
