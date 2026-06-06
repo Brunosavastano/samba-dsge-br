@@ -217,9 +217,17 @@ def test_wbs073_full_mh_config_records_approval_only_for_wbs073():
     assert "approval_status: approved" in text
     assert "approved_by: Bruno" in text
     assert "approval_date: 2026-05-30" in text
-    assert "approved_timeout_seconds: 43200" in text
+    assert "approved_timeout_seconds: 86400" in text
+    assert "rerun_approval_status: approved" in text
+    assert "rerun_notes: approved timeout extension only; no model/data/prior/calibration changes" in text
+    assert "external_drive_rerun_status: approved" in text
+    assert "approved_blocks_metadata: 2" in text
+    assert "actual_dynare_mh_nblocks: 4" in text
+    assert "block_configuration_reconciliation: reconciled" in text
     assert "`mh_replic`: 20000 per chain" in text
     assert "chains: 4 full-MH chains" in text
+    assert "runtime Dynare `mh_nblocks`: 4" in text
+    assert "D:\\SAMBA_RUN\\scratch_output\\posterior\\full" in text
     assert "`mh_jscale`: 0.337313" in text
     assert "final publication-grade posterior inference claims" in text
 

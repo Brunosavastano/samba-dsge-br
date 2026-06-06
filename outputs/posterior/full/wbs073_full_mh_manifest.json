@@ -1,16 +1,84 @@
 {
-  "wbs": "WBS-073",
-  "status": "failed",
-  "summary_artifact": "outputs/posterior/full/wbs073_full_mh_summary.json",
-  "diagnostics_artifact": "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
-  "manifest_artifact": "outputs/posterior/full/wbs073_full_mh_manifest.json",
   "committed_artifacts": [
     "outputs/posterior/full/wbs073_full_mh_summary.json",
     "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
     "outputs/posterior/full/wbs073_full_mh_manifest.json"
   ],
+  "diagnostics_artifact": "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
+  "external_scratch_output_dir": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full",
+  "external_tmp_dir": "D:\\SAMBA_RUN\\tmp",
+  "external_work_dir": "D:\\SAMBA_RUN\\work",
+  "manifest_artifact": "outputs/posterior/full/wbs073_full_mh_manifest.json",
+  "raw_external_artifacts": [
+    {
+      "committed_to_git": false,
+      "external_untracked": true,
+      "modified_time": "2026-06-06T01:10:53",
+      "name": "metropolis.log",
+      "path": "D:\\SAMBA_RUN\\work\\samba_classic\\metropolis\\metropolis.log",
+      "raw_chain_artifact": false,
+      "sha256": "328d133d924560b68c39eb39b91c21a0d3bf217357f4bf9767d9a7ec2f66daa7",
+      "sha256_skipped_reason": null,
+      "size_bytes": 96117
+    },
+    {
+      "committed_to_git": false,
+      "external_untracked": true,
+      "modified_time": "2026-06-06T00:11:10",
+      "name": "samba_classic_mh1_blck1.mat",
+      "path": "D:\\SAMBA_RUN\\work\\samba_classic\\metropolis\\samba_classic_mh1_blck1.mat",
+      "raw_chain_artifact": true,
+      "sha256": "c8841c9f53d0e42ce1629bd08a687a7da3ebfb3b587b301465078390a28d4d7a",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_untracked": true,
+      "modified_time": "2026-06-06T00:31:46",
+      "name": "samba_classic_mh1_blck2.mat",
+      "path": "D:\\SAMBA_RUN\\work\\samba_classic\\metropolis\\samba_classic_mh1_blck2.mat",
+      "raw_chain_artifact": true,
+      "sha256": "bf66202902035089b6cccade13e9b889497894db570e1d68ed1cc0a37e6b81d4",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_untracked": true,
+      "modified_time": "2026-06-06T00:51:37",
+      "name": "samba_classic_mh1_blck3.mat",
+      "path": "D:\\SAMBA_RUN\\work\\samba_classic\\metropolis\\samba_classic_mh1_blck3.mat",
+      "raw_chain_artifact": true,
+      "sha256": "30b18cfd677635eca7ec2082d9f3139e459001283cd75af22e48bf28e1395087",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_untracked": true,
+      "modified_time": "2026-06-06T01:10:52",
+      "name": "samba_classic_mh1_blck4.mat",
+      "path": "D:\\SAMBA_RUN\\work\\samba_classic\\metropolis\\samba_classic_mh1_blck4.mat",
+      "raw_chain_artifact": true,
+      "sha256": "fd36b237080f09eea119413fea95fad41c33a64fff830567d298cff27e1a9625",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_untracked": true,
+      "modified_time": "2026-06-06T01:11:03",
+      "name": "samba_classic_mh_history_0.mat",
+      "path": "D:\\SAMBA_RUN\\work\\samba_classic\\metropolis\\samba_classic_mh_history_0.mat",
+      "raw_chain_artifact": true,
+      "sha256": "47aa816248146a002e94603a9765b8752581f04bd1c835dd3d01e8bf21c3eb50",
+      "sha256_skipped_reason": null,
+      "size_bytes": 193520
+    }
+  ],
   "raw_heavy_chain_artifacts_committed": false,
-  "raw_chain_artifact_manifest_available": false,
-  "raw_chain_artifact_manifest_note": "The approved run timed out and the temporary Dynare directory was cleaned up before raw chain files could be summarized.",
-  "forbidden_artifacts_created": false
+  "raw_heavy_chain_artifacts_intentionally_untracked": true,
+  "summary_artifact": "outputs/posterior/full/wbs073_full_mh_summary.json",
+  "wbs": "WBS-073"
 }
