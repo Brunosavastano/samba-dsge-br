@@ -1,6 +1,6 @@
 # WBS-073 Runtime Diagnostics
 
-Status: `WBS073_DISK_GUARD_IMPLEMENTED_PENDING_REVIEW`
+Status: `BLOCKED_WBS073_EXTERNAL_WORKDIR_NOT_CLEAN`
 
 Scope: WBS-073 full-MH operational rerun using confirmed external `D:\` scratch
 space. No WBS-074, backtesting, Redux, sovereign-extension, equation, prior,
@@ -17,6 +17,22 @@ Guard implementation prepared; no Dynare run performed for this update.
 - telemetry interval: 60 seconds during future full-MH runs.
 - full-MH remains blocked until the guard implementation is reviewed and a
   separate guarded rerun is approved.
+
+## Guarded Rerun Preflight
+
+Bruno approved the guarded rerun for this pass, conditional on preflight. The
+preflight did not start Dynare because `D:\SAMBA_RUN\work` still contains
+generated artifacts from the previous aborted WBS-073 attempt:
+
+- `D:\SAMBA_RUN\work\samba_classic\metropolis\*.mat`
+- `D:\SAMBA_RUN\work\samba_classic\metropolis\metropolis.log`
+- `D:\SAMBA_RUN\work\samba_classic\Output\samba_classic_mode.mat`
+- `D:\SAMBA_RUN\work\samba_classic\prior\definition.mat`
+- generated `D:\SAMBA_RUN\work\+samba_classic\...` files
+
+Free-space checks passed at preflight: `D:\` approximately 923.404 GB free and
+`C:\` approximately 152.887 GB free. The blocker is contamination risk from the
+stale external work directory, not current disk capacity.
 
 ## Command
 

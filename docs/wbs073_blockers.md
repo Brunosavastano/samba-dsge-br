@@ -1,15 +1,24 @@
 # WBS-073 Blockers
 
-Status: `BLOCKED_WBS073_DISK_GUARD_PENDING_REVIEW`
+Status: `BLOCKED_WBS073_EXTERNAL_WORKDIR_NOT_CLEAN`
 
 Current blocker:
-- WBS-073 requires Bruno/assistant review of the tested disk telemetry and
-  hard-abort guard before any full-MH rerun.
-- Guard thresholds prepared: start `D:\ >= 500 GB`, hard abort `D:\ < 50 GB`,
-  hard abort `C:\ < 30 GB`.
-- No Dynare/MH rerun was performed while implementing this guard.
+- Guarded rerun preflight found stale generated Dynare/Metropolis artifacts
+  under `D:\SAMBA_RUN\work` from the previously aborted WBS-073 attempt.
+- The documented guarded command reuses `D:\SAMBA_RUN\work`, so stale
+  `samba_classic\metropolis`, `samba_classic\Output`, `samba_classic\prior`,
+  and generated `+samba_classic` files could contaminate a new manifest/R-hat
+  pass.
+- `D:\` had approximately 923.404 GB free and `C:\` had approximately
+  152.887 GB free, so disk capacity was not the blocker.
+- No Dynare/MH rerun was started.
+- Next safe action: Bruno approves either cleanup/archive of the old external
+  work dir or a repo-documented isolated external work dir for the guarded
+  WBS-073 rerun.
 
-Previous blocker: `BLOCKED_WBS073_EXTERNAL_DISK_GUARD`
+Previous blockers:
+- `BLOCKED_WBS073_DISK_GUARD_PENDING_REVIEW`
+- `BLOCKED_WBS073_EXTERNAL_DISK_GUARD`
 
 Observed WBS-073 external-drive rerun:
 - command used `D:\SAMBA_RUN\work`, `D:\SAMBA_RUN\tmp`, and
