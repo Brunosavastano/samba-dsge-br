@@ -1,6 +1,15 @@
 # WBS-073 Blockers
 
-Status: `BLOCKED_WBS073_EXTERNAL_DISK_GUARD`
+Status: `BLOCKED_WBS073_DISK_GUARD_PENDING_REVIEW`
+
+Current blocker:
+- WBS-073 requires Bruno/assistant review of the tested disk telemetry and
+  hard-abort guard before any full-MH rerun.
+- Guard thresholds prepared: start `D:\ >= 500 GB`, hard abort `D:\ < 50 GB`,
+  hard abort `C:\ < 30 GB`.
+- No Dynare/MH rerun was performed while implementing this guard.
+
+Previous blocker: `BLOCKED_WBS073_EXTERNAL_DISK_GUARD`
 
 Observed WBS-073 external-drive rerun:
 - command used `D:\SAMBA_RUN\work`, `D:\SAMBA_RUN\tmp`, and

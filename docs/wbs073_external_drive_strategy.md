@@ -1,6 +1,6 @@
 # WBS-073 External-Drive Scratch Strategy
 
-Status: `prepared_for_review`
+Status: `disk_guard_implemented_pending_review`
 
 Confirmed external drive: `D:\`
 
@@ -19,7 +19,7 @@ and manifests.
 ## Future WBS-073 Command
 
 ```powershell
-python src/diagnostics/run_dynare.py --mode full-mh --timeout-seconds 86400 --work-dir D:\SAMBA_RUN\work --tmp-dir D:\SAMBA_RUN\tmp --scratch-output-dir D:\SAMBA_RUN\scratch_output\posterior\full --repo-output-dir outputs\posterior\full --min-free-gb 500 --min-c-free-gb 30
+python src/diagnostics/run_dynare.py --mode full-mh --timeout-seconds 86400 --work-dir D:\SAMBA_RUN\work --tmp-dir D:\SAMBA_RUN\tmp --scratch-output-dir D:\SAMBA_RUN\scratch_output\posterior\full --repo-output-dir outputs\posterior\full --min-free-gb 500 --min-c-free-gb 30 --abort-d-free-gb 50 --abort-c-free-gb 30 --disk-telemetry-file outputs\posterior\full\wbs073_disk_telemetry.jsonl --disk-telemetry-interval-seconds 60
 ```
 
 ## Runtime Rules
@@ -31,11 +31,13 @@ python src/diagnostics/run_dynare.py --mode full-mh --timeout-seconds 86400 --wo
   relative to the working directory.
 - Raw heavy chain artifacts remain on `D:\` and are marked external/untracked
   in the manifest.
-- Only `wbs073_full_mh_summary.json`,
-  `wbs073_full_mh_diagnostics.md`, and `wbs073_full_mh_manifest.*` are copied
-  back to the repo.
+- Only lightweight `wbs073_full_mh_summary.json`,
+  `wbs073_full_mh_diagnostics.md`, `wbs073_full_mh_manifest.*`, and
+  `wbs073_disk_telemetry.jsonl` are copied back to the repo.
 - `C:\` may still be used by Windows pagefile/cache, so the wrapper keeps a
   30 GB `C:\` free-space guard.
+- During full-MH, the wrapper records disk telemetry every 60 seconds and
+  terminates the Dynare/Octave process tree if a hard-abort threshold is crossed.
 
 ## Preflight Guards
 
@@ -46,5 +48,14 @@ Before full-MH starts, the wrapper must verify:
 - external scratch free space is at least 500 GB by default;
 - `C:\` free space is at least 30 GB by default.
 
-Full MH must not rerun until Bruno reviews this strategy and explicitly
-approves the external-drive execution.
+## Runtime Hard-Abort Guards
+
+- `D:\` must have at least 500 GB free before full-MH starts.
+- `D:\` hard abort: below 50 GB free during full-MH.
+- `C:\` hard abort: below 30 GB free during full-MH.
+- Raw artifacts remain external/untracked; the repo receives only lightweight
+  summaries, diagnostics, manifests, and telemetry.
+
+The guard implementation does not authorize a rerun. Full MH must not rerun
+until Bruno/assistant reviews the guard and separately approves the guarded
+WBS-073 execution.

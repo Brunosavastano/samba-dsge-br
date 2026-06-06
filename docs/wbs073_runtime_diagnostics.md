@@ -1,10 +1,22 @@
 # WBS-073 Runtime Diagnostics
 
-Status: `BLOCKED_WBS073_EXTERNAL_DISK_GUARD`
+Status: `WBS073_DISK_GUARD_IMPLEMENTED_PENDING_REVIEW`
 
 Scope: WBS-073 full-MH operational rerun using confirmed external `D:\` scratch
 space. No WBS-074, backtesting, Redux, sovereign-extension, equation, prior,
 data, calibration, observable, shock, sample, or `mh_jscale` change was made.
+
+## Guard Implementation Prepared
+
+Guard implementation prepared; no Dynare run performed for this update.
+
+- start threshold: `D:\` at least 500 GB free.
+- runtime hard abort: `D:\` below 50 GB free.
+- runtime hard abort: `C:\` below 30 GB free.
+- disk telemetry file: `outputs/posterior/full/wbs073_disk_telemetry.jsonl`.
+- telemetry interval: 60 seconds during future full-MH runs.
+- full-MH remains blocked until the guard implementation is reviewed and a
+  separate guarded rerun is approved.
 
 ## Command
 

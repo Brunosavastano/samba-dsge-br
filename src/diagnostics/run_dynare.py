@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -67,6 +68,14 @@ FULL_MH_ARTIFACT_FILENAMES = {
 DEFAULT_EXTERNAL_RUN_ROOT = Path("D:/SAMBA_RUN")
 DEFAULT_MIN_EXTERNAL_FREE_GB = 500.0
 DEFAULT_MIN_C_FREE_GB = 30.0
+DEFAULT_ABORT_D_FREE_GB = 50.0
+DEFAULT_ABORT_C_FREE_GB = 30.0
+DEFAULT_DISK_TELEMETRY_FILE = Path(
+    "outputs/posterior/full/wbs073_disk_telemetry.jsonl"
+)
+DEFAULT_DISK_TELEMETRY_INTERVAL_SECONDS = 60.0
+DISK_ABORT_RETURNCODE = 125
+INTERRUPT_RETURNCODE = 130
 RAW_ARTIFACT_HASH_MAX_BYTES = 256 * 1024 * 1024
 LIKELIHOOD_DATA_FILE = "classic_mvp_dynare.csv"
 LIKELIHOOD_OBSERVABLE_COLUMNS = ("y", "c", "i", "g", "q", "r_t")
@@ -87,6 +96,26 @@ RUNTIME_PROCESS_NAMES = {
     "octave-cli.exe",
     "octave-svgconvert.exe",
 }
+
+
+class DynareCommandAborted(RuntimeError):
+    def __init__(
+        self,
+        reason: str,
+        returncode: int,
+        *,
+        stdout: str = "",
+        stderr: str = "",
+        cleanup_records: list[dict[str, Any]] | None = None,
+        telemetry_record: dict[str, Any] | None = None,
+    ) -> None:
+        super().__init__(reason)
+        self.reason = reason
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+        self.cleanup_records = cleanup_records or []
+        self.telemetry_record = telemetry_record or {}
 
 
 def irf_targets_file(root: Path | None = None) -> Path:
@@ -152,6 +181,94 @@ def _path_for_manifest(path: Path, root: Path | None = None) -> str:
 
 def _free_gb(path: Path, disk_usage_func: Any = shutil.disk_usage) -> float:
     return disk_usage_func(path).free / (1024 ** 3)
+
+
+def runtime_process_ids() -> set[int]:
+    if not sys.platform.startswith("win"):
+        return set()
+    try:
+        completed = subprocess.run(
+            ["tasklist", "/FO", "CSV", "/NH"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
+        )
+    except OSError:
+        return set()
+    if completed.returncode != 0:
+        return set()
+    process_ids = set()
+    for row in csv.reader(completed.stdout.splitlines()):
+        if len(row) < 2:
+            continue
+        if row[0].lower() in RUNTIME_PROCESS_NAMES:
+            try:
+                process_ids.add(int(row[1]))
+            except ValueError:
+                continue
+    return process_ids
+
+
+def disk_telemetry_record(
+    *,
+    c_drive_root: Path,
+    d_drive_root: Path,
+    child_pid: int | None,
+    elapsed_seconds: float,
+    disk_usage_func: Any = shutil.disk_usage,
+) -> dict[str, Any]:
+    record: dict[str, Any] = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "elapsed_seconds": round(elapsed_seconds, 3),
+        "c_drive": str(c_drive_root),
+        "d_drive": str(d_drive_root),
+        "child_pid": child_pid,
+        "runtime_process_ids": sorted(runtime_process_ids()),
+    }
+    try:
+        record["c_free_gb"] = round(_free_gb(c_drive_root, disk_usage_func), 3)
+    except OSError as exc:
+        record["c_free_gb"] = None
+        record["c_free_error"] = str(exc)
+    try:
+        record["d_free_gb"] = round(_free_gb(d_drive_root, disk_usage_func), 3)
+    except OSError as exc:
+        record["d_free_gb"] = None
+        record["d_free_error"] = str(exc)
+    return record
+
+
+def write_disk_telemetry_record(telemetry_file: Path, record: dict[str, Any]) -> None:
+    telemetry_file.parent.mkdir(parents=True, exist_ok=True)
+    with telemetry_file.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True) + "\n")
+
+
+def disk_abort_reason(
+    record: dict[str, Any],
+    *,
+    abort_d_free_gb: float = DEFAULT_ABORT_D_FREE_GB,
+    abort_c_free_gb: float = DEFAULT_ABORT_C_FREE_GB,
+) -> str | None:
+    if record.get("d_free_error"):
+        return f"Could not read D: free space during full-MH: {record['d_free_error']}"
+    if record.get("c_free_error"):
+        return f"Could not read C: free space during full-MH: {record['c_free_error']}"
+    d_free_gb = record.get("d_free_gb")
+    c_free_gb = record.get("c_free_gb")
+    if d_free_gb is not None and d_free_gb < abort_d_free_gb:
+        return (
+            f"Full-MH disk guard abort: D: free space {d_free_gb:.3f} GB "
+            f"is below hard threshold {abort_d_free_gb:.3f} GB."
+        )
+    if c_free_gb is not None and c_free_gb < abort_c_free_gb:
+        return (
+            f"Full-MH disk guard abort: C: free space {c_free_gb:.3f} GB "
+            f"is below hard threshold {abort_c_free_gb:.3f} GB."
+        )
+    return None
 
 
 def preflight_full_mh_storage(
@@ -372,83 +489,155 @@ def terminate_process_tree(pid: int) -> dict[str, Any]:
         }
 
 
+def _collect_after_cleanup(
+    process: subprocess.Popen[str],
+) -> tuple[str, str]:
+    try:
+        stdout, stderr = process.communicate(timeout=30)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        stdout, stderr = process.communicate()
+    return stdout or "", stderr or ""
+
+
+def _cleanup_runtime_process_tree(
+    child_pid: int,
+    runtime_pids_before: set[int],
+) -> list[dict[str, Any]]:
+    cleanup_records = [terminate_process_tree(child_pid)]
+    for pid in runtime_process_ids() - runtime_pids_before:
+        if pid == child_pid:
+            continue
+        cleanup_records.append(terminate_process_tree(pid))
+    return cleanup_records
+
+
 def _run_command(
     command: list[str],
     cwd: Path,
     timeout_seconds: int,
     env: dict[str, str] | None = None,
+    disk_monitor: dict[str, Any] | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    def _runtime_process_ids() -> set[int]:
-        if not sys.platform.startswith("win"):
-            return set()
-        completed = subprocess.run(
-            ["tasklist", "/FO", "CSV", "/NH"],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            check=False,
-        )
-        if completed.returncode != 0:
-            return set()
-        process_ids = set()
-        for row in csv.reader(completed.stdout.splitlines()):
-            if len(row) < 2:
-                continue
-            if row[0].lower() in RUNTIME_PROCESS_NAMES:
-                try:
-                    process_ids.add(int(row[1]))
-                except ValueError:
-                    continue
-        return process_ids
-
-    def _run_shell_command() -> subprocess.CompletedProcess[str]:
-        runtime_pids_before = _runtime_process_ids()
-        process = subprocess.Popen(
-            subprocess.list2cmdline(command),
-            cwd=cwd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            shell=True,
-            env=env,
-        )
-        try:
-            stdout, stderr = process.communicate(timeout=timeout_seconds)
-        except subprocess.TimeoutExpired:
-            cleanup_records = [terminate_process_tree(process.pid)]
-            for pid in _runtime_process_ids() - runtime_pids_before:
-                cleanup_records.append(terminate_process_tree(pid))
-            stdout, stderr = process.communicate()
-            timeout_error = subprocess.TimeoutExpired(
-                cmd=command,
-                timeout=timeout_seconds,
-                output=stdout,
-                stderr=stderr,
-            )
-            timeout_error.cleanup_records = cleanup_records  # type: ignore[attr-defined]
-            raise timeout_error
-        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
-
-    if sys.platform.startswith("win") and Path(command[0]).suffix.lower() in {
+    use_shell = sys.platform.startswith("win") and Path(command[0]).suffix.lower() in {
         ".bat",
         ".cmd",
-    }:
-        return _run_shell_command()
-
-    return subprocess.run(
-        command,
+    }
+    popen_command: str | list[str] = (
+        subprocess.list2cmdline(command) if use_shell else command
+    )
+    runtime_pids_before = runtime_process_ids()
+    process = subprocess.Popen(
+        popen_command,
         cwd=cwd,
-        capture_output=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
         encoding="utf-8",
         errors="replace",
-        timeout=timeout_seconds,
-        check=False,
+        shell=use_shell,
         env=env,
     )
+    started = time.monotonic()
+    deadline = started + timeout_seconds
+    last_telemetry_at: float | None = None
+    interval_seconds = float(
+        (disk_monitor or {}).get(
+            "interval_seconds",
+            DEFAULT_DISK_TELEMETRY_INTERVAL_SECONDS,
+        )
+    )
+    interval_seconds = max(interval_seconds, 0.1)
+
+    try:
+        while True:
+            if process.poll() is not None:
+                stdout, stderr = process.communicate()
+                return subprocess.CompletedProcess(
+                    command,
+                    process.returncode,
+                    stdout,
+                    stderr,
+                )
+
+            now = time.monotonic()
+            if now >= deadline:
+                cleanup_records = _cleanup_runtime_process_tree(
+                    process.pid,
+                    runtime_pids_before,
+                )
+                stdout, stderr = _collect_after_cleanup(process)
+                timeout_error = subprocess.TimeoutExpired(
+                    cmd=command,
+                    timeout=timeout_seconds,
+                    output=stdout,
+                    stderr=stderr,
+                )
+                timeout_error.cleanup_records = cleanup_records  # type: ignore[attr-defined]
+                raise timeout_error
+
+            if disk_monitor is not None and (
+                last_telemetry_at is None
+                or now - last_telemetry_at >= interval_seconds
+            ):
+                record = disk_telemetry_record(
+                    c_drive_root=disk_monitor["c_drive_root"],
+                    d_drive_root=disk_monitor["d_drive_root"],
+                    child_pid=process.pid,
+                    elapsed_seconds=now - started,
+                    disk_usage_func=disk_monitor.get("disk_usage_func", shutil.disk_usage),
+                )
+                telemetry_file = disk_monitor.get("telemetry_file")
+                if telemetry_file is not None:
+                    write_disk_telemetry_record(Path(telemetry_file), record)
+                reason = disk_abort_reason(
+                    record,
+                    abort_d_free_gb=disk_monitor.get(
+                        "abort_d_free_gb",
+                        DEFAULT_ABORT_D_FREE_GB,
+                    ),
+                    abort_c_free_gb=disk_monitor.get(
+                        "abort_c_free_gb",
+                        DEFAULT_ABORT_C_FREE_GB,
+                    ),
+                )
+                if reason is not None:
+                    cleanup_records = _cleanup_runtime_process_tree(
+                        process.pid,
+                        runtime_pids_before,
+                    )
+                    stdout, stderr = _collect_after_cleanup(process)
+                    raise DynareCommandAborted(
+                        reason,
+                        DISK_ABORT_RETURNCODE,
+                        stdout=stdout,
+                        stderr=stderr,
+                        cleanup_records=cleanup_records,
+                        telemetry_record=record,
+                    )
+                last_telemetry_at = now
+
+            sleep_seconds = min(1.0, max(0.1, deadline - now))
+            time.sleep(sleep_seconds)
+    except KeyboardInterrupt:
+        cleanup_records = _cleanup_runtime_process_tree(
+            process.pid,
+            runtime_pids_before,
+        )
+        stdout, stderr = _collect_after_cleanup(process)
+        raise DynareCommandAborted(
+            "Full-MH interrupted; Dynare/Octave process tree cleanup was requested.",
+            INTERRUPT_RETURNCODE,
+            stdout=stdout,
+            stderr=stderr,
+            cleanup_records=cleanup_records,
+        ) from None
+    except (DynareCommandAborted, subprocess.TimeoutExpired):
+        raise
+    except Exception:
+        if process.poll() is None:
+            _cleanup_runtime_process_tree(process.pid, runtime_pids_before)
+        raise
 
 
 RESIDUAL_RE = re.compile(
@@ -955,6 +1144,10 @@ def run_dynare(
     repo_output_dir: str | Path | None = None,
     min_free_gb: float = DEFAULT_MIN_EXTERNAL_FREE_GB,
     min_c_free_gb: float = DEFAULT_MIN_C_FREE_GB,
+    abort_d_free_gb: float = DEFAULT_ABORT_D_FREE_GB,
+    abort_c_free_gb: float = DEFAULT_ABORT_C_FREE_GB,
+    disk_telemetry_file: str | Path | None = None,
+    disk_telemetry_interval_seconds: float = DEFAULT_DISK_TELEMETRY_INTERVAL_SECONDS,
 ) -> dict[str, Any]:
     root = repo_root()
     source_dir = samba_model_dir(root)
@@ -1009,6 +1202,11 @@ def run_dynare(
             full_mh_paths["repo_output_dir"],
             root,
         )
+        resolved_disk_telemetry_file = _resolve_repo_relative_path(
+            disk_telemetry_file,
+            DEFAULT_DISK_TELEMETRY_FILE,
+            root,
+        )
         preflight = preflight_full_mh_storage(
             resolved_work_dir,
             resolved_tmp_dir,
@@ -1022,6 +1220,13 @@ def run_dynare(
             "tmp_dir": str(resolved_tmp_dir),
             "scratch_output_dir": str(resolved_scratch_output_dir),
             "repo_output_dir": _path_for_manifest(resolved_repo_output_dir, root),
+            "disk_telemetry_file": _path_for_manifest(
+                resolved_disk_telemetry_file,
+                root,
+            ),
+            "disk_telemetry_interval_seconds": disk_telemetry_interval_seconds,
+            "abort_d_free_gb": abort_d_free_gb,
+            "abort_c_free_gb": abort_c_free_gb,
         }
         if preflight["status"] != "passed":
             return {
@@ -1041,10 +1246,24 @@ def run_dynare(
                 "TMPDIR": str(resolved_tmp_dir),
             }
         )
+        disk_monitor = {
+            "c_drive_root": Path("C:/"),
+            "d_drive_root": _drive_root(resolved_scratch_output_dir),
+            "abort_d_free_gb": abort_d_free_gb,
+            "abort_c_free_gb": abort_c_free_gb,
+            "telemetry_file": resolved_disk_telemetry_file,
+            "interval_seconds": disk_telemetry_interval_seconds,
+        }
     else:
         resolved_scratch_output_dir = full_mh_paths["scratch_output_dir"]
         resolved_repo_output_dir = full_mh_paths["repo_output_dir"]
+        resolved_disk_telemetry_file = _resolve_repo_relative_path(
+            disk_telemetry_file,
+            DEFAULT_DISK_TELEMETRY_FILE,
+            root,
+        )
         command_env = None
+        disk_monitor = None
         temp_context = tempfile.TemporaryDirectory(prefix="samba_dynare_")
 
     with temp_context as temp_dir_raw:
@@ -1189,7 +1408,13 @@ def run_dynare(
         command = build_dynare_command(dynare_path)
         started = time.monotonic()
         try:
-            completed = _run_command(command, temp_dir, timeout_seconds, env=command_env)
+            completed = _run_command(
+                command,
+                temp_dir,
+                timeout_seconds,
+                env=command_env,
+                disk_monitor=disk_monitor,
+            )
         except subprocess.TimeoutExpired as exc:
             stdout = _decode_output(exc.stdout)
             stderr = _decode_output(exc.stderr)
@@ -1238,6 +1463,56 @@ def run_dynare(
                     )
                 )
             return timeout_result
+        except DynareCommandAborted as exc:
+            stdout = _decode_output(exc.stdout)
+            stderr = _decode_output(exc.stderr)
+            aborted_result = {
+                "mode": normalized_mode,
+                "status": "failed",
+                "returncode": exc.returncode,
+                "command": command,
+                "model_file": str(source_dir / "samba_classic.mod"),
+                "working_directory": (
+                    "external_scratch"
+                    if normalized_mode == "full-mh"
+                    else "temporary"
+                ),
+                "elapsed_seconds": round(time.monotonic() - started, 3),
+                "stdout_tail": _tail(stdout),
+                "stderr_tail": _tail(stderr),
+                "process_cleanup": exc.cleanup_records,
+                "error": exc.reason,
+                "disk_abort": exc.returncode == DISK_ABORT_RETURNCODE,
+                "disk_abort_telemetry_record": exc.telemetry_record,
+                **full_mh_storage,
+            }
+            if normalized_mode == "full-mh":
+                full_abort = {
+                    **_parse_mh_acceptance(stdout, stderr, FULL_MH_CONFIG),
+                    **_compute_rhat_from_metropolis(temp_dir, FULL_MH_CONFIG["mh_drop"]),
+                    "generated_artifact_manifest": _generated_file_manifest(
+                        temp_dir,
+                        resolved_scratch_output_dir,
+                    ),
+                }
+                aborted_result.update(
+                    {
+                        **likelihood_data,
+                        **estimation_options,
+                        **_parse_likelihood(stdout, stderr),
+                        **full_abort,
+                        "abort_artifact_handling": "raw_chain_files_kept_on_external_scratch_if_present",
+                        "likelihood_measurement_errors": LIKELIHOOD_MEASUREMENT_ERRORS,
+                    }
+                )
+                aborted_result.update(
+                    _write_full_mh_artifacts(
+                        root,
+                        aborted_result,
+                        resolved_repo_output_dir,
+                    )
+                )
+            return aborted_result
 
         elapsed = round(time.monotonic() - started, 3)
         residuals = (
@@ -1435,6 +1710,29 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=DEFAULT_MIN_C_FREE_GB,
         help="Minimum free GB required on C: for pagefile/cache safety.",
     )
+    parser.add_argument(
+        "--abort-d-free-gb",
+        type=float,
+        default=DEFAULT_ABORT_D_FREE_GB,
+        help="Hard-abort full-MH if D: free GB falls below this value.",
+    )
+    parser.add_argument(
+        "--abort-c-free-gb",
+        type=float,
+        default=DEFAULT_ABORT_C_FREE_GB,
+        help="Hard-abort full-MH if C: free GB falls below this value.",
+    )
+    parser.add_argument(
+        "--disk-telemetry-file",
+        default=None,
+        help="JSONL telemetry file for full-MH disk guard records.",
+    )
+    parser.add_argument(
+        "--disk-telemetry-interval-seconds",
+        type=float,
+        default=DEFAULT_DISK_TELEMETRY_INTERVAL_SECONDS,
+        help="Seconds between full-MH disk telemetry records.",
+    )
     return parser
 
 
@@ -1454,6 +1752,10 @@ def main() -> int:
         args.repo_output_dir,
         args.min_free_gb,
         args.min_c_free_gb,
+        args.abort_d_free_gb,
+        args.abort_c_free_gb,
+        args.disk_telemetry_file,
+        args.disk_telemetry_interval_seconds,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return int(result["returncode"])

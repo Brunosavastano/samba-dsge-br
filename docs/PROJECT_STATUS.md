@@ -1,24 +1,24 @@
 # Project Status
 
-Updated: 2026-06-05
+Updated: 2026-06-06
 
-Current gate: Gate 5a completed; Gate 5b MH pilot completed; WBS-073 external-drive full-MH rerun blocked by runtime disk guard; Gate 4 completed; Gate 3 completed; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
-Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED; WBS-071_COMPLETED; WBS-071a_COMPLETED; WBS-072_CONFIG_APPROVED; WBS-072_COMPLETED; WBS-073_APPROVED_FOR_FULL_MH; WBS073_EXTERNAL_DRIVE_PREPARED; BLOCKED_WBS073_EXTERNAL_DISK_GUARD.
-Current PR/WBS: WBS-073 / PR14 external-drive full-MH rerun.
-Blocked WBS: WBS-073 full MH rerun.
+Current gate: Gate 5a completed; Gate 5b MH pilot completed; WBS-073 disk telemetry and hard-abort guard implemented pending review; Gate 4 completed; Gate 3 completed; Gate 1b approved for core source IDs; Gate 2b approved for minimum viable equation registry.
+Execution status: WBS-057_COMPLETED; WBS-058_COMPLETED; WBS-059_COMPLETED; WBS-060_COMPLETED; WBS-061_COMPLETED; WBS-062_COMPLETED; WBS-063_COMPLETED; WBS-064_COMPLETED; GATE3_COMPLETED; WBS-065_COMPLETED; WBS-066_COMPLETED; WBS-067_COMPLETED; GATE4_COMPLETED; WBS-068_COMPLETED; WBS-069_COMPLETED; WBS-070_COMPLETED; WBS-071_COMPLETED; WBS-071a_COMPLETED; WBS-072_CONFIG_APPROVED; WBS-072_COMPLETED; WBS-073_APPROVED_FOR_FULL_MH; WBS073_EXTERNAL_DRIVE_PREPARED; WBS073_DISK_GUARD_IMPLEMENTED_PENDING_REVIEW; BLOCKED_WBS073_DISK_GUARD_PENDING_REVIEW.
+Current PR/WBS: WBS-073 / PR14 disk telemetry and hard-abort guard.
+Blocked WBS: WBS-073 full MH rerun pending guard review.
 Previous blocking status: BLOCKED_WBS066_IDENTIFICATION_SOLVE resolved mechanically by using Dynare's documented diffuse-filter identification path.
 Last completed task: WBS-072 approved MH pilot completed with tuned proposal scale.
-Last attempted task: WBS-073 full-MH rerun on `D:\` aborted by runtime disk guard before `D:\` crossed the approved 500 GB free-space margin.
+Last attempted task: implemented WBS-073 disk telemetry and hard-abort guard only; no Dynare or MH run performed.
 Last runtime task: Installed and verified Octave 11.1.0 plus Dynare 7.0.
-Next safe task: Bruno reviews revised WBS-073 runtime strategy before any further full-MH attempt.
+Next safe task: Bruno/assistant review guard implementation before full-MH rerun.
 Blocker classification: operational storage/runtime blocker; no model equations, priors, data, calibration, observables, or shocks changed.
-Blockers: `docs/wbs073_blockers.md` records `BLOCKED_WBS073_EXTERNAL_DISK_GUARD`.
-Required user action: decide revised WBS-073 runtime strategy; do not rerun the same full-MH command without review.
-Files changed: `docs/wbs073_full_mh_config.md`, `docs/wbs073_runtime_diagnostics.md`, `docs/wbs073_blockers.md`, `docs/PROJECT_STATUS.md`, `outputs/posterior/full/wbs073_full_mh_summary.json`, `outputs/posterior/full/wbs073_full_mh_diagnostics.md`, `outputs/posterior/full/wbs073_full_mh_manifest.json`, `tests/test_econometric.py`.
-Tests run: `python -m pytest` - 116 passed; `git diff --check` - passed.
-Dynare results: full-MH started on external `D:\` scratch; controlled abort after approximately 17441 seconds because `D:\` free space fell from approximately 923.422 GB to 527.253 GB and was still declining toward the approved 500 GB safety margin; R-hat and acceptance ratio unavailable.
-Runtime diagnosis: `C:\` remained stable around 152.6 GB free; after terminating the Python/Dynare/Octave process tree, `D:\` returned to approximately 923.404 GB free, indicating transient/open runtime disk use.
-Commit hash: pending for WBS-073 external-drive disk-guard blocker commit.
+Blockers: `docs/wbs073_blockers.md` records guard review pending before any WBS-073 rerun.
+Required user action: review guard implementation and approve a separate guarded full-MH rerun.
+Files changed: `src/diagnostics/run_dynare.py`, `docs/wbs073_external_drive_strategy.md`, `docs/wbs073_runtime_diagnostics.md`, `docs/wbs073_blockers.md`, `docs/PROJECT_STATUS.md`, `tests/test_run_dynare_storage.py`.
+Tests run: `python -m pytest` with Dynare/Octave removed from PATH - 115 passed, 5 skipped; `git diff --check` - passed.
+Dynare results: no Dynare/MH run performed for this guard implementation.
+Runtime diagnosis: wrapper now supports full-MH disk telemetry and hard-abort thresholds; previous external-drive disk pressure remains the reason for requiring guard review.
+Commit hash: pending for WBS-073 disk telemetry and hard-abort guard commit.
 Safe to continue: false for full MH; forbidden next without prompt: WBS-073 rerun/WBS-074/backtesting/Redux/sovereign.
 
 Visual status:
@@ -40,7 +40,7 @@ Progress metric: 75/86 WBS complete, approximately 87% by WBS item count. This i
 | PR 11 Dynare calibrated model | 054..064 | 11/11 | complete | Gate 3 closed |
 | PR 12 identification | 065..067 | 3/3 | complete | Gate 4 closed |
 | PR 13 estimation smoke/priors | 068..071a | 5/5 | complete | none |
-| PR 14 Bayesian estimation | 072..073 | 1/2 | blocked | WBS-073 external-drive rerun aborted by disk guard |
+| PR 14 Bayesian estimation | 072..073 | 1/2 | blocked | WBS-073 disk guard implemented pending review |
 | PR 15 validation/backtesting | 074..079 | 0/6 | blocked | requires estimation outputs |
 | Post-MVP Redux/sovereign | 080..081 | 0/2 | out of MVP | only after Gate 6 and separate decision |
 
@@ -55,5 +55,5 @@ Gate view:
 | Gate 2b | approved | `docs/gate2b_approval_record.md` |
 | Gate 3 | completed | WBS-054 structure, WBS-055 `calibration.m`, WBS-056 `steady_state.m`, WBS-057 `samba_classic.mod`, WBS-058 `shocks.inc`, WBS-059 `observables.inc`, WBS-060 wrapper, WBS-061 residual tests, WBS-062 BK tests, WBS-063 IRF tests, and WBS-064 MVP report complete |
 | Gate 4 | completed | WBS-065 protocol complete; WBS-066 reduced-form identification diagnostics complete; WBS-067 treatment decisions recorded |
-| Gate 5a/5b | Gate 5a complete; Gate 5b pilot complete; WBS-073 blocked | WBS-071a estimation smoke complete; WBS-072 accepted with tuned `mh_jscale=0.337313`; WBS-073 external-drive full-MH rerun aborted by disk guard before completion |
+| Gate 5a/5b | Gate 5a complete; Gate 5b pilot complete; WBS-073 blocked | WBS-071a estimation smoke complete; WBS-072 accepted with tuned `mh_jscale=0.337313`; WBS-073 disk guard implemented pending Bruno/assistant review |
 | Gate 6 | not started | no validation/backtesting outputs |
