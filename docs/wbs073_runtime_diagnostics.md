@@ -1,88 +1,94 @@
 # WBS-073 Runtime Diagnostics
 
-Status: `BLOCKED_WBS073_EXTERNAL_WORKDIR_NOT_CLEAN`
+Status: `BLOCKED_WBS073_FULL_MH_DISK_ABORT_AND_DIAGNOSTICS`
 
-Scope: WBS-073 full-MH operational rerun using confirmed external `D:\` scratch
-space. No WBS-074, backtesting, Redux, sovereign-extension, equation, prior,
-data, calibration, observable, shock, sample, or `mh_jscale` change was made.
+Scope: WBS-073 guarded full-MH operational rerun using confirmed external
+`D:\` scratch space. No WBS-074, backtesting, Redux, sovereign-extension,
+equation, prior, data, calibration, observable, shock, sample, `mh_jscale`,
+`mh_replic`, chain, burn-in, or MH-configuration change was made.
 
-## Guard Implementation Prepared
+## External Workdir Cleanup
 
-Guard implementation prepared; no Dynare run performed for this update.
+The stale external work directory was handled before the rerun:
 
-- start threshold: `D:\` at least 500 GB free.
-- runtime hard abort: `D:\` below 50 GB free.
-- runtime hard abort: `C:\` below 30 GB free.
-- disk telemetry file: `outputs/posterior/full/wbs073_disk_telemetry.jsonl`.
-- telemetry interval: 60 seconds during future full-MH runs.
-- full-MH remains blocked until the guard implementation is reviewed and a
-  separate guarded rerun is approved.
+- stale workdir: `D:\SAMBA_RUN\work`
+- archive path: `D:\SAMBA_RUN\archive\work_stale_20260606_173108`
+- stale file count: 87
+- stale total bytes: 19,202,580
+- action: renamed/moved only; no source files deleted
+- fresh workdir: `D:\SAMBA_RUN\work` recreated empty
 
-## Guarded Rerun Preflight
+An intermediate wrapper-abort workdir was also archived after diagnosing a
+mechanical pipe-drain issue:
 
-Bruno approved the guarded rerun for this pass, conditional on preflight. The
-preflight did not start Dynare because `D:\SAMBA_RUN\work` still contains
-generated artifacts from the previous aborted WBS-073 attempt:
+- archive path: `D:\SAMBA_RUN\archive\work_pipe_abort_20260606_192912`
+- file count: 80
+- total bytes: 319,111
+- partial telemetry moved to `D:\SAMBA_RUN\logs`
+- no raw/heavy artifacts copied into the repo
 
-- `D:\SAMBA_RUN\work\samba_classic\metropolis\*.mat`
-- `D:\SAMBA_RUN\work\samba_classic\metropolis\metropolis.log`
-- `D:\SAMBA_RUN\work\samba_classic\Output\samba_classic_mode.mat`
-- `D:\SAMBA_RUN\work\samba_classic\prior\definition.mat`
-- generated `D:\SAMBA_RUN\work\+samba_classic\...` files
+## Wrapper Runtime Fix
 
-Free-space checks passed at preflight: `D:\` approximately 923.404 GB free and
-`C:\` approximately 152.887 GB free. The blocker is contamination risk from the
-stale external work directory, not current disk capacity.
+The first guarded attempt after workdir cleanup stalled because the wrapper
+started Dynare with captured stdout/stderr but did not drain those pipes while
+the child process was running. The process tree was terminated with `taskkill`
+before any new full-MH result was accepted.
 
-## Command
+`src/diagnostics/run_dynare.py` now drains stdout and stderr on background
+threads while the child process runs. This is a mechanical wrapper/runtime fix;
+it does not change model economics or MH configuration.
 
-```powershell
-python src/diagnostics/run_dynare.py --mode full-mh --timeout-seconds 86400 --work-dir D:\SAMBA_RUN\work --tmp-dir D:\SAMBA_RUN\tmp --scratch-output-dir D:\SAMBA_RUN\scratch_output\posterior\full --repo-output-dir outputs/posterior/full --min-free-gb 500 --min-c-free-gb 30
-```
+## Guarded Rerun
 
-## Storage Preflight
+Command used the repo-documented external scratch strategy with:
 
-- `C:\` free before run: approximately 155.018 GB.
-- `D:\` free before run: approximately 923.422 GB.
-- approved external minimum: 500 GB free.
-- approved `C:\` safety margin: 30 GB free.
+- work dir: `D:\SAMBA_RUN\work`
+- temp dir: `D:\SAMBA_RUN\tmp`
+- scratch output dir: `D:\SAMBA_RUN\scratch_output\posterior\full`
+- repo output dir: `outputs/posterior/full`
+- start guard: `D:\` at least 500 GB free
+- hard abort: `D:\` below 50 GB free
+- hard abort: `C:\` below 30 GB free
 
-## Runtime Observation
+Storage preflight passed:
 
-- start: 2026-06-05 23:33:51 America/Sao_Paulo.
-- controlled abort: 2026-06-06 04:24:32 America/Sao_Paulo.
-- approximate elapsed time: 17441 seconds.
-- `D:\` free space fell to approximately 527.253 GB and was still declining
-  toward the approved 500 GB guard.
-- `C:\` remained stable around 152.6 GB free.
-- after terminating the process tree, `D:\` returned to approximately
-  923.404 GB free.
+- `D:\` free before run: 923.404 GB
+- `C:\` free before run: 152.955 GB
+- fresh workdir item count: 0
 
-## Process Cleanup
+## Result
 
-The Python/Dynare/Octave process tree was terminated manually before the
-external drive crossed the approved safety margin. No project Dynare/Octave
-process remained active after cleanup.
+The guarded full-MH run produced lightweight diagnostics but did not pass
+WBS-073:
 
-## Artifact Findings
+- status: failed
+- wrapper return code: 125
+- disk abort: true
+- abort point: `D:\` free space 49.937 GB, below the 50 GB hard threshold
+- `C:\` free space at abort telemetry: 151.364 GB
+- final observed free space after cleanup: `C:\` 151.33 GB, `D:\` 923.37 GB
+- chains completed: true
+- finite likelihood reported: true
+- NaN/Inf likelihood blocker: not observed
+- acceptance values: 0.30705, 0.18170, 0.13610, 0.12315
+- average acceptance ratio: 0.187
+- target acceptance band: 0.20 to 0.35
+- R-hat status: above_threshold
+- max R-hat: 4.054739157907651
 
-- repo raw/heavy chain files: none.
-- external visible artifacts: small Metropolis `.mat` block files and
-  `metropolis.log` under `D:\SAMBA_RUN\work\samba_classic\metropolis`.
-- stdout/stderr files under `D:\SAMBA_RUN\logs` remained empty because the
-  wrapper was killed before final JSON output.
-- lightweight repo artifacts summarize this failed operational attempt:
-  `outputs/posterior/full/wbs073_full_mh_summary.json`,
-  `outputs/posterior/full/wbs073_full_mh_diagnostics.md`, and
-  `outputs/posterior/full/wbs073_full_mh_manifest.json`.
+## Artifact Status
 
-## Diagnostics Availability
+Lightweight repo artifacts:
 
-- acceptance ratio: unavailable.
-- R-hat: unavailable.
-- finite likelihood from final wrapper output: unavailable.
+- `outputs/posterior/full/wbs073_full_mh_summary.json`
+- `outputs/posterior/full/wbs073_full_mh_diagnostics.md`
+- `outputs/posterior/full/wbs073_full_mh_manifest.json`
 
-Conclusion: WBS-073 remains blocked by transient/open runtime disk use during
-the full-MH run. The external drive protected `C:\`, but the approved full-MH
-configuration still consumed too much transient external disk space for the
-current guard.
+Raw chain artifacts remain external and untracked under
+`D:\SAMBA_RUN\scratch_output\posterior\full`. The manifest records external raw
+artifact paths, sizes, hashes, and `external_untracked` status. No raw/heavy
+chain files were staged in the repo.
+
+Conclusion: WBS-073 remains blocked by the disk guard abort and by MH
+diagnostics outside acceptance/R-hat criteria. Do not proceed to WBS-074,
+backtesting, Redux, or sovereign-extension work.

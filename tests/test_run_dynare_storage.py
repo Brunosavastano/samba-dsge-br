@@ -207,6 +207,28 @@ def test_run_command_disk_monitor_aborts_and_cleans_child_process(tmp_path):
         raise AssertionError("disk monitor should abort the sleeping child process")
 
 
+def test_run_command_drains_large_stdout_while_process_runs(tmp_path):
+    wrapper = _load_wrapper()
+    line_count = 20000
+
+    completed = wrapper._run_command(
+        [
+            sys.executable,
+            "-c",
+            (
+                "import sys; "
+                f"[print('x' * 200) for _ in range({line_count})]; "
+                "sys.stdout.flush()"
+            ),
+        ],
+        tmp_path,
+        timeout_seconds=30,
+    )
+
+    assert completed.returncode == 0
+    assert completed.stdout.count("\n") == line_count
+
+
 def test_raw_chain_artifacts_are_copied_only_to_external_manifest_target(tmp_path):
     wrapper = _load_wrapper()
     work = tmp_path / "work"

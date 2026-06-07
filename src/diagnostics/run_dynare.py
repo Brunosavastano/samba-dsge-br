@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -489,15 +490,57 @@ def terminate_process_tree(pid: int) -> dict[str, Any]:
         }
 
 
+def _start_stream_reader(
+    stream: Any,
+) -> tuple[list[str], threading.Thread | None]:
+    chunks: list[str] = []
+    if stream is None:
+        return chunks, None
+
+    def _reader() -> None:
+        try:
+            for line in iter(stream.readline, ""):
+                chunks.append(line)
+        except ValueError:
+            return
+
+    thread = threading.Thread(target=_reader, daemon=True)
+    thread.start()
+    return chunks, thread
+
+
+def _join_stream_readers(
+    stdout_chunks: list[str],
+    stderr_chunks: list[str],
+    stdout_thread: threading.Thread | None,
+    stderr_thread: threading.Thread | None,
+    *,
+    timeout_seconds: float = 30,
+) -> tuple[str, str]:
+    for thread in (stdout_thread, stderr_thread):
+        if thread is not None:
+            thread.join(timeout=timeout_seconds)
+    return "".join(stdout_chunks), "".join(stderr_chunks)
+
+
 def _collect_after_cleanup(
     process: subprocess.Popen[str],
+    stdout_chunks: list[str],
+    stderr_chunks: list[str],
+    stdout_thread: threading.Thread | None,
+    stderr_thread: threading.Thread | None,
 ) -> tuple[str, str]:
     try:
-        stdout, stderr = process.communicate(timeout=30)
+        process.wait(timeout=30)
     except subprocess.TimeoutExpired:
         process.kill()
-        stdout, stderr = process.communicate()
-    return stdout or "", stderr or ""
+        process.wait()
+    return _join_stream_readers(
+        stdout_chunks,
+        stderr_chunks,
+        stdout_thread,
+        stderr_thread,
+    )
 
 
 def _cleanup_runtime_process_tree(
@@ -538,6 +581,8 @@ def _run_command(
         shell=use_shell,
         env=env,
     )
+    stdout_chunks, stdout_thread = _start_stream_reader(process.stdout)
+    stderr_chunks, stderr_thread = _start_stream_reader(process.stderr)
     started = time.monotonic()
     deadline = started + timeout_seconds
     last_telemetry_at: float | None = None
@@ -552,7 +597,13 @@ def _run_command(
     try:
         while True:
             if process.poll() is not None:
-                stdout, stderr = process.communicate()
+                process.wait()
+                stdout, stderr = _join_stream_readers(
+                    stdout_chunks,
+                    stderr_chunks,
+                    stdout_thread,
+                    stderr_thread,
+                )
                 return subprocess.CompletedProcess(
                     command,
                     process.returncode,
@@ -566,7 +617,13 @@ def _run_command(
                     process.pid,
                     runtime_pids_before,
                 )
-                stdout, stderr = _collect_after_cleanup(process)
+                stdout, stderr = _collect_after_cleanup(
+                    process,
+                    stdout_chunks,
+                    stderr_chunks,
+                    stdout_thread,
+                    stderr_thread,
+                )
                 timeout_error = subprocess.TimeoutExpired(
                     cmd=command,
                     timeout=timeout_seconds,
@@ -606,7 +663,13 @@ def _run_command(
                         process.pid,
                         runtime_pids_before,
                     )
-                    stdout, stderr = _collect_after_cleanup(process)
+                    stdout, stderr = _collect_after_cleanup(
+                        process,
+                        stdout_chunks,
+                        stderr_chunks,
+                        stdout_thread,
+                        stderr_thread,
+                    )
                     raise DynareCommandAborted(
                         reason,
                         DISK_ABORT_RETURNCODE,
@@ -624,7 +687,13 @@ def _run_command(
             process.pid,
             runtime_pids_before,
         )
-        stdout, stderr = _collect_after_cleanup(process)
+        stdout, stderr = _collect_after_cleanup(
+            process,
+            stdout_chunks,
+            stderr_chunks,
+            stdout_thread,
+            stderr_thread,
+        )
         raise DynareCommandAborted(
             "Full-MH interrupted; Dynare/Octave process tree cleanup was requested.",
             INTERRUPT_RETURNCODE,

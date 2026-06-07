@@ -1,27 +1,24 @@
 # WBS-073 Full MH Diagnostics
 
-Status: `failed_external_disk_guard_abort`.
+Status: failed.
 
-This was an operational WBS-073 full-MH attempt using the confirmed external `D:\` scratch strategy. It is not final publication-grade posterior evidence.
+Command: `C:\Users\bruno\AppData\Local\Microsoft\WinGet\Links\dynare.CMD samba_classic.mod noclearall nolog`
 
-## Result
+Configuration:
+- `mh_replic`: 20000 per chain
+- chains: 4
+- Dynare `mh_nblocks`: 4
+- approved blocks metadata: 2
+- burn-in: 0.5
+- `mh_jscale`: 0.337313
 
-- Start: 2026-06-05 23:33:51 America/Sao_Paulo.
-- Abort: 2026-06-06 04:24:32 America/Sao_Paulo.
-- Approximate elapsed time: 17441 seconds.
-- Abort reason: `D:\` free space fell to approximately 527.253 GB and was still declining toward the 500 GB approved safety margin.
-- `C:\` remained stable, around 152.6 GB free.
-- After terminating the Dynare/Octave process tree, `D:\` returned to approximately 923.404 GB free.
+Diagnostics:
+- finite likelihood reported: True
+- acceptance values: [0.30705, 0.18170000000000003, 0.1361, 0.12315]
+- average acceptance ratio: 0.187
+- R-hat status: above_threshold
+- max R-hat: 4.054739157907651
+- raw chain artifacts committed: False
 
-## Diagnostics Availability
-
-- Acceptance ratio: unavailable.
-- R-hat: unavailable.
-- Finite likelihood result: unavailable from final wrapper output.
-- stdout/stderr logs in `D:\SAMBA_RUN\logs` remained empty because the wrapper was killed before final JSON output.
-
-## Artifact Policy
-
-- External raw artifact entries recorded in manifest: 6.
-- Raw external artifacts are marked `external_untracked` and were not copied into the repo.
-- No backtesting, Redux, sovereign-extension, or WBS-074 artifacts were created.
+This is full-MH operational validation, not final publication-grade posterior evidence.
+WBS-074, backtesting, Redux, and sovereign-extension work remain forbidden until explicitly approved.
