@@ -1,0 +1,821 @@
+{
+  "committed_artifacts": [
+    "outputs/posterior/full/wbs073_full_mh_summary.json",
+    "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
+    "outputs/posterior/full/wbs073_full_mh_manifest.json"
+  ],
+  "diagnostics_artifact": "outputs/posterior/full/wbs073_full_mh_diagnostics.md",
+  "generated_artifact_count": 80,
+  "generated_artifact_total_bytes": 19180096,
+  "generated_artifacts": [
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_1.m",
+      "raw_chain_artifact": false,
+      "sha256": "475f268acac2be304efc38bab29b5990a194cf03e2d46642b062fcb45723612e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 232
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_10.m",
+      "raw_chain_artifact": false,
+      "sha256": "69f98b9e1683181e608b8340aff7f441d3bae566572dc9268fa896caded36e8d",
+      "sha256_skipped_reason": null,
+      "size_bytes": 230
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_11.m",
+      "raw_chain_artifact": false,
+      "sha256": "436415251aafbc06afe67edb1c4ab3a9653107831fdbefd422059c08b4389c9b",
+      "sha256_skipped_reason": null,
+      "size_bytes": 554
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_12.m",
+      "raw_chain_artifact": false,
+      "sha256": "ea700c353c651de8a06db6349358d6d77ccbff84f1696f79511c238eddb70d25",
+      "sha256_skipped_reason": null,
+      "size_bytes": 193
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_13.m",
+      "raw_chain_artifact": false,
+      "sha256": "88dee2427a416da98d63d3c33005d302d0b104f5dba8702e8c6c9bbe693672c4",
+      "sha256_skipped_reason": null,
+      "size_bytes": 168
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_14.m",
+      "raw_chain_artifact": false,
+      "sha256": "0bcc36f7b453869cd7b9afb210e6b5b8b7f74f617018a3a085d5b83fa0629e0b",
+      "sha256_skipped_reason": null,
+      "size_bytes": 475
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_15.m",
+      "raw_chain_artifact": false,
+      "sha256": "825faf9285a9b942755fdc53dcb781107338cdc14456d3d433fcf99c26a7b32e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 476
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_16.m",
+      "raw_chain_artifact": false,
+      "sha256": "88dba9a13973ad2fce040b9df7764159fa80925a11a04833f157943127d9a1eb",
+      "sha256_skipped_reason": null,
+      "size_bytes": 960
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_17.m",
+      "raw_chain_artifact": false,
+      "sha256": "04d988094061a8a445475e2650e3e117e2264c60ca07da8bece738b2254d4669",
+      "sha256_skipped_reason": null,
+      "size_bytes": 209
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_18.m",
+      "raw_chain_artifact": false,
+      "sha256": "3fcb4d4a2d8363be9abc7a55d823b867e954ae84368b398c4170b2cefca9884f",
+      "sha256_skipped_reason": null,
+      "size_bytes": 476
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_19.m",
+      "raw_chain_artifact": false,
+      "sha256": "004e81b7109ddb9d9b187b8f2d8fc5af7f7a192bb4c76b618945defd823aa81d",
+      "sha256_skipped_reason": null,
+      "size_bytes": 476
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_2.m",
+      "raw_chain_artifact": false,
+      "sha256": "81b89ccebb89198e8bab8535e4b883bd629f5e6380fa6c0824b73b05eccbb465",
+      "sha256_skipped_reason": null,
+      "size_bytes": 125
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_20.m",
+      "raw_chain_artifact": false,
+      "sha256": "a5051b48533f3b347899729582536565d7d0a19ecd94bf6e97153aa2c58abc9d",
+      "sha256_skipped_reason": null,
+      "size_bytes": 476
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_21.m",
+      "raw_chain_artifact": false,
+      "sha256": "58ecb909c462f40a24bf8fc0222e5b80e2e54ff2e55a31654a6adee5c253b48b",
+      "sha256_skipped_reason": null,
+      "size_bytes": 482
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_22.m",
+      "raw_chain_artifact": false,
+      "sha256": "c94be127f618c9b1145075a3f18763ad84452e01af85e99348b5e25674b10975",
+      "sha256_skipped_reason": null,
+      "size_bytes": 897
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_23.m",
+      "raw_chain_artifact": false,
+      "sha256": "3a085192e436233c37f8ccef3d8c96139b21d04745f3a7a0e82a06eb6ab2b4fe",
+      "sha256_skipped_reason": null,
+      "size_bytes": 786
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_3.m",
+      "raw_chain_artifact": false,
+      "sha256": "81aa4af3998e9fe9f26bb5fc237ec23fba5cf5e59f469cac8c49989d0cd87dd1",
+      "sha256_skipped_reason": null,
+      "size_bytes": 125
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_4.m",
+      "raw_chain_artifact": false,
+      "sha256": "2b58cdcc0fb040d988a1484b0a49a0dfaf2df83b3b2313e7318f46e82639cd90",
+      "sha256_skipped_reason": null,
+      "size_bytes": 140
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_5.m",
+      "raw_chain_artifact": false,
+      "sha256": "33b2c718db9bc2a0d923d5e4351bdedb20e88624ff6c65d0e3a36af8ffd3c701",
+      "sha256_skipped_reason": null,
+      "size_bytes": 125
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_6.m",
+      "raw_chain_artifact": false,
+      "sha256": "48f8f55287177f2d09b83a0f1457fe965ecb34bd6d9eff9b87849cc3281ea035",
+      "sha256_skipped_reason": null,
+      "size_bytes": 125
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_7.m",
+      "raw_chain_artifact": false,
+      "sha256": "12a73f9b6faded313422729a1e8f9d1873953602d68110c4b32481492ca6f04c",
+      "sha256_skipped_reason": null,
+      "size_bytes": 376
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_8.m",
+      "raw_chain_artifact": false,
+      "sha256": "ffe9e092bed6df549efba53fa4ebff60989dd3b4e98804fa6f8149b02bccfa1e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 281
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/dynamic_9.m",
+      "raw_chain_artifact": false,
+      "sha256": "d70a4bca42d580616c59d03afad1a51a15afc75107f4d8f66480d04b2a9924ee",
+      "sha256_skipped_reason": null,
+      "size_bytes": 581
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_1.m",
+      "raw_chain_artifact": false,
+      "sha256": "bf25beb894a7d875362192fb0a7c69d066429093045d22b27b9ce6a7eabe4df4",
+      "sha256_skipped_reason": null,
+      "size_bytes": 107
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_10.m",
+      "raw_chain_artifact": false,
+      "sha256": "ae5aa0daa0af9100fc96569674e9494930347181be317ace9e8ed01f010814c4",
+      "sha256_skipped_reason": null,
+      "size_bytes": 365
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_11.m",
+      "raw_chain_artifact": false,
+      "sha256": "1caa6d6ba32a26bca1ccb6468078d36801870538e7356ecd31a88d9c793b0370",
+      "sha256_skipped_reason": null,
+      "size_bytes": 296
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_12.m",
+      "raw_chain_artifact": false,
+      "sha256": "aa68f530eb6b7f4892ad548c399ffc74b4556812e1cb249af8ab8be5d4915844",
+      "sha256_skipped_reason": null,
+      "size_bytes": 425
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_13.m",
+      "raw_chain_artifact": false,
+      "sha256": "4afc9b739425eaa8fbcfc21f852c3542488758810391d62e26fd47b297044c7a",
+      "sha256_skipped_reason": null,
+      "size_bytes": 833
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_14.m",
+      "raw_chain_artifact": false,
+      "sha256": "af64d09180c84a6063a5e6c633cb5d3009a6f2144de27059bf20df091617b971",
+      "sha256_skipped_reason": null,
+      "size_bytes": 194
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_15.m",
+      "raw_chain_artifact": false,
+      "sha256": "38251a4f29590a7ab948b543966957b0167c415cda813e4784b2079f5a1c3599",
+      "sha256_skipped_reason": null,
+      "size_bytes": 434
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_16.m",
+      "raw_chain_artifact": false,
+      "sha256": "77450ef90d7b894aee713a7cd63589c45eddb500f0e8e08cea362f0df6ebbaea",
+      "sha256_skipped_reason": null,
+      "size_bytes": 435
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_17.m",
+      "raw_chain_artifact": false,
+      "sha256": "37d085bf32d740bef49186d0511d27563c2703edd76740259076868a0b8213d1",
+      "sha256_skipped_reason": null,
+      "size_bytes": 440
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_18.m",
+      "raw_chain_artifact": false,
+      "sha256": "867df021a1f40481385cbec2dbb3b0d2279291eb9108b1c9c80ff49572511cfe",
+      "sha256_skipped_reason": null,
+      "size_bytes": 435
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_19.m",
+      "raw_chain_artifact": false,
+      "sha256": "20ad3311b200a0bf15a3bb688643debd1d818a6e82f4e9ab0b958e6ee8b2a7cb",
+      "sha256_skipped_reason": null,
+      "size_bytes": 435
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_2.m",
+      "raw_chain_artifact": false,
+      "sha256": "d19e35df509b8653d8cd8fc758596014fbb10e434d573e62a5b56e8dff2885af",
+      "sha256_skipped_reason": null,
+      "size_bytes": 293
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_20.m",
+      "raw_chain_artifact": false,
+      "sha256": "3a2eeaad0104ce1a9c828661e74e8be24d0e4cd7a084e20693476b96af993e8d",
+      "sha256_skipped_reason": null,
+      "size_bytes": 602
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_21.m",
+      "raw_chain_artifact": false,
+      "sha256": "f138b3e3450de6f96070c7a7a89a9c4a2d287428e3baa5e9f7baf612d909337c",
+      "sha256_skipped_reason": null,
+      "size_bytes": 466
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_22.m",
+      "raw_chain_artifact": false,
+      "sha256": "b78bb42ef5e8ece66ffe34799ea2066cb8e4d10335e0c8a339e94b7370c463e6",
+      "sha256_skipped_reason": null,
+      "size_bytes": 538
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_23.m",
+      "raw_chain_artifact": false,
+      "sha256": "bb5f199df71f9d5580faaf44690ec13f5360327c152cbab5cd2b703c3b014fc2",
+      "sha256_skipped_reason": null,
+      "size_bytes": 498
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_3.m",
+      "raw_chain_artifact": false,
+      "sha256": "1facf03dde91103f367dd7e54b5d6f3478e40e20de4136304bfbe4d28140e8ee",
+      "sha256_skipped_reason": null,
+      "size_bytes": 297
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_4.m",
+      "raw_chain_artifact": false,
+      "sha256": "2a505e5f18c7590f23ff6ee54432081e85483b77f4dc38309d1c5a11c51e6cc3",
+      "sha256_skipped_reason": null,
+      "size_bytes": 297
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_5.m",
+      "raw_chain_artifact": false,
+      "sha256": "01c344d4e66d68aff56e4b1d97cb0a7d7f1ac0900e9920350ef482353b739325",
+      "sha256_skipped_reason": null,
+      "size_bytes": 460
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_6.m",
+      "raw_chain_artifact": false,
+      "sha256": "1caa83913bd1c87b79e838e8eb1a309d969b0746c9564661126c1ff41de55a4e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 427
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_7.m",
+      "raw_chain_artifact": false,
+      "sha256": "8616df3e538d3ca3be6c2dc068e58cab83594952ee4dbff43a26f459077d3151",
+      "sha256_skipped_reason": null,
+      "size_bytes": 537
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_8.m",
+      "raw_chain_artifact": false,
+      "sha256": "4d0875737add1245e9da4261f36830891792ac8db775d56a32b7cb58505202e1",
+      "sha256_skipped_reason": null,
+      "size_bytes": 408
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+block/static_9.m",
+      "raw_chain_artifact": false,
+      "sha256": "600fcfe51826899017d745c1d13d0255cd2a381681b5a9307ebda260553bd3f2",
+      "sha256_skipped_reason": null,
+      "size_bytes": 511
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+debug/dynamic_resid.m",
+      "raw_chain_artifact": false,
+      "sha256": "1bf42449ad120f55a0a0bd6f49af7753c58cf75a9e90735f7f62b8daedcfd72e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 5137
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/+debug/static_resid.m",
+      "raw_chain_artifact": false,
+      "sha256": "65de5e957e673152c3f63f78860367c4e2dd8cbbafade1b32eb4cce57c092208",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4955
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/driver.m",
+      "raw_chain_artifact": false,
+      "sha256": "25c48ac77ca0b745e0b3bab5ac535fdf4fee77048186e07d41be37544af91ca5",
+      "sha256_skipped_reason": null,
+      "size_bytes": 82325
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_complementarity_conditions.m",
+      "raw_chain_artifact": false,
+      "sha256": "24c6906a9ab316b1c6cfae2fc0d3d11b173d538b43b1494dd1d62683e23c51bb",
+      "sha256_skipped_reason": null,
+      "size_bytes": 93
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_g1.m",
+      "raw_chain_artifact": false,
+      "sha256": "68c2cf87ec00bdd24e669d7617bf4f10441441943842395e9b799476cde68a57",
+      "sha256_skipped_reason": null,
+      "size_bytes": 7107
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_g1_tt.m",
+      "raw_chain_artifact": false,
+      "sha256": "47486afaedc0d7908ec95aacdf26e2453bb3583832d169edb501b539bc61ddcf",
+      "sha256_skipped_reason": null,
+      "size_bytes": 272
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_g2.m",
+      "raw_chain_artifact": false,
+      "sha256": "28ddf69675aef22185a4813c608f1e405d6cec950ac20917fccc58ff252298db",
+      "sha256_skipped_reason": null,
+      "size_bytes": 242
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_g2_tt.m",
+      "raw_chain_artifact": false,
+      "sha256": "955c3c807931d41548233877744b20330f429907f36fcb9e154f77584a276ce7",
+      "sha256_skipped_reason": null,
+      "size_bytes": 269
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_resid.m",
+      "raw_chain_artifact": false,
+      "sha256": "2c0abf3b89db44619083d0391e60a573379f742a7b93d01aad5b08ac115aef74",
+      "sha256_skipped_reason": null,
+      "size_bytes": 5220
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_resid_tt.m",
+      "raw_chain_artifact": false,
+      "sha256": "0389c35a020af5f9a090953dded3c9c23888af3060faa63c54a72189a821fc04",
+      "sha256_skipped_reason": null,
+      "size_bytes": 512
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/dynamic_set_auxiliary_series.m",
+      "raw_chain_artifact": false,
+      "sha256": "52b56152bd9e998d30b856a797dd0f976cb524e05bd08cbab144d1d0828ad499",
+      "sha256_skipped_reason": null,
+      "size_bytes": 1231
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/set_auxiliary_variables.m",
+      "raw_chain_artifact": false,
+      "sha256": "f0b898c49c96a17401827ee6f89ce0a5d26214a149744f32166c87079f5528fe",
+      "sha256_skipped_reason": null,
+      "size_bytes": 479
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/static_complementarity_conditions.m",
+      "raw_chain_artifact": false,
+      "sha256": "1e02760f4a02e1d38f924a81d70877c8ba87a116b8ce739898cfc8d4914b1c9e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 92
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/static_g1.m",
+      "raw_chain_artifact": false,
+      "sha256": "bfb9ea4f944ce1b105e66fef2a4726de427269a47bca26d0b0025a64c5198556",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4552
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/static_g1_tt.m",
+      "raw_chain_artifact": false,
+      "sha256": "6dcee299261887dfcecc4084112fa1b4f6b6c61ae3504dcb364916c36081447f",
+      "sha256_skipped_reason": null,
+      "size_bytes": 242
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/static_resid.m",
+      "raw_chain_artifact": false,
+      "sha256": "ebb96e605a2848a7dad258bc8af08d78f1f09cec6b3eaa31f1dd924962a9871e",
+      "sha256_skipped_reason": null,
+      "size_bytes": 5202
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "+samba_classic/static_resid_tt.m",
+      "raw_chain_artifact": false,
+      "sha256": "71e18c2b8f3779fd2d6a3f755897567acbb7897993f79c321aab1a2a95d57041",
+      "sha256_skipped_reason": null,
+      "size_bytes": 318
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/checksum",
+      "raw_chain_artifact": false,
+      "sha256": "d3b092ffb1d687d6e7ee0d64bd41682e0b85a7d8067ea8b2f1e86392392373f9",
+      "sha256_skipped_reason": null,
+      "size_bytes": 19
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/metropolis/metropolis.log",
+      "raw_chain_artifact": false,
+      "sha256": "5c9a7c8efb795ef309f2b6617b12245763f7c1ed226cf1f0140b558d2f66915c",
+      "sha256_skipped_reason": null,
+      "size_bytes": 96117
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full\\samba_classic\\metropolis\\samba_classic_mh1_blck1.mat",
+      "external_untracked": true,
+      "path": "samba_classic/metropolis/samba_classic_mh1_blck1.mat",
+      "raw_chain_artifact": true,
+      "sha256": "9d020ce04f08402e5ea50bdf0d9e7cbdf8d056121548570a863d2a3e6c43ed64",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full\\samba_classic\\metropolis\\samba_classic_mh1_blck2.mat",
+      "external_untracked": true,
+      "path": "samba_classic/metropolis/samba_classic_mh1_blck2.mat",
+      "raw_chain_artifact": true,
+      "sha256": "45131dfbe04d7f2c83ba3f9ee3ba9248690f8ad6ae96d92c5fb63728fe24a962",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full\\samba_classic\\metropolis\\samba_classic_mh1_blck3.mat",
+      "external_untracked": true,
+      "path": "samba_classic/metropolis/samba_classic_mh1_blck3.mat",
+      "raw_chain_artifact": true,
+      "sha256": "8326ccfa2558f2e79531f120168fad076c52fbc701fda9c93cb0c657e74a5772",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full\\samba_classic\\metropolis\\samba_classic_mh1_blck4.mat",
+      "external_untracked": true,
+      "path": "samba_classic/metropolis/samba_classic_mh1_blck4.mat",
+      "raw_chain_artifact": true,
+      "sha256": "0a61e7f638c9dbe87a86862780432ccc1ae5136d87d0d0c9a645d7e7a8fd45bb",
+      "sha256_skipped_reason": null,
+      "size_bytes": 4646168
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full\\samba_classic\\metropolis\\samba_classic_mh_history_0.mat",
+      "external_untracked": true,
+      "path": "samba_classic/metropolis/samba_classic_mh_history_0.mat",
+      "raw_chain_artifact": true,
+      "sha256": "ada83598aa7cfe180b2d1e1b0cc5cefb63dce46b6ee035e026faf82dc438525d",
+      "sha256_skipped_reason": null,
+      "size_bytes": 193520
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/block/dynamic.bin",
+      "raw_chain_artifact": false,
+      "sha256": "60de4bb2737c89a18c9268c590eb7ae858ba40cda523bcef24e2783482652a5c",
+      "sha256_skipped_reason": null,
+      "size_bytes": 1016
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/block/dynamic.cod",
+      "raw_chain_artifact": false,
+      "sha256": "d9c8095ecd868a14a308eac8c7a8b74f492a06c174f3d9048cc4e6b613fc8fcc",
+      "sha256_skipped_reason": null,
+      "size_bytes": 27249
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/block/static.bin",
+      "raw_chain_artifact": false,
+      "sha256": "3206ecdcbc8fc0ed593b4774bc74d104de15911f49b78e9dd5583f234753f9bb",
+      "sha256_skipped_reason": null,
+      "size_bytes": 736
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/block/static.cod",
+      "raw_chain_artifact": false,
+      "sha256": "d3889ebc025895aa79dd56b48def5b3d472e2baf47f4621807c8318cb7214960",
+      "sha256_skipped_reason": null,
+      "size_bytes": 22940
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/dynamic.bin",
+      "raw_chain_artifact": false,
+      "sha256": "b57fdab888e9402e82cc5320addd30e2f9798dac76d8cf76ee805e4bdd595041",
+      "sha256_skipped_reason": null,
+      "size_bytes": 3752
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/dynamic.cod",
+      "raw_chain_artifact": false,
+      "sha256": "7c6ddabacf5d7bfb1ad0e453006b3d9744089d860972b3af3c2af930fd407ce7",
+      "sha256_skipped_reason": null,
+      "size_bytes": 54133
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/static.bin",
+      "raw_chain_artifact": false,
+      "sha256": "886ddb554e9293deb0c8459c475eb38e2a12643dbdf289cae93fe49aea8b8131",
+      "sha256_skipped_reason": null,
+      "size_bytes": 3160
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/model/bytecode/static.cod",
+      "raw_chain_artifact": false,
+      "sha256": "40317fbee1c8004a6b8adceaba246e0583a4bd1ad65ad8fadfa0c10ac96cc1e3",
+      "sha256_skipped_reason": null,
+      "size_bytes": 40969
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/Output/samba_classic_mode.mat",
+      "raw_chain_artifact": false,
+      "sha256": "a5d6a68e50009e5d2c48d344ec83c75b5cdd97b8975cd114449e91b1caf5e061",
+      "sha256_skipped_reason": null,
+      "size_bytes": 9160
+    },
+    {
+      "committed_to_git": false,
+      "external_raw_artifact": null,
+      "external_untracked": false,
+      "path": "samba_classic/prior/definition.mat",
+      "raw_chain_artifact": false,
+      "sha256": "a365197b68e47bbac306e3abba523cc31a57126bf4f1c8dc6b7c9000970014b1",
+      "sha256_skipped_reason": null,
+      "size_bytes": 5704
+    }
+  ],
+  "manifest_artifact": "outputs/posterior/full/wbs073_full_mh_manifest.json",
+  "raw_chain_artifact_count": 5,
+  "raw_chain_artifact_total_bytes": 18778192,
+  "raw_chain_artifacts_committed": false,
+  "raw_chain_artifacts_intentionally_untracked": true,
+  "raw_heavy_chain_artifacts_committed": false,
+  "raw_heavy_chain_artifacts_intentionally_untracked": true,
+  "summary_artifact": "outputs/posterior/full/wbs073_full_mh_summary.json",
+  "wbs": "WBS-073"
+}

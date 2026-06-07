@@ -1,0 +1,22 @@
+{
+  "model_id": "samba_classic_mvp_v0",
+  "spec_version": "v3.0-consolidated",
+  "plan_version": "v2.0-consolidated",
+  "status": "planned",
+  "description": "SAMBA classic calibrated MVP",
+  "dynare_file": "model/samba_classic/samba_classic.mod",
+  "steady_state_file": "model/samba_classic/steady_state.m",
+  "calibration_file": "model/samba_classic/calibration.m",
+  "observables_file": "model/samba_classic/observables.inc",
+  "shocks_file": "model/samba_classic/shocks.inc",
+  "priors_file": null,
+  "data_config": "config/classic_mvp.yaml",
+  "sample_config": "config/sample.yaml",
+  "environment_config": "config/environment.yaml",
+  "equation_registry": "docs/01_equation_registry.md",
+  "data_dictionary": "docs/02_data_dictionary.md",
+  "created_at": "2026-05-25",
+  "updated_at": "2026-05-25",
+  "notes": "Registry metadata only; executable model files live under model/."
+}
+

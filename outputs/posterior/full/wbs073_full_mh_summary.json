@@ -1,0 +1,173 @@
+{
+  "abort_artifact_handling": "raw_chain_files_kept_on_external_scratch_if_present",
+  "abort_c_free_gb": 30.0,
+  "abort_d_free_gb": 50.0,
+  "approved_blocks": 2,
+  "chains": 4,
+  "command": [
+    "C:\\Users\\bruno\\AppData\\Local\\Microsoft\\WinGet\\Links\\dynare.CMD",
+    "samba_classic.mod",
+    "noclearall",
+    "nolog"
+  ],
+  "disk_abort": true,
+  "disk_abort_telemetry_record": {
+    "c_drive": "C:\\",
+    "c_free_gb": 151.364,
+    "child_pid": 35316,
+    "d_drive": "D:\\",
+    "d_free_gb": 49.937,
+    "elapsed_seconds": 32065.922,
+    "runtime_process_ids": [
+      5896,
+      36060
+    ],
+    "timestamp": "2026-06-07T07:24:51.453567+00:00"
+  },
+  "disk_telemetry_file": "outputs/posterior/full/wbs073_disk_telemetry.jsonl",
+  "disk_telemetry_interval_seconds": 60.0,
+  "dynare_default_mh_jscale": null,
+  "elapsed_seconds": 32071.828,
+  "error": "Full-MH disk guard abort: D: free space 49.937 GB is below hard threshold 50.000 GB.",
+  "estimation_smoke": false,
+  "finite_likelihood_reported": true,
+  "full_mh": true,
+  "full_mh_created": false,
+  "likelihood_data_file": "classic_mvp_dynare.csv",
+  "likelihood_data_source": "C:\\Users\\bruno\\Desktop\\Codex\\SAMBA\\data\\model_input\\classic_mvp.csv",
+  "likelihood_data_transformations": {
+    "q": "percent difference from sample mean",
+    "r_t": "demeaned level, using source column r",
+    "y_c_i_g": "first log-difference, demeaned"
+  },
+  "likelihood_last_finite_value": -456.997406,
+  "likelihood_lines_found": 5,
+  "likelihood_measurement_errors": {
+    "y": {
+      "rationale": "GDP growth measurement error documented by WP239 and needed to avoid singular likelihood for y,c,i,g.",
+      "source": "BCB_WP239",
+      "source_location": "WP239 Table 3 measurement errors, PDF page 99 printed page 98",
+      "stderr": 0.08
+    }
+  },
+  "likelihood_nonfinite_value_count": 0,
+  "likelihood_numeric_values_found": 3,
+  "likelihood_observable_columns": [
+    "y",
+    "c",
+    "i",
+    "g",
+    "q",
+    "r_t"
+  ],
+  "likelihood_observation_count": 67,
+  "manifest": "outputs/posterior/full/wbs073_full_mh_manifest.json",
+  "mh_acceptance_in_target_band": false,
+  "mh_acceptance_lines": [
+    "Chain  1: 30.705%",
+    "Chain  2: 18.17%",
+    "Chain  3: 13.61%",
+    "Chain  4: 12.315%"
+  ],
+  "mh_acceptance_lines_found": 4,
+  "mh_acceptance_ratio": 0.187,
+  "mh_acceptance_values": [
+    0.30705,
+    0.18170000000000003,
+    0.1361,
+    0.12315
+  ],
+  "mh_chains_completed": true,
+  "mh_drop": 0.5,
+  "mh_jscale": 0.337313,
+  "mh_jscale_source": "config",
+  "mh_nblocks": 4,
+  "mh_nonfinite_token_count": 0,
+  "mh_nonfinite_tokens": [],
+  "mh_pilot": false,
+  "mh_replic": 20000,
+  "mode": "full-mh",
+  "mode_compute": 4,
+  "model_file": "C:\\Users\\bruno\\Desktop\\Codex\\SAMBA\\model\\samba_classic\\samba_classic.mod",
+  "persistent_outputs_created": false,
+  "posterior_inference_claimed": false,
+  "posterior_mode": false,
+  "process_cleanup": [
+    {
+      "method": "taskkill /T /F",
+      "pid": 35316,
+      "returncode": 0,
+      "stderr_tail": "",
+      "stdout_tail": "\u00c3\u0160XITO: o processo com PID 3184 (processo filho de PID 17924) foi finalizado.\n\u00c3\u0160XITO: o processo com PID 36060 (processo filho de PID 17924) foi finalizado.\n\u00c3\u0160XITO: o processo com PID 17924 (processo filho de PID 5896) foi finalizado.\n\u00c3\u0160XITO: o processo com PID 5896 (processo filho de PID 35316) foi finalizado.\n\u00c3\u0160XITO: o processo com PID 35316 (processo filho de PID 31996) foi finalizado."
+    },
+    {
+      "method": "taskkill /T /F",
+      "pid": 5896,
+      "returncode": 255,
+      "stderr_tail": "ERRO: o processo com PID 5896 (processo filho de PID 35316) n\u00c3\u00a3o p\u00c3\u00b4de ser finalizado.\nRaz\u00c3\u00a3o: N\u00c3\u00a3o h\u00c3\u00a1 ocorr\u00c3\u00aancia da tarefa em execu\u00c3\u00a7\u00c3\u00a3o.\n",
+      "stdout_tail": ""
+    }
+  ],
+  "publication_grade_posterior_evidence": false,
+  "repo_output_dir": "outputs/posterior/full",
+  "returncode": 125,
+  "rhat_chain_count": 4,
+  "rhat_draws_per_chain": 10000,
+  "rhat_max": 4.054739157907651,
+  "rhat_parameter_count": 28,
+  "rhat_policy": "blocking_if_unavailable_or_above_threshold",
+  "rhat_status": "above_threshold",
+  "rhat_value": 4.054739157907651,
+  "rhat_values": [
+    1.084615697037656,
+    3.884134034853038,
+    1.0376955576687945,
+    1.3766927622590648,
+    1.389304039036907,
+    1.1755205940299063,
+    4.054739157907651,
+    3.603213649692588,
+    1.16819315675433,
+    1.0336656360678287,
+    1.0025535378835022,
+    1.0122748981035168,
+    1.0117961153728399,
+    1.0132145766810627,
+    1.0603507634817744,
+    1.055752952327089,
+    1.025488441120177,
+    1.008421572514649,
+    1.0046641954779982,
+    1.0645180771331741,
+    1.026488643339309,
+    1.0141593621293363,
+    1.0409597064859872,
+    1.0088969550664608,
+    1.0039845768416085,
+    1.0711319095140712,
+    3.181717392479583,
+    1.1700524661795508
+  ],
+  "scratch_output_dir": "D:\\SAMBA_RUN\\scratch_output\\posterior\\full",
+  "status": "failed",
+  "storage_preflight": {
+    "c_drive": "C:\\",
+    "c_free_gb": 152.955,
+    "checked_directories": [
+      "D:\\SAMBA_RUN\\work",
+      "D:\\SAMBA_RUN\\tmp",
+      "D:\\SAMBA_RUN\\scratch_output\\posterior\\full"
+    ],
+    "errors": [],
+    "external_drive": "D:\\",
+    "external_free_gb": 923.404,
+    "required_c_free_gb": 30.0,
+    "required_external_free_gb": 500.0,
+    "status": "passed"
+  },
+  "target_acceptance_central": 0.234,
+  "tmp_dir": "D:\\SAMBA_RUN\\tmp",
+  "wbs": "WBS-073",
+  "work_dir": "D:\\SAMBA_RUN\\work",
+  "working_directory": "external_scratch"
+}

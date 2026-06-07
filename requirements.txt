@@ -1,0 +1,4 @@
+# Compatibility file. pyproject.toml is the source of truth.
+pytest>=8
+PyYAML>=6
+

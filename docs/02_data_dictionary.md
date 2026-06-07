@@ -1,0 +1,353 @@
+# Data Dictionary - samba-dsge-br
+
+**Documento:** `docs/02_data_dictionary.md`
+**Status:** Gate 1b approved for core source IDs
+**Fonte canonica:** `samba_dsge_br_spec_standalone_consolidado.md`
+**Gate anterior:** Gate 0 approved
+**Criado em:** 2026-05-25
+
+---
+
+## 0. Gate status
+
+```yaml
+gate: Gate 1b
+gate_status: approved
+gate1b_passed: true
+data_extraction_allowed: true
+data_extraction_status: completed_wbs052_core_dataset
+data_extraction_blocker: "None for WBS-052 core dataset; later model, Dynare, estimation, Redux, and sovereign work remain blocked."
+core_source_ids_verified: true
+decision_status: approved
+approved_by: Bruno
+approval_date: 2026-05-26
+approval_basis: "Objective Gate 1b checklist authorized by Bruno: nine core sources have verified source_id values and no TBD placeholders."
+source_id_invention_allowed: false
+final_revised_and_realtime_must_not_mix: true
+```
+
+Gate 1b is passed for core source ID verification. WBS-052 generated the core final-revised dataset from verified sources only.
+
+---
+
+## 1. Source policy
+
+```text
+- Nenhum source_id pode ser inventado por memoria interna.
+- Fonte generica isolada, como "BCB" ou "IBGE", nao basta.
+- Se a fonte nao estiver verificada, usar TBD-verify-in-task-<WBS-ID>.
+- Gate 1a permite placeholders.
+- Gate 1b exige source_id verificado para os core sources.
+- Nenhum dado real deve ser extraido, transformado ou salvo antes de Gate 1b.
+- Dados final-revised e real-time vintage nao podem ser misturados no mesmo experimento.
+```
+
+---
+
+## 2. DataSeries schema
+
+Required metadata fields for every planned series:
+
+```text
+series_id
+variable
+description
+source
+source_id
+source_status
+revision_policy
+vintage_date
+base_year
+frequency_raw
+frequency_model
+seasonal_adjustment
+transform
+quarterly_conversion
+sample_scope
+wbs
+gate_status
+notes
+```
+
+Allowed placeholder format for unverified non-core or deferred series:
+
+```text
+TBD-verify-in-task-<WBS-ID>
+```
+
+---
+
+## 3. Core sources required for Gate 1b
+
+The following core sources must have verified `source_id` values before extraction, transformation, or dataset generation.
+
+```csv
+series_id,variable,description,source,source_id,source_status,revision_policy,frequency_model,wbs,gate_status
+br_gdp_real,y,PIB real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1,verified,final_revised,quarterly,WBS-024,Gate 1b source verified
+br_ipca_headline,pi,Inflacao IPCA cheia variacao mensal,IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo,IBGE-SIDRA-IPCA-1737-v63-n1-1,verified,final_revised,quarterly,WBS-025,Gate 1b source verified
+br_selic,r,Taxa Selic meta definida pelo Copom,Banco Central do Brasil SGS,BCB-SGS-432,verified,final_revised,quarterly,WBS-026,Gate 1b source verified
+br_real_exchange_rate,q,Cambio real efetivo IPCA with q_t up as BRL real depreciation,Banco Central do Brasil SGS,BCB-SGS-11752,verified,final_revised,quarterly,WBS-027,Gate 1b source verified
+br_private_consumption,c,Consumo privado real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1,verified,final_revised,quarterly,WBS-045,Gate 1b source verified
+br_investment,i,Investimento real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93406-n1-1,verified,final_revised,quarterly,WBS-046,Gate 1b source verified
+br_government_consumption,g,Gasto do governo real seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93405-n1-1,verified,final_revised,quarterly,WBS-047,Gate 1b source verified
+br_exports,x,Exportacoes reais seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93407-n1-1,verified,final_revised,quarterly,WBS-048,Gate 1b source verified
+br_imports,m,Importacoes reais seasonally adjusted chained volume index,IBGE SIDRA Contas Nacionais Trimestrais,IBGE-SIDRA-CNT-1621-v584-c11255-93408-n1-1,verified,final_revised,quarterly,WBS-049,Gate 1b source verified
+```
+
+### 3.1 Verified source notes
+
+```text
+WBS-024 br_gdp_real:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 90707 PIB a precos de mercado; N1 Brasil.
+- no data was extracted or saved in WBS-024.
+
+WBS-025 br_ipca_headline:
+- source: IBGE SIDRA Indice Nacional de Precos ao Consumidor Amplo.
+- source_id: IBGE-SIDRA-IPCA-1737-v63-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1737.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1737/metadados.
+- source meaning: table 1737 IPCA serie historica; variable 63 IPCA variacao mensal; N1 Brasil.
+- quarterly transformation contract is defined in WBS-031; no data was extracted or saved in WBS-025.
+
+WBS-026 br_selic:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-432.
+- official SGS page: https://www.bcb.gov.br/estatisticas/sgs.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json.
+- source meaning: Meta Selic definida pelo Copom, baseline observable for the policy rate `r`.
+- Selic over SGS 11 is a documented alternative for later measurement-equation review, not the WBS-026 baseline.
+- interest-rate transformation contract is defined in WBS-032; no data was extracted or saved in WBS-026.
+
+WBS-027 br_real_exchange_rate:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-11752.
+- official SGS page: https://www.bcb.gov.br/estatisticas/sgs.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.11752/dados?formato=json.
+- source meaning: Indice da taxa de cambio real efetiva (IPCA), Jun/1994=100.
+- project convention remains `q_t` up = BRL real depreciation.
+- nominal exchange rate or bilateral real USD measures are documented alternatives for later measurement-equation review, not the WBS-027 baseline.
+- quarterly conversion remains future Gate 1b work; no dataset was generated or saved in WBS-027.
+
+WBS-045 br_private_consumption:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93404 Despesa de consumo das familias; N1 Brasil.
+- no data was extracted or saved in WBS-045.
+
+WBS-046 br_investment:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93406-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93406 Formacao bruta de capital fixo; N1 Brasil.
+- no data was extracted or saved in WBS-046.
+
+WBS-047 br_government_consumption:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93405-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93405 Despesa de consumo da administracao publica; N1 Brasil.
+- no data was extracted or saved in WBS-047.
+
+WBS-048 br_exports:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93407-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93407 Exportacao de bens e servicos; N1 Brasil.
+- no data was extracted or saved in WBS-048.
+
+WBS-049 br_imports:
+- source: IBGE SIDRA Contas Nacionais Trimestrais.
+- source_id: IBGE-SIDRA-CNT-1621-v584-c11255-93408-n1-1.
+- official table URL: https://sidra.ibge.gov.br/tabela/1621.
+- metadata API: https://servicodados.ibge.gov.br/api/v3/agregados/1621/metadados.
+- source meaning: table 1621 seasonally adjusted chained quarterly volume index; variable 584; classification 11255; category 93408 Importacao de bens e servicos (-); N1 Brasil.
+- no data was extracted or saved in WBS-049.
+```
+
+---
+
+## 4. Additional planned MVP observables
+
+These planned observables do not block Gate 1b when core sources are verified. Any unverified non-core source must remain `TBD-verify-in-task-*`.
+
+```csv
+series_id,variable,description,source,source_id,source_status,revision_policy,frequency_model,wbs,gate_status
+br_ipca_free,pi_f,Inflacao de precos livres,Banco Central do Brasil SGS,BCB-SGS-11428,verified,final_revised,quarterly,WBS-050,Gate 1b source verified
+br_ipca_administered,pi_a,Inflacao de precos administrados monitorados,Banco Central do Brasil SGS,BCB-SGS-4449,verified,final_revised,quarterly,WBS-050,Gate 1b source verified
+br_import_price_inflation,pi_m,Inflacao de importados,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
+br_inflation_target,pi_target,Meta de inflacao,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
+br_risk_premium,risk,Premio de risco domestico if needed for estimation,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
+br_output_gap,y_gap,Hiato do produto measurement candidate,TBD,TBD-verify-in-task-WBS-051,tbd,final_revised,quarterly,WBS-051,Gate 1a skeleton
+```
+
+### 4.1 Auxiliary source notes
+
+```text
+WBS-050 br_ipca_free:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-11428.
+- official dataset URL: https://dadosabertos.bcb.gov.br/dataset/11428-indice-nacional-de-precos-ao-consumidor---amplo-ipca---itens-livres.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.11428/dados?formato=json.
+- source meaning: IPCA itens livres, variacao percentual mensal.
+- quarterly transformation contract is defined in WBS-031; no data was extracted or saved in WBS-050.
+
+WBS-050 br_ipca_administered:
+- source: Banco Central do Brasil SGS.
+- source_id: BCB-SGS-4449.
+- official dataset URL: https://dadosabertos.bcb.gov.br/dataset/4449-indice-nacional-de-precos-ao-consumidor-amplo-ipca---precos-monitorados---total.
+- official API: https://api.bcb.gov.br/dados/serie/bcdata.sgs.4449/dados?formato=json.
+- source meaning: IPCA precos monitorados/administrados total, variacao percentual mensal.
+- quarterly transformation contract is defined in WBS-031; no data was extracted or saved in WBS-050.
+
+WBS-051 br_import_price_inflation:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- WBS-051 permits pinned source or TBD for non-core auxiliary/external series.
+- no reproducible source_id was pinned without a measurement decision for imported inflation.
+- no data was extracted or saved in WBS-051.
+
+WBS-051 br_inflation_target:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- pi_target_t is explicit and exogenous/deterministic in the calibrated MVP.
+- official target source must be pinned before data generation.
+- no data was extracted or saved in WBS-051.
+
+WBS-051 br_risk_premium:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- risk_t has an AR(1) structural process, but the observable proxy is not pinned here.
+- proxy selection such as EMBI, CDS, or another country-risk measure is a future measurement/source decision.
+- no data was extracted or saved in WBS-051.
+
+WBS-051 br_output_gap:
+- source_selection_deferred: source remains TBD-verify-in-task-WBS-051.
+- y_gap_t is structural in the MVP; its measurement equation is future Gate 1/2 work.
+- no observable output-gap source is pinned in WBS-051.
+- no data was extracted or saved in WBS-051.
+```
+
+---
+
+## 5. Transformation rules to finalize later
+
+```text
+- Inflation: compound monthly inflation or use index log-difference; never simple average of monthly inflation.
+- Interest rates: quarterly average or effective quarterly rate, chosen by measurement equation.
+- Exchange rate: quarterly average baseline; end-of-period only for robustness.
+- Expectations: average or end-of-quarter rule must be defined before estimation.
+- Real activity: seasonally adjusted real series when appropriate.
+- `y_gap_t` is structural in the MVP; measurement equation is future Gate 1/2 work.
+```
+
+### 5.1 WBS-031 inflation transformation contract
+
+```yaml
+wbs: WBS-031
+status: contract_defined_no_data_created
+applies_to:
+  - br_ipca_headline
+  - br_ipca_free
+  - br_ipca_administered
+  - br_import_price_inflation_when_source_is_pinned
+monthly_percent_input_rule: "quarterly_rate = product(1 + monthly_percent / 100) - 1"
+index_input_rule: "quarterly_log_change = log(index_last_month_of_quarter) - log(index_last_month_previous_quarter)"
+simple_average_for_quarterly_inflation: forbidden
+missing_month_rule: "quarter is invalid until all required monthly observations are present"
+output_unit_for_dataset_contract: decimal_rate
+model_scaling: "percent or annualized scaling remains a measurement-equation choice, not a data-source change"
+pi_target_scope: "pi_target is deterministic/exogenous in the calibrated MVP and is not transformed by WBS-031 until its source is pinned"
+data_created: false
+pipeline_created: false
+```
+
+### 5.2 WBS-032 interest-rate transformation contract
+
+```yaml
+wbs: WBS-032
+status: contract_defined_no_data_created
+applies_to:
+  - br_selic
+baseline_source: BCB-SGS-432
+baseline_measure: Selic target level defined by Copom
+raw_unit_expected: annual_percent_rate
+quarterly_level_rule: "quarterly_policy_rate = arithmetic_average(raw_annual_percent_rate_observations_in_quarter)"
+effective_quarterly_rule: "quarterly_effective_rate = (1 + quarterly_policy_rate / 100)^(1 / 4) - 1"
+missing_observation_rule: "quarter is invalid until the required source observations for the chosen frequency are present"
+selic_over_alternative: "BCB-SGS-11 remains a documented alternative for later measurement-equation review, not the WBS-032 baseline"
+output_unit_for_dataset_contract: annual_percent_rate
+model_scaling: "deviation from steady state, annualized percent, or quarterly effective decimal remains a measurement-equation choice"
+data_created: false
+pipeline_created: false
+```
+
+### 5.3 WBS-028 quarterly frequency validation contract
+
+```yaml
+wbs: WBS-028
+status: validation_contract_defined_no_data_created
+frequency_model_required: quarterly
+applies_to: all_planned_observables
+validation_rule: "every observable row must declare frequency_model = quarterly before dataset generation"
+raw_frequency_policy: "monthly, daily, or irregular raw sources require explicit quarterly conversion before WBS-052"
+failure_condition: "missing or non-quarterly frequency_model fails validation"
+data_created: false
+pipeline_created: false
+```
+
+### 5.4 WBS-029 revision-policy validation contract
+
+```yaml
+wbs: WBS-029
+status: validation_contract_defined_no_data_created
+experiment_revision_policy_required: final_revised
+applies_to: all_planned_observables
+validation_rule: "all observable rows in one experiment must share the same revision_policy"
+current_mvp_policy: final_revised
+forbidden_mix:
+  - final_revised
+  - real_time_vintage
+failure_condition: "mixing final_revised and real_time_vintage fails validation"
+future_operational_policy: "real_time_vintage is out_of_mvp and must use a separate experiment config"
+data_created: false
+pipeline_created: false
+```
+
+### 5.5 WBS-030 missing-policy validation contract
+
+```yaml
+wbs: WBS-030
+status: validation_contract_defined_no_data_created
+applies_to: all_planned_observables
+silent_missing: forbidden
+default_interpolation: forbidden
+required_missing_flags:
+  - missing_source_observation
+  - incomplete_quarter
+  - transformation_not_computed
+baseline_action: "drop or fail the affected quarter before dataset generation; do not fill silently"
+future_interpolation_policy: "any interpolation or nowcast must be explicit, source-tagged, and outside the default MVP dataset"
+failure_condition: "missing observation without a missing flag fails validation"
+data_created: false
+pipeline_created: false
+```
+
+---
+
+## 6. Gate 1b acceptance
+
+Gate 1b is satisfied by the current dictionary because:
+
+```text
+- nine core sources are listed for PIB, IPCA, Selic, cambio, consumo, investimento, governo, exportacoes, importacoes;
+- each core source has a verified source_id;
+- no core source uses TBD;
+- auxiliary non-core sources can remain TBD when not objectively pinned;
+- no data file is created by Gate 1b approval.
+```

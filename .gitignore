@@ -18,13 +18,16 @@ Thumbs.db
 *.tmp
 
 # Data/output artifacts that should be intentionally versioned only when needed
-data/raw/
-data/interim/
-data/clean/
-data/observables/
-data/model_input/
+data/*
+!data/observables/
+!data/observables/**
+!data/model_input/
+!data/model_input/**
 outputs/
+!outputs/
+outputs/*
 !outputs/schema/
+!outputs/schema/**
 
 # Dynare/MATLAB generated artifacts
 *.asv
@@ -34,4 +37,3 @@ outputs/
 *_set_auxiliary_variables.m
 *_results.mat
 *_mode.mat
-

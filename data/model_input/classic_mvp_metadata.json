@@ -1,0 +1,104 @@
+{
+  "wbs": "WBS-052",
+  "status": "generated_from_verified_sources",
+  "sample": {
+    "start": "2003Q1",
+    "end": "2019Q4",
+    "frequency": "quarterly",
+    "revision_policy": "final_revised"
+  },
+  "rows": 68,
+  "model_input": "data/model_input/classic_mvp.csv",
+  "observables_dir": "data/observables",
+  "source_ids": {
+    "br_gdp_real": "IBGE-SIDRA-CNT-1621-v584-c11255-90707-n1-1",
+    "br_private_consumption": "IBGE-SIDRA-CNT-1621-v584-c11255-93404-n1-1",
+    "br_investment": "IBGE-SIDRA-CNT-1621-v584-c11255-93406-n1-1",
+    "br_government_consumption": "IBGE-SIDRA-CNT-1621-v584-c11255-93405-n1-1",
+    "br_exports": "IBGE-SIDRA-CNT-1621-v584-c11255-93407-n1-1",
+    "br_imports": "IBGE-SIDRA-CNT-1621-v584-c11255-93408-n1-1",
+    "br_ipca_headline": "IBGE-SIDRA-IPCA-1737-v63-n1-1",
+    "br_selic": "BCB-SGS-432",
+    "br_real_exchange_rate": "BCB-SGS-11752"
+  },
+  "fetch_log": [
+    {
+      "series_id": "br_gdp_real",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1621/n1/all/v/584/p/200301-201904/c11255/90707?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_private_consumption",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1621/n1/all/v/584/p/200301-201904/c11255/93404?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_investment",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1621/n1/all/v/584/p/200301-201904/c11255/93406?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_government_consumption",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1621/n1/all/v/584/p/200301-201904/c11255/93405?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_exports",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1621/n1/all/v/584/p/200301-201904/c11255/93407?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_imports",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1621/n1/all/v/584/p/200301-201904/c11255/93408?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_ipca_headline",
+      "urls": [
+        "https://apisidra.ibge.gov.br/values/t/1737/n1/all/v/63/p/200301-201912?formato=json"
+      ]
+    },
+    {
+      "series_id": "br_selic",
+      "urls": [
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2003&dataFinal=31/12/2003",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2004&dataFinal=31/12/2004",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2005&dataFinal=31/12/2005",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2006&dataFinal=31/12/2006",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2007&dataFinal=31/12/2007",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2008&dataFinal=31/12/2008",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2009&dataFinal=31/12/2009",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2010&dataFinal=31/12/2010",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2011&dataFinal=31/12/2011",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2012&dataFinal=31/12/2012",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2013&dataFinal=31/12/2013",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2014&dataFinal=31/12/2014",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2015&dataFinal=31/12/2015",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2016&dataFinal=31/12/2016",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2017&dataFinal=31/12/2017",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2018&dataFinal=31/12/2018",
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=01/01/2019&dataFinal=31/12/2019"
+      ]
+    },
+    {
+      "series_id": "br_real_exchange_rate",
+      "urls": [
+        "https://api.bcb.gov.br/dados/serie/bcdata.sgs.11752/dados?formato=json&dataInicial=01/01/2003&dataFinal=31/12/2019"
+      ]
+    }
+  ],
+  "rules": {
+    "inflation": "compound monthly percent rates to quarterly decimal rate",
+    "selic": "quarterly arithmetic average of observed annual percent-rate target",
+    "real_exchange_rate": "quarterly arithmetic average of monthly real effective exchange-rate index",
+    "real_activity": "source quarterly seasonally adjusted volume index levels"
+  },
+  "no_source_id_invention": true,
+  "no_model_or_dynare_files_created": true
+}
